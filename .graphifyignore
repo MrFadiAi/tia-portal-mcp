@@ -66,6 +66,3 @@ nunit-*.xml
 
 .claude/settings.local.json
 priv/
-graphify-out/cache/
-graphify-out/manifest.json
-graphify-out/cost.json
