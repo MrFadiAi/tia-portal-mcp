@@ -14,12 +14,14 @@
 
   <ItemGroup>
     <Reference Include="Siemens.Engineering.Base">
-      <HintPath>$(TiaPortalV21Dir)\Siemens.Engineering.Base.dll</HintPath>
+      <HintPath>..\ref\Siemens.Engineering.Base.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
     <Reference Include="Siemens.Engineering.Step7">
-      <HintPath>$(TiaPortalV21Dir)\Siemens.Engineering.Step7.dll</HintPath>
+      <HintPath>..\ref\Siemens.Engineering.Step7.dll</HintPath>
       <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
     </Reference>
   </ItemGroup>
 </Project>

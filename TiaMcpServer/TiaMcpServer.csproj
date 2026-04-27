@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>tia-mcp-server</ToolCommandName>
+    <ToolCommandName>tia-mcp</ToolCommandName>
     <PackageId>TiaMcpServer</PackageId>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>

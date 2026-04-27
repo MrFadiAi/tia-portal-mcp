@@ -1,0 +1,42 @@
+name: Publish .NET Global Tool
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-and-publish:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore TiaMcpServer.sln
+
+      - name: Build and Pack
+        run: dotnet pack TiaMcpServer/TiaMcpServer.csproj -c Release --no-restore -o ./out
+
+      - name: Push to NuGet
+        run: dotnet nuget push "./out/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+      - name: Publish Standalone Binary
+        run: dotnet publish TiaMcpServer/TiaMcpServer.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PackAsTool=false -o ./publish-bin
+
+      - name: Zip Standalone Binary
+        run: Compress-Archive -Path ./publish-bin/* -DestinationPath ./out/tia-mcp-windows-x64.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            out/*.nupkg
+            out/tia-mcp-windows-x64.zip
+          generate_release_notes: true
