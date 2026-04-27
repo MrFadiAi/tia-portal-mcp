@@ -39,7 +39,7 @@ jobs:
     
       # Push the package
       - name: NuGet push
-        run: dotnet nuget push "./tia-portal-mcp/out/*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
+        run: dotnet nuget push "~/tia-portal-mcp/out/*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json --skip-duplicate
 
       - name: Publish Standalone Binary
         run: dotnet publish TiaMcpServer/TiaMcpServer.csproj -c Release -r win-x64 --self-contained true /p:PublishSingleFile=true /p:PackAsTool=false -o ./publish-bin
