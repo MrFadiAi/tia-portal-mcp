@@ -15,15 +15,110 @@ public class OpennessWorkerClient
 
     private static readonly TimeSpan WorkerTimeout = TimeSpan.FromMinutes(5);
 
+    private readonly ProjectSessionBinding _projectSessionBinding;
+
+    public OpennessWorkerClient(ProjectSessionBinding projectSessionBinding)
+    {
+        _projectSessionBinding = projectSessionBinding;
+    }
+
     public async Task<string> BrowseProjectTreeAsync(string? projectPath)
     {
         try
         {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
             var response = await SendAsync(
                 new WorkerRequest
                 {
                     Method = "browse_project_tree",
-                    ProjectPath = projectPath
+                    ProjectPath = effectiveProjectPath
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "get_block_content",
+                    BlockPath = blockPath,
+                    ProjectPath = effectiveProjectPath
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? string.Empty
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> UpdateBlockLogicAsync(string blockPath, string yamlContent, string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "update_block_logic",
+                    BlockPath = blockPath,
+                    YamlContent = yamlContent,
+                    ProjectPath = effectiveProjectPath,
+                    AllowTiaConfirmations = true
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? string.Empty
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ListTagTablesAsync(string? plcName, string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "list_tag_tables",
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath
                 }).ConfigureAwait(false);
 
             return response.Success

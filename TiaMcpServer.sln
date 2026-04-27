@@ -8,6 +8,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaMcpServer.Contracts", "T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaMcpServer.OpennessWorker", "TiaMcpServer.OpennessWorker\TiaMcpServer.OpennessWorker.csproj", "{87A8D3DA-F0ED-4D39-9D46-45210CC4BD59}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TiaMcpServer.Tests", "TiaMcpServer.Tests\TiaMcpServer.Tests.csproj", "{BCAB91F2-4572-4C73-B415-46C76E21C093}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +28,10 @@ Global
 		{87A8D3DA-F0ED-4D39-9D46-45210CC4BD59}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{87A8D3DA-F0ED-4D39-9D46-45210CC4BD59}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{87A8D3DA-F0ED-4D39-9D46-45210CC4BD59}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCAB91F2-4572-4C73-B415-46C76E21C093}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCAB91F2-4572-4C73-B415-46C76E21C093}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCAB91F2-4572-4C73-B415-46C76E21C093}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCAB91F2-4572-4C73-B415-46C76E21C093}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

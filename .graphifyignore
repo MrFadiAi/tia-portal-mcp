@@ -64,5 +64,12 @@ nunit-*.xml
 
 .idea/
 
-.claude/settings.local.json
+.claude/
+.codex/
+.gemini/
+
 priv/
+
+AGENTS.md
+CLAUDE.md
+GEMINI.md

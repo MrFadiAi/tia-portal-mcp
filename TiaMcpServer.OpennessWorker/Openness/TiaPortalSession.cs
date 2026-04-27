@@ -7,8 +7,14 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 public class TiaPortalSession : IDisposable
 {
+    private readonly bool _allowTiaConfirmations;
     private TiaPortal? _tiaPortal;
     private bool _disposed;
+
+    public TiaPortalSession(bool allowTiaConfirmations = false)
+    {
+        _allowTiaConfirmations = allowTiaConfirmations;
+    }
 
     public Project? Project { get; private set; }
 
@@ -70,9 +76,11 @@ public class TiaPortalSession : IDisposable
         Console.Error.WriteLine($"TIA Notification: {e.Text}");
     }
 
-    private static void OnConfirmation(object? sender, ConfirmationEventArgs e)
+    private void OnConfirmation(object? sender, ConfirmationEventArgs e)
     {
-        e.Result = ConfirmationResult.Yes;
+        e.Result = _allowTiaConfirmations
+            ? ConfirmationResult.Yes
+            : ConfirmationResult.No;
     }
 
     private void OnDisposed(object? sender, EventArgs e)

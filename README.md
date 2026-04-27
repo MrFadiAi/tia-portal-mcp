@@ -2,9 +2,12 @@
 
 MCP server for Siemens SIMATIC TIA Portal V21. It lets MCP clients and AI agents inspect a running TIA Portal project through the Siemens Openness API.
 
-The server currently exposes one tool:
+The server currently exposes four tools:
 
-- `browse_project_tree` - recursively enumerates TIA devices, PLC software, program blocks, PLC tags, and PLC data types, returning a JSON project tree.
+- `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details.
+- `get_block_content` - exports a PLC block to its SIMATIC SD document representation.
+- `update_block_logic` - imports SIMATIC SD document content to update or create a PLC block. Requires `confirm=true`.
+- `list_tag_tables` - retrieves PLC tag tables, tags, and user constants.
 
 ## Architecture
 
@@ -23,7 +26,7 @@ The MCP host starts the worker on demand and exchanges newline-delimited JSON ov
 - Siemens TIA Portal V21 installed
 - TIA Portal Openness installed and enabled
 - Current Windows user is a member of the `Siemens TIA Openness` user group
-- .NET SDK 8 or newer
+- .NET SDK 8.0.4xx or newer 8.0 feature band. The repo includes `global.json` to prefer .NET SDK 8 for builds.
 - .NET Framework 4.8 Developer Pack or targeting pack
 
 By default, the build expects Openness DLLs here:
@@ -95,17 +98,40 @@ Run the installed server:
 tia-mcp-server
 ```
 
+To bind an MCP server process to a specific project, pass `--project` or set `TIA_MCP_PROJECT_PATH`:
+
+```powershell
+tia-mcp-server --project C:\Projects\Line.ap21
+$env:TIA_MCP_PROJECT_PATH = 'C:\Projects\Line.ap21'
+tia-mcp-server
+```
+
+Once a server process is bound to a project path, later tool calls with a different `projectPath` are rejected. Start a new MCP session for a different customer project.
+
+## Block Paths
+
+Prefer block paths returned in `browse_project_tree` node `Details.Path` values. Supported block path forms are:
+
+```text
+BlockName
+PLC_1/BlockName
+PLC_1/Blocks/Folder/SubFolder/BlockName
+PLC_1/Units/UnitName/Blocks/Folder/SubFolder/BlockName
+```
+
+Legacy `BlockName` and `PLC_1/BlockName` paths are accepted only when the block name is unambiguous. If more than one block has the same name, use the deterministic `Path` returned by `browse_project_tree`.
+
 The package includes the `openness-worker` folder and required non-Siemens dependencies. It intentionally excludes `Siemens.Engineering*.dll`; those are loaded from the local TIA Portal installation at runtime.
 
 ## Roadmap
 
 Current status:
 
-- Phase 1 is implemented: MCP stdio host, TIA Openness worker bridge, and `browse_project_tree` project discovery.
+- Phase 1 is implemented: MCP stdio host, TIA Openness worker bridge, and `browse_project_tree` project discovery, including Software Units.
+- Phase 2 is implemented for SIMATIC SD document export/import through `get_block_content` and `update_block_logic`.
 
 Planned next phases:
 
-- Phase 2: universal block support through V21 YAML export/import, including SCL, LAD, FBD, Graph, STL, global DBs, and instance DBs.
 - Phase 3: hardware and network discovery, including rack configuration, I/O modules, PROFINET device names, and Network View data where available through Openness.
 - Phase 4: advanced diagnostics, including compile/check-syntax results and cross-reference style project analysis for AI-assisted review.
 
@@ -154,3 +180,4 @@ For local development without installing the tool, point the client at `dotnet`:
 - Openness DLL not found: verify TIA Portal V21 is installed and set `TiaPortalV21Dir` to the `PublicAPI\V21\net48` folder if your install path is non-standard.
 - No running TIA Portal instance: start TIA Portal V21 before calling `browse_project_tree`.
 - Access denied or attach failure: confirm the Windows user belongs to the `Siemens TIA Openness` user group, then sign out and back in.
+- `dotnet` selects the wrong SDK: install .NET SDK 8.0.4xx or update `global.json` to a locally installed .NET 8 SDK feature band.

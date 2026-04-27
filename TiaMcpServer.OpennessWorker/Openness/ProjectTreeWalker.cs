@@ -7,6 +7,7 @@ using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
 using Siemens.Engineering.SW.Tags;
 using Siemens.Engineering.SW.Types;
+using Siemens.Engineering.SW.Units;
 using TiaMcpServer.Contracts;
 
 namespace TiaMcpServer.OpennessWorker.Openness;
@@ -23,13 +24,17 @@ public class ProjectTreeWalker
 
             foreach (var plcSoftware in FindPlcSoftwareInDevice(device))
             {
-                children.Add(WalkPlcSoftware(plcSoftware));
+                children.Add(WalkPlcSoftware(device.Name, plcSoftware));
             }
 
             rootNodes.Add(new ProjectTreeNode
             {
                 Name = device.Name,
                 NodeType = "Device",
+                Details = new Dictionary<string, string>
+                {
+                    ["Path"] = device.Name
+                },
                 Children = children
             });
         }
@@ -70,22 +75,70 @@ public class ProjectTreeWalker
         }
     }
 
-    private static ProjectTreeNode WalkPlcSoftware(PlcSoftware plcSoftware)
+    private static ProjectTreeNode WalkPlcSoftware(string deviceName, PlcSoftware plcSoftware)
     {
+        var children = new List<ProjectTreeNode>
+        {
+            WalkBlockGroup(plcSoftware.BlockGroup, CombinePath(deviceName, "Blocks"), softwareUnitName: null),
+            WalkTagTableGroup(plcSoftware.TagTableGroup, CombinePath(deviceName, "TagTables")),
+            WalkTypeGroup(plcSoftware.TypeGroup, CombinePath(deviceName, "Types"))
+        };
+
+        children.AddRange(WalkSoftwareUnits(deviceName, plcSoftware));
+
         return new ProjectTreeNode
         {
             Name = plcSoftware.Name,
             NodeType = "PlcSoftware",
-            Children = new List<ProjectTreeNode>
+            Details = new Dictionary<string, string>
             {
-                WalkBlockGroup(plcSoftware.BlockGroup),
-                WalkTagTableGroup(plcSoftware.TagTableGroup),
-                WalkTypeGroup(plcSoftware.TypeGroup)
-            }
+                ["Path"] = deviceName
+            },
+            Children = children
         };
     }
 
-    private static ProjectTreeNode WalkBlockGroup(PlcBlockGroup group)
+    private static IEnumerable<ProjectTreeNode> WalkSoftwareUnits(string deviceName, PlcSoftware plcSoftware)
+    {
+        PlcUnitProvider? unitProvider = null;
+
+        try
+        {
+            unitProvider = plcSoftware.GetService<PlcUnitProvider>();
+        }
+        catch (EngineeringException ex)
+        {
+            Console.Error.WriteLine($"Skipping software units for PLC software '{plcSoftware.Name}': {ex.Message}");
+        }
+
+        if (unitProvider is null)
+        {
+            yield break;
+        }
+
+        foreach (PlcUnit unit in unitProvider.UnitGroup.Units)
+        {
+            var unitPath = CombinePath(deviceName, "Units", unit.Name);
+
+            yield return new ProjectTreeNode
+            {
+                Name = unit.Name,
+                NodeType = "SoftwareUnit",
+                Details = new Dictionary<string, string>
+                {
+                    ["Path"] = unitPath
+                },
+                Children = new List<ProjectTreeNode>
+                {
+                    WalkBlockGroup(unit.BlockGroup, CombinePath(unitPath, "Blocks"), unit.Name),
+                    WalkTagTableGroup(unit.TagTableGroup, CombinePath(unitPath, "TagTables")),
+                    WalkTypeGroup(unit.TypeGroup, CombinePath(unitPath, "Types"))
+                }
+            };
+        }
+    }
+
+    private static ProjectTreeNode WalkBlockGroup(PlcBlockGroup group, string path, string? softwareUnitName)
     {
         var children = new List<ProjectTreeNode>();
 
@@ -93,6 +146,18 @@ public class ProjectTreeWalker
         {
             try
             {
+                var details = new Dictionary<string, string>
+                {
+                    ["Path"] = CombinePath(path, block.Name),
+                    ["Number"] = block.Number.ToString(),
+                    ["ProgrammingLanguage"] = block.ProgrammingLanguage.ToString()
+                };
+
+                if (softwareUnitName is not null)
+                {
+                    details["SoftwareUnit"] = softwareUnitName;
+                }
+
                 children.Add(new ProjectTreeNode
                 {
                     Name = block.Name,
@@ -106,11 +171,7 @@ public class ProjectTreeWalker
                         ArrayDB => "ArrayDB",
                         _ => "Block"
                     },
-                    Details = new Dictionary<string, string>
-                    {
-                        ["Number"] = block.Number.ToString(),
-                        ["ProgrammingLanguage"] = block.ProgrammingLanguage.ToString()
-                    }
+                    Details = details
                 });
             }
             catch (EngineeringException ex)
@@ -123,7 +184,7 @@ public class ProjectTreeWalker
         {
             try
             {
-                children.Add(WalkBlockGroup(childGroup));
+                children.Add(WalkBlockGroup(childGroup, CombinePath(path, childGroup.Name), softwareUnitName));
             }
             catch (EngineeringException ex)
             {
@@ -135,11 +196,15 @@ public class ProjectTreeWalker
         {
             Name = group.Name,
             NodeType = "BlockFolder",
+            Details = new Dictionary<string, string>
+            {
+                ["Path"] = path
+            },
             Children = children
         };
     }
 
-    private static ProjectTreeNode WalkTagTableGroup(PlcTagTableGroup group)
+    private static ProjectTreeNode WalkTagTableGroup(PlcTagTableGroup group, string path)
     {
         var children = new List<ProjectTreeNode>();
 
@@ -150,7 +215,11 @@ public class ProjectTreeWalker
                 children.Add(new ProjectTreeNode
                 {
                     Name = table.Name,
-                    NodeType = "TagTable"
+                    NodeType = "TagTable",
+                    Details = new Dictionary<string, string>
+                    {
+                        ["Path"] = CombinePath(path, table.Name)
+                    }
                 });
             }
             catch (EngineeringException ex)
@@ -163,7 +232,7 @@ public class ProjectTreeWalker
         {
             try
             {
-                children.Add(WalkTagTableGroup(childGroup));
+                children.Add(WalkTagTableGroup(childGroup, CombinePath(path, childGroup.Name)));
             }
             catch (EngineeringException ex)
             {
@@ -175,11 +244,15 @@ public class ProjectTreeWalker
         {
             Name = group.Name,
             NodeType = "TagTableFolder",
+            Details = new Dictionary<string, string>
+            {
+                ["Path"] = path
+            },
             Children = children
         };
     }
 
-    private static ProjectTreeNode WalkTypeGroup(PlcTypeGroup group)
+    private static ProjectTreeNode WalkTypeGroup(PlcTypeGroup group, string path)
     {
         var children = new List<ProjectTreeNode>();
 
@@ -190,7 +263,11 @@ public class ProjectTreeWalker
                 children.Add(new ProjectTreeNode
                 {
                     Name = type.Name,
-                    NodeType = "Type"
+                    NodeType = "Type",
+                    Details = new Dictionary<string, string>
+                    {
+                        ["Path"] = CombinePath(path, type.Name)
+                    }
                 });
             }
             catch (EngineeringException ex)
@@ -203,7 +280,7 @@ public class ProjectTreeWalker
         {
             try
             {
-                children.Add(WalkTypeGroup(childGroup));
+                children.Add(WalkTypeGroup(childGroup, CombinePath(path, childGroup.Name)));
             }
             catch (EngineeringException ex)
             {
@@ -215,7 +292,16 @@ public class ProjectTreeWalker
         {
             Name = group.Name,
             NodeType = "TypeFolder",
+            Details = new Dictionary<string, string>
+            {
+                ["Path"] = path
+            },
             Children = children
         };
+    }
+
+    private static string CombinePath(params string[] segments)
+    {
+        return string.Join("/", segments);
     }
 }
