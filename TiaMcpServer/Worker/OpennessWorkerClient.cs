@@ -48,6 +48,32 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> ReadHardwareConfigAsync(string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "read_hardware_config",
+                    ProjectPath = effectiveProjectPath
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
     public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath)
     {
         try

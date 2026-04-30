@@ -48,6 +48,7 @@ internal static class Program
             return request.Method switch
             {
                 "browse_project_tree" => BrowseProjectTree(request.ProjectPath),
+                "read_hardware_config" => ReadHardwareConfig(request.ProjectPath),
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "list_tag_tables"     => ListTagTables(request),
@@ -89,6 +90,49 @@ internal static class Program
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(tree, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ReadHardwareConfig(string? projectPath)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession();
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(projectPath))
+            {
+                session.OpenProject(projectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var config = HardwareConfigReader.Read(session.Project);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(config, JsonOptions)
             };
         }
         catch (EngineeringException ex)
