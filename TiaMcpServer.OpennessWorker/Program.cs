@@ -49,6 +49,7 @@ internal static class Program
             {
                 "browse_project_tree" => BrowseProjectTree(request.ProjectPath),
                 "read_hardware_config" => ReadHardwareConfig(request.ProjectPath),
+                "read_cross_references" => ReadCrossReferences(request),
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "list_tag_tables"     => ListTagTables(request),
@@ -133,6 +134,57 @@ internal static class Program
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(config, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ReadCrossReferences(WorkerRequest request)
+    {
+        if (!CrossReferenceFilterNames.TryNormalize(
+                request.CrossReferenceFilter,
+                out var filter,
+                out var filterError))
+        {
+            return Failure(filterError ?? "Invalid cross-reference filter.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession();
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var report = CrossReferenceReader.Read(session.Project, request.PlcName, filter);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(report, JsonOptions)
             };
         }
         catch (EngineeringException ex)

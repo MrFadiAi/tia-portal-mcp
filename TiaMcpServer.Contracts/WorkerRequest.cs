@@ -12,5 +12,7 @@ public class WorkerRequest
 
     public string? PlcName { get; set; }
 
+    public string? CrossReferenceFilter { get; set; }
+
     public bool AllowTiaConfirmations { get; set; }
 }

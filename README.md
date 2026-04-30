@@ -2,13 +2,23 @@
 
 MCP server for Siemens SIMATIC TIA Portal V21. It lets MCP clients and AI agents inspect a running TIA Portal project through the Siemens Openness API.
 
-The server currently exposes five tools:
+The current implementation covers project discovery, PLC block export/import, tag table reads, hardware/network discovery, and cross-reference diagnostics. The forward roadmap adds guarded hardware catalog search and network-device provisioning before broader compile/check diagnostics.
+
+The server currently exposes six tools:
 
 - `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details.
 - `get_block_content` - exports a PLC block to its SIMATIC SD document representation.
 - `update_block_logic` - imports SIMATIC SD document content to update or create a PLC block. Requires `confirm=true`.
 - `list_tag_tables` - retrieves PLC tag tables, tags, and user constants.
 - `read_hardware_config` - exports device hardware, rack/module items, network interfaces, node addressing, subnets, and IO systems as JSON.
+- `read_cross_references` - exports PLC cross-reference diagnostics, including source objects, referenced objects, usage locations, access types, and reference types.
+
+Planned tools are not exposed yet:
+
+- `search_equipment_catalog` - search the local TIA Portal hardware catalog, including installed GSD/HSP packages.
+- `add_network_device` - insert an exact catalog `typeIdentifier` into the project with explicit confirmation.
+- `configure_network_device` - configure IP address, subnet mask, PROFINET device name, subnet, and IO-system settings when supported by Openness.
+- `compile_check` - run compile/check operations and return diagnostics.
 
 ## Architecture
 
@@ -115,6 +125,7 @@ You can test the Openness worker directly:
 ```powershell
 '{ "method": "browse_project_tree", "projectPath": null }' | .\TiaMcpServer.OpennessWorker\bin\Debug\net48\TiaMcpServer.OpennessWorker.exe
 '{ "method": "read_hardware_config", "projectPath": null }' | .\TiaMcpServer.OpennessWorker\bin\Debug\net48\TiaMcpServer.OpennessWorker.exe
+'{ "method": "read_cross_references", "projectPath": null, "crossReferenceFilter": "ObjectsWithReferences" }' | .\TiaMcpServer.OpennessWorker\bin\Debug\net48\TiaMcpServer.OpennessWorker.exe
 ```
 
 Expected successful response shape:
@@ -157,8 +168,8 @@ npx -y @modelcontextprotocol/inspector dotnet .\TiaMcpServer\bin\Debug\net8.0\Ti
 In the Inspector UI:
 
 - Open the Tools tab.
-- Click `List Tools` and verify the five tools appear.
-- Start with read-only tools: `browse_project_tree`, `list_tag_tables`, and `read_hardware_config`.
+- Click `List Tools` and verify the six tools appear.
+- Start with read-only tools: `browse_project_tree`, `list_tag_tables`, `read_hardware_config`, and `read_cross_references`.
 - Use `get_block_content` on a block path returned by `browse_project_tree`.
 - Avoid `update_block_logic` unless the project is disposable; it writes to the TIA project and requires `confirm=true`.
 
@@ -169,6 +180,23 @@ Recommended smoke-test inputs:
 ```
 
 for `browse_project_tree` and `read_hardware_config`, or:
+
+```json
+{
+  "filter": "UnusedObjects"
+}
+```
+
+for `read_cross_references`. Large projects can return large JSON from cross-reference diagnostics; use `plcName` and `filter` to narrow the response:
+
+```json
+{
+  "plcName": "PLC_1",
+  "filter": "ObjectsWithReferences"
+}
+```
+
+Use:
 
 ```json
 {
@@ -230,10 +258,15 @@ Current status:
 - Phase 1 is implemented: MCP stdio host, TIA Openness worker bridge, and `browse_project_tree` project discovery, including Software Units.
 - Phase 2 is implemented for SIMATIC SD document export/import through `get_block_content` and `update_block_logic`.
 - Phase 3 hardware and network discovery is implemented through `read_hardware_config`.
+- Phase 4 cross-reference diagnostics is implemented through `read_cross_references`.
 
 Planned next phases:
 
-- Phase 4: advanced diagnostics, including compile/check-syntax results and cross-reference style project analysis for AI-assisted review.
+- Phase 5: hardware catalog search and guarded network-device provisioning:
+  - `search_equipment_catalog` to return installed catalog entries with `typeIdentifier`, article number, version, catalog path, and description.
+  - `add_network_device` to create a selected device from an exact `typeIdentifier`, requiring `confirm=true`.
+  - `configure_network_device` to set supported network identity fields such as IP address, subnet mask, PROFINET device name, subnet, and IO-system settings, requiring `confirm=true`.
+- Phase 6: `compile_check` for compile/check-syntax diagnostics and richer post-change validation.
 
 Possible future work:
 
