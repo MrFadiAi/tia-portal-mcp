@@ -74,6 +74,109 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "search_equipment_catalog",
+                    Query = query,
+                    ProjectPath = effectiveProjectPath
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> AddNetworkDeviceAsync(
+        string typeIdentifier,
+        string deviceName,
+        string deviceItemName,
+        string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "add_network_device",
+                    TypeIdentifier = typeIdentifier,
+                    DeviceName = deviceName,
+                    DeviceItemName = deviceItemName,
+                    ProjectPath = effectiveProjectPath,
+                    Confirm = true,
+                    AllowTiaConfirmations = true
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ConfigureNetworkDeviceAsync(
+        string deviceName,
+        string? ipAddress,
+        string? subnetMask,
+        string? pnDeviceName,
+        string? subnetName,
+        string? ioSystemName,
+        string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "configure_network_device",
+                    DeviceName = deviceName,
+                    IpAddress = ipAddress,
+                    SubnetMask = subnetMask,
+                    PnDeviceName = pnDeviceName,
+                    SubnetName = subnetName,
+                    IoSystemName = ioSystemName,
+                    ProjectPath = effectiveProjectPath,
+                    Confirm = true,
+                    AllowTiaConfirmations = true
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
     public async Task<string> ReadCrossReferencesAsync(string? projectPath, string? plcName, string? filter)
     {
         try

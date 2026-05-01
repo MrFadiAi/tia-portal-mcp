@@ -49,6 +49,9 @@ internal static class Program
             {
                 "browse_project_tree" => BrowseProjectTree(request.ProjectPath),
                 "read_hardware_config" => ReadHardwareConfig(request.ProjectPath),
+                "search_equipment_catalog" => SearchEquipmentCatalog(request),
+                "add_network_device" => AddNetworkDevice(request),
+                "configure_network_device" => ConfigureNetworkDevice(request),
                 "read_cross_references" => ReadCrossReferences(request),
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
@@ -134,6 +137,178 @@ internal static class Program
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(config, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse SearchEquipmentCatalog(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession();
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.TiaPortal is null)
+            {
+                return Failure("No TIA Portal session is connected. Please start TIA Portal and try again.");
+            }
+
+            var entries = EquipmentCatalogSearcher.Search(session.TiaPortal, request.Query!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(entries, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse AddNetworkDevice(WorkerRequest request)
+    {
+        if (!CatalogTypeIdentifier.IsCreatable(request.TypeIdentifier))
+        {
+            return Failure(CatalogTypeIdentifier.BuildValidationMessage(request.TypeIdentifier));
+        }
+
+        if (string.IsNullOrWhiteSpace(request.DeviceName))
+        {
+            return Failure("DeviceName is required.");
+        }
+
+        if (!request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with adding a network device.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = NetworkDeviceCreator.Create(
+                session.Project,
+                request.TypeIdentifier!,
+                request.DeviceName!,
+                string.IsNullOrWhiteSpace(request.DeviceItemName) ? request.DeviceName! : request.DeviceItemName!);
+
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ConfigureNetworkDevice(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.DeviceName))
+        {
+            return Failure("DeviceName is required.");
+        }
+
+        if (!request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with configuring a network device.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = NetworkDeviceConfigurator.Configure(
+                session.Project,
+                request.DeviceName!,
+                request.IpAddress,
+                request.SubnetMask,
+                request.PnDeviceName,
+                request.SubnetName,
+                request.IoSystemName);
+
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
             };
         }
         catch (EngineeringException ex)

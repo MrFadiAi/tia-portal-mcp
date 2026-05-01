@@ -9,7 +9,7 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L1",
       "id": "tiamcpserver_program_cs",
-      "community": 13,
+      "community": 15,
       "norm_label": "program.cs"
     },
     {
@@ -18,7 +18,7 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L8",
       "id": "tiamcpserver_program_tiamcpserver",
-      "community": 13,
+      "community": 15,
       "norm_label": "tiamcpserver"
     },
     {
@@ -27,7 +27,7 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L10",
       "id": "tiamcpserver_program_program",
-      "community": 13,
+      "community": 15,
       "norm_label": "program"
     },
     {
@@ -36,7 +36,7 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L17",
       "id": "tiamcpserver_program_program_currentdomain_assemblyresolve",
-      "community": 13,
+      "community": 15,
       "norm_label": ".currentdomain_assemblyresolve()"
     },
     {
@@ -45,7 +45,7 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L44",
       "id": "tiamcpserver_program_program_main",
-      "community": 13,
+      "community": 15,
       "norm_label": ".main()"
     },
     {
@@ -54,8 +54,44 @@
       "source_file": "TiaMcpServer\\Program.cs",
       "source_location": "L54",
       "id": "tiamcpserver_program_program_resolvestartupprojectpath",
-      "community": 13,
+      "community": 15,
       "norm_label": ".resolvestartupprojectpath()"
+    },
+    {
+      "label": "AddNetworkDeviceTool.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tools_addnetworkdevicetool_cs",
+      "community": 26,
+      "norm_label": "addnetworkdevicetool.cs"
+    },
+    {
+      "label": "TiaMcpServer.Tools",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L5",
+      "id": "tools_addnetworkdevicetool_tiamcpserver_tools",
+      "community": 26,
+      "norm_label": "tiamcpserver.tools"
+    },
+    {
+      "label": "AddNetworkDeviceTool",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L7",
+      "id": "tools_addnetworkdevicetool_addnetworkdevicetool",
+      "community": 26,
+      "norm_label": "addnetworkdevicetool"
+    },
+    {
+      "label": ".AddNetworkDevice()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L10",
+      "id": "tools_addnetworkdevicetool_addnetworkdevicetool_addnetworkdevice",
+      "community": 26,
+      "norm_label": ".addnetworkdevice()"
     },
     {
       "label": "BrowseProjectTreeTool.cs",
@@ -63,7 +99,7 @@
       "source_file": "TiaMcpServer\\Tools\\BrowseProjectTreeTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_browseprojecttreetool_cs",
-      "community": 17,
+      "community": 27,
       "norm_label": "browseprojecttreetool.cs"
     },
     {
@@ -72,7 +108,7 @@
       "source_file": "TiaMcpServer\\Tools\\BrowseProjectTreeTool.cs",
       "source_location": "L5",
       "id": "tools_browseprojecttreetool_tiamcpserver_tools",
-      "community": 17,
+      "community": 27,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -81,7 +117,7 @@
       "source_file": "TiaMcpServer\\Tools\\BrowseProjectTreeTool.cs",
       "source_location": "L7",
       "id": "tools_browseprojecttreetool_browseprojecttreetool",
-      "community": 17,
+      "community": 27,
       "norm_label": "browseprojecttreetool"
     },
     {
@@ -90,8 +126,44 @@
       "source_file": "TiaMcpServer\\Tools\\BrowseProjectTreeTool.cs",
       "source_location": "L10",
       "id": "tools_browseprojecttreetool_browseprojecttreetool_browseprojecttree",
-      "community": 17,
+      "community": 27,
       "norm_label": ".browseprojecttree()"
+    },
+    {
+      "label": "ConfigureNetworkDeviceTool.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tools_configurenetworkdevicetool_cs",
+      "community": 28,
+      "norm_label": "configurenetworkdevicetool.cs"
+    },
+    {
+      "label": "TiaMcpServer.Tools",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L5",
+      "id": "tools_configurenetworkdevicetool_tiamcpserver_tools",
+      "community": 28,
+      "norm_label": "tiamcpserver.tools"
+    },
+    {
+      "label": "ConfigureNetworkDeviceTool",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L7",
+      "id": "tools_configurenetworkdevicetool_configurenetworkdevicetool",
+      "community": 28,
+      "norm_label": "configurenetworkdevicetool"
+    },
+    {
+      "label": ".ConfigureNetworkDevice()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L10",
+      "id": "tools_configurenetworkdevicetool_configurenetworkdevicetool_configurenetworkdevice",
+      "community": 28,
+      "norm_label": ".configurenetworkdevice()"
     },
     {
       "label": "GetBlockContentTool.cs",
@@ -99,7 +171,7 @@
       "source_file": "TiaMcpServer\\Tools\\GetBlockContentTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_getblockcontenttool_cs",
-      "community": 18,
+      "community": 29,
       "norm_label": "getblockcontenttool.cs"
     },
     {
@@ -108,7 +180,7 @@
       "source_file": "TiaMcpServer\\Tools\\GetBlockContentTool.cs",
       "source_location": "L5",
       "id": "tools_getblockcontenttool_tiamcpserver_tools",
-      "community": 18,
+      "community": 29,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -117,7 +189,7 @@
       "source_file": "TiaMcpServer\\Tools\\GetBlockContentTool.cs",
       "source_location": "L7",
       "id": "tools_getblockcontenttool_getblockcontenttool",
-      "community": 18,
+      "community": 29,
       "norm_label": "getblockcontenttool"
     },
     {
@@ -126,7 +198,7 @@
       "source_file": "TiaMcpServer\\Tools\\GetBlockContentTool.cs",
       "source_location": "L10",
       "id": "tools_getblockcontenttool_getblockcontenttool_getblockcontent",
-      "community": 18,
+      "community": 29,
       "norm_label": ".getblockcontent()"
     },
     {
@@ -135,7 +207,7 @@
       "source_file": "TiaMcpServer\\Tools\\ListTagTablesTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_listtagtablestool_cs",
-      "community": 19,
+      "community": 30,
       "norm_label": "listtagtablestool.cs"
     },
     {
@@ -144,7 +216,7 @@
       "source_file": "TiaMcpServer\\Tools\\ListTagTablesTool.cs",
       "source_location": "L5",
       "id": "tools_listtagtablestool_tiamcpserver_tools",
-      "community": 19,
+      "community": 30,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -153,7 +225,7 @@
       "source_file": "TiaMcpServer\\Tools\\ListTagTablesTool.cs",
       "source_location": "L7",
       "id": "tools_listtagtablestool_listtagtablestool",
-      "community": 19,
+      "community": 30,
       "norm_label": "listtagtablestool"
     },
     {
@@ -162,7 +234,7 @@
       "source_file": "TiaMcpServer\\Tools\\ListTagTablesTool.cs",
       "source_location": "L10",
       "id": "tools_listtagtablestool_listtagtablestool_listtagtables",
-      "community": 19,
+      "community": 30,
       "norm_label": ".listtagtables()"
     },
     {
@@ -171,7 +243,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadCrossReferencesTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_readcrossreferencestool_cs",
-      "community": 20,
+      "community": 31,
       "norm_label": "readcrossreferencestool.cs"
     },
     {
@@ -180,7 +252,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadCrossReferencesTool.cs",
       "source_location": "L5",
       "id": "tools_readcrossreferencestool_tiamcpserver_tools",
-      "community": 20,
+      "community": 31,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -189,7 +261,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadCrossReferencesTool.cs",
       "source_location": "L7",
       "id": "tools_readcrossreferencestool_readcrossreferencestool",
-      "community": 20,
+      "community": 31,
       "norm_label": "readcrossreferencestool"
     },
     {
@@ -198,7 +270,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadCrossReferencesTool.cs",
       "source_location": "L10",
       "id": "tools_readcrossreferencestool_readcrossreferencestool_readcrossreferences",
-      "community": 20,
+      "community": 31,
       "norm_label": ".readcrossreferences()"
     },
     {
@@ -207,7 +279,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadHardwareConfigTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_readhardwareconfigtool_cs",
-      "community": 21,
+      "community": 32,
       "norm_label": "readhardwareconfigtool.cs"
     },
     {
@@ -216,7 +288,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadHardwareConfigTool.cs",
       "source_location": "L5",
       "id": "tools_readhardwareconfigtool_tiamcpserver_tools",
-      "community": 21,
+      "community": 32,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -225,7 +297,7 @@
       "source_file": "TiaMcpServer\\Tools\\ReadHardwareConfigTool.cs",
       "source_location": "L7",
       "id": "tools_readhardwareconfigtool_readhardwareconfigtool",
-      "community": 21,
+      "community": 32,
       "norm_label": "readhardwareconfigtool"
     },
     {
@@ -234,8 +306,44 @@
       "source_file": "TiaMcpServer\\Tools\\ReadHardwareConfigTool.cs",
       "source_location": "L10",
       "id": "tools_readhardwareconfigtool_readhardwareconfigtool_readhardwareconfig",
-      "community": 21,
+      "community": 32,
       "norm_label": ".readhardwareconfig()"
+    },
+    {
+      "label": "SearchEquipmentCatalogTool.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tools_searchequipmentcatalogtool_cs",
+      "community": 33,
+      "norm_label": "searchequipmentcatalogtool.cs"
+    },
+    {
+      "label": "TiaMcpServer.Tools",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L5",
+      "id": "tools_searchequipmentcatalogtool_tiamcpserver_tools",
+      "community": 33,
+      "norm_label": "tiamcpserver.tools"
+    },
+    {
+      "label": "SearchEquipmentCatalogTool",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L7",
+      "id": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool",
+      "community": 33,
+      "norm_label": "searchequipmentcatalogtool"
+    },
+    {
+      "label": ".SearchEquipmentCatalog()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L10",
+      "id": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool_searchequipmentcatalog",
+      "community": 33,
+      "norm_label": ".searchequipmentcatalog()"
     },
     {
       "label": "UpdateBlockLogicTool.cs",
@@ -243,7 +351,7 @@
       "source_file": "TiaMcpServer\\Tools\\UpdateBlockLogicTool.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tools_updateblocklogictool_cs",
-      "community": 22,
+      "community": 34,
       "norm_label": "updateblocklogictool.cs"
     },
     {
@@ -252,7 +360,7 @@
       "source_file": "TiaMcpServer\\Tools\\UpdateBlockLogicTool.cs",
       "source_location": "L5",
       "id": "tools_updateblocklogictool_tiamcpserver_tools",
-      "community": 22,
+      "community": 34,
       "norm_label": "tiamcpserver.tools"
     },
     {
@@ -261,7 +369,7 @@
       "source_file": "TiaMcpServer\\Tools\\UpdateBlockLogicTool.cs",
       "source_location": "L7",
       "id": "tools_updateblocklogictool_updateblocklogictool",
-      "community": 22,
+      "community": 34,
       "norm_label": "updateblocklogictool"
     },
     {
@@ -270,7 +378,7 @@
       "source_file": "TiaMcpServer\\Tools\\UpdateBlockLogicTool.cs",
       "source_location": "L10",
       "id": "tools_updateblocklogictool_updateblocklogictool_updateblocklogic",
-      "community": 22,
+      "community": 34,
       "norm_label": ".updateblocklogic()"
     },
     {
@@ -279,7 +387,7 @@
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
       "source_location": "L1",
       "id": "tiamcpserver_worker_opennessworkerclient_cs",
-      "community": 3,
+      "community": 2,
       "norm_label": "opennessworkerclient.cs"
     },
     {
@@ -288,7 +396,7 @@
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
       "source_location": "L8",
       "id": "worker_opennessworkerclient_opennessworkerclient",
-      "community": 3,
+      "community": 2,
       "norm_label": "opennessworkerclient"
     },
     {
@@ -297,7 +405,7 @@
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
       "source_location": "L25",
       "id": "worker_opennessworkerclient_opennessworkerclient_browseprojecttreeasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".browseprojecttreeasync()"
     },
     {
@@ -306,71 +414,116 @@
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
       "source_location": "L51",
       "id": "worker_opennessworkerclient_opennessworkerclient_readhardwareconfigasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".readhardwareconfigasync()"
+    },
+    {
+      "label": ".SearchEquipmentCatalogAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L77",
+      "id": "worker_opennessworkerclient_opennessworkerclient_searchequipmentcatalogasync",
+      "community": 2,
+      "norm_label": ".searchequipmentcatalogasync()"
+    },
+    {
+      "label": ".AddNetworkDeviceAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L104",
+      "id": "worker_opennessworkerclient_opennessworkerclient_addnetworkdeviceasync",
+      "community": 2,
+      "norm_label": ".addnetworkdeviceasync()"
+    },
+    {
+      "label": ".ConfigureNetworkDeviceAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L139",
+      "id": "worker_opennessworkerclient_opennessworkerclient_configurenetworkdeviceasync",
+      "community": 2,
+      "norm_label": ".configurenetworkdeviceasync()"
     },
     {
       "label": ".ReadCrossReferencesAsync()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L77",
+      "source_location": "L180",
       "id": "worker_opennessworkerclient_opennessworkerclient_readcrossreferencesasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".readcrossreferencesasync()"
     },
     {
       "label": ".GetBlockContentAsync()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L110",
+      "source_location": "L213",
       "id": "worker_opennessworkerclient_opennessworkerclient_getblockcontentasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".getblockcontentasync()"
     },
     {
       "label": ".UpdateBlockLogicAsync()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L137",
+      "source_location": "L240",
       "id": "worker_opennessworkerclient_opennessworkerclient_updateblocklogicasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".updateblocklogicasync()"
     },
     {
       "label": ".ListTagTablesAsync()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L166",
+      "source_location": "L269",
       "id": "worker_opennessworkerclient_opennessworkerclient_listtagtablesasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".listtagtablesasync()"
     },
     {
       "label": ".SendAsync()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L193",
+      "source_location": "L296",
       "id": "worker_opennessworkerclient_opennessworkerclient_sendasync",
-      "community": 3,
+      "community": 2,
       "norm_label": ".sendasync()"
     },
     {
       "label": ".LocateWorkerExecutable()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L241",
+      "source_location": "L344",
       "id": "worker_opennessworkerclient_opennessworkerclient_locateworkerexecutable",
-      "community": 3,
+      "community": 2,
       "norm_label": ".locateworkerexecutable()"
     },
     {
       "label": ".TryKill()",
       "file_type": "code",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L276",
+      "source_location": "L379",
       "id": "worker_opennessworkerclient_opennessworkerclient_trykill",
-      "community": 3,
+      "community": 2,
       "norm_label": ".trykill()"
+    },
+    {
+      "label": "AddDeviceResultInfo.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\AddDeviceResultInfo.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_contracts_adddeviceresultinfo_cs",
+      "community": 40,
+      "norm_label": "adddeviceresultinfo.cs"
+    },
+    {
+      "label": "AddDeviceResultInfo",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\AddDeviceResultInfo.cs",
+      "source_location": "L5",
+      "id": "tiamcpserver_contracts_adddeviceresultinfo_adddeviceresultinfo",
+      "community": 40,
+      "norm_label": "adddeviceresultinfo"
     },
     {
       "label": "BlockAddress.cs",
@@ -378,7 +531,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_blockaddress_cs",
-      "community": 9,
+      "community": 11,
       "norm_label": "blockaddress.cs"
     },
     {
@@ -387,7 +540,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L7",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress",
-      "community": 9,
+      "community": 11,
       "norm_label": "blockaddress"
     },
     {
@@ -396,7 +549,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L38",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_parse",
-      "community": 9,
+      "community": 11,
       "norm_label": ".parse()"
     },
     {
@@ -405,7 +558,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L85",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_todisplaypath",
-      "community": 9,
+      "community": 11,
       "norm_label": ".todisplaypath()"
     },
     {
@@ -414,7 +567,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L111",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_fromblocksegments",
-      "community": 9,
+      "community": 11,
       "norm_label": ".fromblocksegments()"
     },
     {
@@ -423,7 +576,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L136",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_splitsegments",
-      "community": 9,
+      "community": 11,
       "norm_label": ".splitsegments()"
     },
     {
@@ -432,7 +585,7 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L153",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_stripblocksuffix",
-      "community": 9,
+      "community": 11,
       "norm_label": ".stripblocksuffix()"
     },
     {
@@ -441,8 +594,80 @@
       "source_file": "TiaMcpServer.Contracts\\BlockAddress.cs",
       "source_location": "L164",
       "id": "tiamcpserver_contracts_blockaddress_blockaddress_isreservedsegment",
-      "community": 9,
+      "community": 11,
       "norm_label": ".isreservedsegment()"
+    },
+    {
+      "label": "CatalogEntryInfo.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogEntryInfo.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_contracts_catalogentryinfo_cs",
+      "community": 41,
+      "norm_label": "catalogentryinfo.cs"
+    },
+    {
+      "label": "CatalogEntryInfo",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogEntryInfo.cs",
+      "source_location": "L3",
+      "id": "tiamcpserver_contracts_catalogentryinfo_catalogentryinfo",
+      "community": 41,
+      "norm_label": "catalogentryinfo"
+    },
+    {
+      "label": "CatalogTypeIdentifier.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_contracts_catalogtypeidentifier_cs",
+      "community": 35,
+      "norm_label": "catalogtypeidentifier.cs"
+    },
+    {
+      "label": "CatalogTypeIdentifier",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L3",
+      "id": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "community": 35,
+      "norm_label": "catalogtypeidentifier"
+    },
+    {
+      "label": ".IsCreatable()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L12",
+      "id": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_iscreatable",
+      "community": 35,
+      "norm_label": ".iscreatable()"
+    },
+    {
+      "label": ".BuildValidationMessage()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L36",
+      "id": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_buildvalidationmessage",
+      "community": 35,
+      "norm_label": ".buildvalidationmessage()"
+    },
+    {
+      "label": "ConfigureNetworkDeviceResultInfo.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\ConfigureNetworkDeviceResultInfo.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_cs",
+      "community": 42,
+      "norm_label": "configurenetworkdeviceresultinfo.cs"
+    },
+    {
+      "label": "ConfigureNetworkDeviceResultInfo",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Contracts\\ConfigureNetworkDeviceResultInfo.cs",
+      "source_location": "L5",
+      "id": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_configurenetworkdeviceresultinfo",
+      "community": 42,
+      "norm_label": "configurenetworkdeviceresultinfo"
     },
     {
       "label": "CrossReferenceFilterNames.cs",
@@ -450,7 +675,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceFilterNames.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_crossreferencefilternames_cs",
-      "community": 24,
+      "community": 38,
       "norm_label": "crossreferencefilternames.cs"
     },
     {
@@ -459,7 +684,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceFilterNames.cs",
       "source_location": "L6",
       "id": "tiamcpserver_contracts_crossreferencefilternames_crossreferencefilternames",
-      "community": 24,
+      "community": 38,
       "norm_label": "crossreferencefilternames"
     },
     {
@@ -468,7 +693,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceFilterNames.cs",
       "source_location": "L23",
       "id": "tiamcpserver_contracts_crossreferencefilternames_crossreferencefilternames_trynormalize",
-      "community": 24,
+      "community": 38,
       "norm_label": ".trynormalize()"
     },
     {
@@ -477,7 +702,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceLocationInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_crossreferencelocationinfo_cs",
-      "community": 26,
+      "community": 43,
       "norm_label": "crossreferencelocationinfo.cs"
     },
     {
@@ -486,7 +711,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceLocationInfo.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_crossreferencelocationinfo_crossreferencelocationinfo",
-      "community": 26,
+      "community": 43,
       "norm_label": "crossreferencelocationinfo"
     },
     {
@@ -495,7 +720,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceReport.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_crossreferencereport_cs",
-      "community": 27,
+      "community": 44,
       "norm_label": "crossreferencereport.cs"
     },
     {
@@ -504,7 +729,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceReport.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_crossreferencereport_crossreferencereport",
-      "community": 27,
+      "community": 44,
       "norm_label": "crossreferencereport"
     },
     {
@@ -513,7 +738,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceSourceInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_crossreferencesourceinfo_cs",
-      "community": 28,
+      "community": 45,
       "norm_label": "crossreferencesourceinfo.cs"
     },
     {
@@ -522,7 +747,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceSourceInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_crossreferencesourceinfo_crossreferencesourceinfo",
-      "community": 28,
+      "community": 45,
       "norm_label": "crossreferencesourceinfo"
     },
     {
@@ -531,7 +756,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceTargetInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_crossreferencetargetinfo_cs",
-      "community": 29,
+      "community": 46,
       "norm_label": "crossreferencetargetinfo.cs"
     },
     {
@@ -540,7 +765,7 @@
       "source_file": "TiaMcpServer.Contracts\\CrossReferenceTargetInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_crossreferencetargetinfo_crossreferencetargetinfo",
-      "community": 29,
+      "community": 46,
       "norm_label": "crossreferencetargetinfo"
     },
     {
@@ -549,7 +774,7 @@
       "source_file": "TiaMcpServer.Contracts\\DeviceInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_deviceinfo_cs",
-      "community": 30,
+      "community": 47,
       "norm_label": "deviceinfo.cs"
     },
     {
@@ -558,7 +783,7 @@
       "source_file": "TiaMcpServer.Contracts\\DeviceInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_deviceinfo_deviceinfo",
-      "community": 30,
+      "community": 47,
       "norm_label": "deviceinfo"
     },
     {
@@ -567,7 +792,7 @@
       "source_file": "TiaMcpServer.Contracts\\DeviceItemInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_deviceiteminfo_cs",
-      "community": 31,
+      "community": 48,
       "norm_label": "deviceiteminfo.cs"
     },
     {
@@ -576,7 +801,7 @@
       "source_file": "TiaMcpServer.Contracts\\DeviceItemInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_deviceiteminfo_deviceiteminfo",
-      "community": 31,
+      "community": 48,
       "norm_label": "deviceiteminfo"
     },
     {
@@ -585,7 +810,7 @@
       "source_file": "TiaMcpServer.Contracts\\HardwareConfigInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_hardwareconfiginfo_cs",
-      "community": 32,
+      "community": 49,
       "norm_label": "hardwareconfiginfo.cs"
     },
     {
@@ -594,7 +819,7 @@
       "source_file": "TiaMcpServer.Contracts\\HardwareConfigInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_hardwareconfiginfo_hardwareconfiginfo",
-      "community": 32,
+      "community": 49,
       "norm_label": "hardwareconfiginfo"
     },
     {
@@ -603,7 +828,7 @@
       "source_file": "TiaMcpServer.Contracts\\IoSystemInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_iosysteminfo_cs",
-      "community": 33,
+      "community": 50,
       "norm_label": "iosysteminfo.cs"
     },
     {
@@ -612,7 +837,7 @@
       "source_file": "TiaMcpServer.Contracts\\IoSystemInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_iosysteminfo_iosysteminfo",
-      "community": 33,
+      "community": 50,
       "norm_label": "iosysteminfo"
     },
     {
@@ -621,7 +846,7 @@
       "source_file": "TiaMcpServer.Contracts\\NetworkInterfaceInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_networkinterfaceinfo_cs",
-      "community": 34,
+      "community": 51,
       "norm_label": "networkinterfaceinfo.cs"
     },
     {
@@ -630,7 +855,7 @@
       "source_file": "TiaMcpServer.Contracts\\NetworkInterfaceInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_networkinterfaceinfo_networkinterfaceinfo",
-      "community": 34,
+      "community": 51,
       "norm_label": "networkinterfaceinfo"
     },
     {
@@ -639,7 +864,7 @@
       "source_file": "TiaMcpServer.Contracts\\NodeInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_nodeinfo_cs",
-      "community": 35,
+      "community": 52,
       "norm_label": "nodeinfo.cs"
     },
     {
@@ -648,7 +873,7 @@
       "source_file": "TiaMcpServer.Contracts\\NodeInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_nodeinfo_nodeinfo",
-      "community": 35,
+      "community": 52,
       "norm_label": "nodeinfo"
     },
     {
@@ -657,7 +882,7 @@
       "source_file": "TiaMcpServer.Contracts\\PlcCrossReferenceInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_plccrossreferenceinfo_cs",
-      "community": 36,
+      "community": 53,
       "norm_label": "plccrossreferenceinfo.cs"
     },
     {
@@ -666,7 +891,7 @@
       "source_file": "TiaMcpServer.Contracts\\PlcCrossReferenceInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_plccrossreferenceinfo_plccrossreferenceinfo",
-      "community": 36,
+      "community": 53,
       "norm_label": "plccrossreferenceinfo"
     },
     {
@@ -675,7 +900,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectSessionBinding.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_projectsessionbinding_cs",
-      "community": 23,
+      "community": 36,
       "norm_label": "projectsessionbinding.cs"
     },
     {
@@ -684,7 +909,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectSessionBinding.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_projectsessionbinding_projectsessionbinding",
-      "community": 23,
+      "community": 36,
       "norm_label": "projectsessionbinding"
     },
     {
@@ -693,7 +918,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectSessionBinding.cs",
       "source_location": "L16",
       "id": "tiamcpserver_contracts_projectsessionbinding_projectsessionbinding_tryresolve",
-      "community": 23,
+      "community": 36,
       "norm_label": ".tryresolve()"
     },
     {
@@ -702,7 +927,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectSessionBinding.cs",
       "source_location": "L46",
       "id": "tiamcpserver_contracts_projectsessionbinding_projectsessionbinding_normalize",
-      "community": 23,
+      "community": 36,
       "norm_label": ".normalize()"
     },
     {
@@ -711,7 +936,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectTreeNode.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_projecttreenode_cs",
-      "community": 37,
+      "community": 54,
       "norm_label": "projecttreenode.cs"
     },
     {
@@ -720,7 +945,7 @@
       "source_file": "TiaMcpServer.Contracts\\ProjectTreeNode.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_projecttreenode_projecttreenode",
-      "community": 37,
+      "community": 54,
       "norm_label": "projecttreenode"
     },
     {
@@ -729,7 +954,7 @@
       "source_file": "TiaMcpServer.Contracts\\SubnetInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_subnetinfo_cs",
-      "community": 38,
+      "community": 55,
       "norm_label": "subnetinfo.cs"
     },
     {
@@ -738,7 +963,7 @@
       "source_file": "TiaMcpServer.Contracts\\SubnetInfo.cs",
       "source_location": "L5",
       "id": "tiamcpserver_contracts_subnetinfo_subnetinfo",
-      "community": 38,
+      "community": 55,
       "norm_label": "subnetinfo"
     },
     {
@@ -747,7 +972,7 @@
       "source_file": "TiaMcpServer.Contracts\\TagInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_taginfo_cs",
-      "community": 39,
+      "community": 56,
       "norm_label": "taginfo.cs"
     },
     {
@@ -756,7 +981,7 @@
       "source_file": "TiaMcpServer.Contracts\\TagInfo.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_taginfo_taginfo",
-      "community": 39,
+      "community": 56,
       "norm_label": "taginfo"
     },
     {
@@ -765,7 +990,7 @@
       "source_file": "TiaMcpServer.Contracts\\TagTableInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_tagtableinfo_cs",
-      "community": 40,
+      "community": 57,
       "norm_label": "tagtableinfo.cs"
     },
     {
@@ -774,7 +999,7 @@
       "source_file": "TiaMcpServer.Contracts\\TagTableInfo.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_tagtableinfo_tagtableinfo",
-      "community": 40,
+      "community": 57,
       "norm_label": "tagtableinfo"
     },
     {
@@ -783,7 +1008,7 @@
       "source_file": "TiaMcpServer.Contracts\\UserConstantInfo.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_userconstantinfo_cs",
-      "community": 41,
+      "community": 58,
       "norm_label": "userconstantinfo.cs"
     },
     {
@@ -792,7 +1017,7 @@
       "source_file": "TiaMcpServer.Contracts\\UserConstantInfo.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_userconstantinfo_userconstantinfo",
-      "community": 41,
+      "community": 58,
       "norm_label": "userconstantinfo"
     },
     {
@@ -801,7 +1026,7 @@
       "source_file": "TiaMcpServer.Contracts\\WorkerRequest.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_workerrequest_cs",
-      "community": 42,
+      "community": 59,
       "norm_label": "workerrequest.cs"
     },
     {
@@ -810,7 +1035,7 @@
       "source_file": "TiaMcpServer.Contracts\\WorkerRequest.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_workerrequest_workerrequest",
-      "community": 42,
+      "community": 59,
       "norm_label": "workerrequest"
     },
     {
@@ -819,7 +1044,7 @@
       "source_file": "TiaMcpServer.Contracts\\WorkerResponse.cs",
       "source_location": "L1",
       "id": "tiamcpserver_contracts_workerresponse_cs",
-      "community": 43,
+      "community": 60,
       "norm_label": "workerresponse.cs"
     },
     {
@@ -828,7 +1053,7 @@
       "source_file": "TiaMcpServer.Contracts\\WorkerResponse.cs",
       "source_location": "L3",
       "id": "tiamcpserver_contracts_workerresponse_workerresponse",
-      "community": 43,
+      "community": 60,
       "norm_label": "workerresponse"
     },
     {
@@ -837,7 +1062,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_program_cs",
-      "community": 4,
+      "community": 3,
       "norm_label": "program.cs"
     },
     {
@@ -846,7 +1071,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
       "source_location": "L10",
       "id": "tiamcpserver_opennessworker_program_program",
-      "community": 4,
+      "community": 3,
       "norm_label": "program"
     },
     {
@@ -855,7 +1080,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
       "source_location": "L24",
       "id": "tiamcpserver_opennessworker_program_program_main",
-      "community": 4,
+      "community": 3,
       "norm_label": ".main()"
     },
     {
@@ -864,70 +1089,97 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
       "source_location": "L38",
       "id": "tiamcpserver_opennessworker_program_program_handleline",
-      "community": 4,
+      "community": 3,
       "norm_label": ".handleline()"
     },
     {
       "label": ".BrowseProjectTree()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L70",
+      "source_location": "L73",
       "id": "tiamcpserver_opennessworker_program_program_browseprojecttree",
-      "community": 4,
+      "community": 3,
       "norm_label": ".browseprojecttree()"
     },
     {
       "label": ".ReadHardwareConfig()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L114",
+      "source_location": "L117",
       "id": "tiamcpserver_opennessworker_program_program_readhardwareconfig",
-      "community": 4,
+      "community": 3,
       "norm_label": ".readhardwareconfig()"
+    },
+    {
+      "label": ".SearchEquipmentCatalog()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L160",
+      "id": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "community": 3,
+      "norm_label": ".searchequipmentcatalog()"
+    },
+    {
+      "label": ".AddNetworkDevice()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L208",
+      "id": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "community": 3,
+      "norm_label": ".addnetworkdevice()"
+    },
+    {
+      "label": ".ConfigureNetworkDevice()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L271",
+      "id": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "community": 3,
+      "norm_label": ".configurenetworkdevice()"
     },
     {
       "label": ".ReadCrossReferences()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L157",
+      "source_location": "L332",
       "id": "tiamcpserver_opennessworker_program_program_readcrossreferences",
-      "community": 4,
+      "community": 3,
       "norm_label": ".readcrossreferences()"
     },
     {
       "label": ".GetBlockContent()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L208",
+      "source_location": "L383",
       "id": "tiamcpserver_opennessworker_program_program_getblockcontent",
-      "community": 4,
+      "community": 3,
       "norm_label": ".getblockcontent()"
     },
     {
       "label": ".UpdateBlockLogic()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L250",
+      "source_location": "L425",
       "id": "tiamcpserver_opennessworker_program_program_updateblocklogic",
-      "community": 4,
+      "community": 3,
       "norm_label": ".updateblocklogic()"
     },
     {
       "label": ".ListTagTables()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L299",
+      "source_location": "L474",
       "id": "tiamcpserver_opennessworker_program_program_listtagtables",
-      "community": 4,
+      "community": 3,
       "norm_label": ".listtagtables()"
     },
     {
       "label": ".Failure()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L342",
+      "source_location": "L517",
       "id": "tiamcpserver_opennessworker_program_program_failure",
-      "community": 4,
+      "community": 3,
       "norm_label": ".failure()"
     },
     {
@@ -936,7 +1188,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_assemblyresolver_cs",
-      "community": 14,
+      "community": 16,
       "norm_label": "assemblyresolver.cs"
     },
     {
@@ -945,7 +1197,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L10",
       "id": "openness_assemblyresolver_assemblyresolver",
-      "community": 14,
+      "community": 16,
       "norm_label": "assemblyresolver"
     },
     {
@@ -954,7 +1206,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L24",
       "id": "openness_assemblyresolver_assemblyresolver_register",
-      "community": 14,
+      "community": 16,
       "norm_label": ".register()"
     },
     {
@@ -963,7 +1215,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L30",
       "id": "openness_assemblyresolver_assemblyresolver_onassemblyresolve",
-      "community": 14,
+      "community": 16,
       "norm_label": ".onassemblyresolve()"
     },
     {
@@ -972,7 +1224,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L58",
       "id": "openness_assemblyresolver_assemblyresolver_getopennessinstallpath",
-      "community": 14,
+      "community": 16,
       "norm_label": ".getopennessinstallpath()"
     },
     {
@@ -981,7 +1233,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\AssemblyResolver.cs",
       "source_location": "L115",
       "id": "openness_assemblyresolver_assemblyresolver_containsrequiredassemblies",
-      "community": 14,
+      "community": 16,
       "norm_label": ".containsrequiredassemblies()"
     },
     {
@@ -990,7 +1242,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockExporter.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_blockexporter_cs",
-      "community": 25,
+      "community": 39,
       "norm_label": "blockexporter.cs"
     },
     {
@@ -999,7 +1251,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockExporter.cs",
       "source_location": "L9",
       "id": "openness_blockexporter_blockexporter",
-      "community": 25,
+      "community": 39,
       "norm_label": "blockexporter"
     },
     {
@@ -1008,7 +1260,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockExporter.cs",
       "source_location": "L11",
       "id": "openness_blockexporter_blockexporter_export",
-      "community": 25,
+      "community": 39,
       "norm_label": ".export()"
     },
     {
@@ -1017,7 +1269,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_blockimporter_cs",
-      "community": 15,
+      "community": 17,
       "norm_label": "blockimporter.cs"
     },
     {
@@ -1026,7 +1278,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L8",
       "id": "openness_blockimporter_blockimporter",
-      "community": 15,
+      "community": 17,
       "norm_label": "blockimporter"
     },
     {
@@ -1035,7 +1287,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L12",
       "id": "openness_blockimporter_blockimporter_import",
-      "community": 15,
+      "community": 17,
       "norm_label": ".import()"
     },
     {
@@ -1044,7 +1296,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L49",
       "id": "openness_blockimporter_blockimporter_writecontenttotempdir",
-      "community": 15,
+      "community": 17,
       "norm_label": ".writecontenttotempdir()"
     },
     {
@@ -1053,7 +1305,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L79",
       "id": "openness_blockimporter_blockimporter_extractfilename",
-      "community": 15,
+      "community": 17,
       "norm_label": ".extractfilename()"
     },
     {
@@ -1062,7 +1314,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockImporter.cs",
       "source_location": "L91",
       "id": "openness_blockimporter_blockimporter_flushsection",
-      "community": 15,
+      "community": 17,
       "norm_label": ".flushsection()"
     },
     {
@@ -1071,7 +1323,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_blocktargetresolver_cs",
-      "community": 2,
+      "community": 6,
       "norm_label": "blocktargetresolver.cs"
     },
     {
@@ -1080,7 +1332,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L13",
       "id": "openness_blocktargetresolver_blocktargetresolver",
-      "community": 2,
+      "community": 6,
       "norm_label": "blocktargetresolver"
     },
     {
@@ -1089,7 +1341,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L15",
       "id": "openness_blocktargetresolver_blocktargetresolver_resolveforexport",
-      "community": 2,
+      "community": 6,
       "norm_label": ".resolveforexport()"
     },
     {
@@ -1098,7 +1350,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L43",
       "id": "openness_blocktargetresolver_blocktargetresolver_resolveforimport",
-      "community": 2,
+      "community": 6,
       "norm_label": ".resolveforimport()"
     },
     {
@@ -1107,7 +1359,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L66",
       "id": "openness_blocktargetresolver_blocktargetresolver_resolvedeterministicblockgroup",
-      "community": 2,
+      "community": 6,
       "norm_label": ".resolvedeterministicblockgroup()"
     },
     {
@@ -1116,7 +1368,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L75",
       "id": "openness_blocktargetresolver_blocktargetresolver_findplcsoftware",
-      "community": 2,
+      "community": 6,
       "norm_label": ".findplcsoftware()"
     },
     {
@@ -1125,7 +1377,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L95",
       "id": "openness_blocktargetresolver_blocktargetresolver_findplcsoftwareindeviceitems",
-      "community": 2,
+      "community": 6,
       "norm_label": ".findplcsoftwareindeviceitems()"
     },
     {
@@ -1134,7 +1386,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L123",
       "id": "openness_blocktargetresolver_blocktargetresolver_findsoftwareunit",
-      "community": 2,
+      "community": 6,
       "norm_label": ".findsoftwareunit()"
     },
     {
@@ -1143,7 +1395,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L142",
       "id": "openness_blocktargetresolver_blocktargetresolver_findblockgroup",
-      "community": 2,
+      "community": 6,
       "norm_label": ".findblockgroup()"
     },
     {
@@ -1152,7 +1404,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L164",
       "id": "openness_blocktargetresolver_blocktargetresolver_findlegacymatches",
-      "community": 2,
+      "community": 6,
       "norm_label": ".findlegacymatches()"
     },
     {
@@ -1161,7 +1413,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L181",
       "id": "openness_blocktargetresolver_blocktargetresolver_collectmatches",
-      "community": 2,
+      "community": 6,
       "norm_label": ".collectmatches()"
     },
     {
@@ -1170,7 +1422,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\BlockTargetResolver.cs",
       "source_location": "L196",
       "id": "openness_blocktargetresolver_resolvedblocktarget",
-      "community": 2,
+      "community": 6,
       "norm_label": "resolvedblocktarget"
     },
     {
@@ -1307,6 +1559,123 @@
       "id": "openness_crossreferencereader_discoveredplcsoftware",
       "community": 1,
       "norm_label": "discoveredplcsoftware"
+    },
+    {
+      "label": "EquipmentCatalogSearcher.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_opennessworker_openness_equipmentcatalogsearcher_cs",
+      "community": 5,
+      "norm_label": "equipmentcatalogsearcher.cs"
+    },
+    {
+      "label": "EquipmentCatalogSearcher",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L11",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "community": 5,
+      "norm_label": "equipmentcatalogsearcher"
+    },
+    {
+      "label": ".Search()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L28",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "community": 5,
+      "norm_label": ".search()"
+    },
+    {
+      "label": ".AddMatchesFromHardwareCatalogFind()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L61",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "community": 5,
+      "norm_label": ".addmatchesfromhardwarecatalogfind()"
+    },
+    {
+      "label": ".FindCatalogRoots()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L81",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "community": 5,
+      "norm_label": ".findcatalogroots()"
+    },
+    {
+      "label": ".Traverse()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L108",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "community": 5,
+      "norm_label": ".traverse()"
+    },
+    {
+      "label": ".AddMatch()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L148",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "community": 5,
+      "norm_label": ".addmatch()"
+    },
+    {
+      "label": ".HasReadableProperty()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L201",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_hasreadableproperty",
+      "community": 5,
+      "norm_label": ".hasreadableproperty()"
+    },
+    {
+      "label": ".AppendPath()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L206",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_appendpath",
+      "community": 5,
+      "norm_label": ".appendpath()"
+    },
+    {
+      "label": ".Contains()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L213",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_contains",
+      "community": 5,
+      "norm_label": ".contains()"
+    },
+    {
+      "label": ".ReadStringProperty()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L218",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "community": 5,
+      "norm_label": ".readstringproperty()"
+    },
+    {
+      "label": ".ReadProperty()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L223",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "community": 5,
+      "norm_label": ".readproperty()"
+    },
+    {
+      "label": ".Enumerate()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L258",
+      "id": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "community": 5,
+      "norm_label": ".enumerate()"
     },
     {
       "label": "HardwareConfigReader.cs",
@@ -1489,12 +1858,183 @@
       "norm_label": ".readenumerableproperty()"
     },
     {
+      "label": "NetworkDeviceConfigurator.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_opennessworker_openness_networkdeviceconfigurator_cs",
+      "community": 4,
+      "norm_label": "networkdeviceconfigurator.cs"
+    },
+    {
+      "label": "NetworkDeviceConfigurator",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L10",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "community": 4,
+      "norm_label": "networkdeviceconfigurator"
+    },
+    {
+      "label": ".Configure()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L12",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "community": 4,
+      "norm_label": ".configure()"
+    },
+    {
+      "label": ".FindDevice()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L80",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_finddevice",
+      "community": 4,
+      "norm_label": ".finddevice()"
+    },
+    {
+      "label": ".FindNetworkInterface()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L93",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnetworkinterface",
+      "community": 4,
+      "norm_label": ".findnetworkinterface()"
+    },
+    {
+      "label": ".GetFirstNode()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L134",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_getfirstnode",
+      "community": 4,
+      "norm_label": ".getfirstnode()"
+    },
+    {
+      "label": ".ApplyNodeAttribute()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L144",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_applynodeattribute",
+      "community": 4,
+      "norm_label": ".applynodeattribute()"
+    },
+    {
+      "label": ".ConnectSubnet()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L166",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "community": 4,
+      "norm_label": ".connectsubnet()"
+    },
+    {
+      "label": ".FindSubnet()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L202",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findsubnet",
+      "community": 4,
+      "norm_label": ".findsubnet()"
+    },
+    {
+      "label": ".ConnectIoSystem()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L215",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "community": 4,
+      "norm_label": ".connectiosystem()"
+    },
+    {
+      "label": ".FindNamedItem()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L255",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "community": 4,
+      "norm_label": ".findnameditem()"
+    },
+    {
+      "label": ".InvokeFirstAvailable()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L269",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "community": 4,
+      "norm_label": ".invokefirstavailable()"
+    },
+    {
+      "label": ".ReadProperty()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L297",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "community": 4,
+      "norm_label": ".readproperty()"
+    },
+    {
+      "label": ".ReadEnumerableProperty()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L317",
+      "id": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "community": 4,
+      "norm_label": ".readenumerableproperty()"
+    },
+    {
+      "label": "NetworkDeviceCreator.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_opennessworker_openness_networkdevicecreator_cs",
+      "community": 20,
+      "norm_label": "networkdevicecreator.cs"
+    },
+    {
+      "label": "NetworkDeviceCreator",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L7",
+      "id": "openness_networkdevicecreator_networkdevicecreator",
+      "community": 20,
+      "norm_label": "networkdevicecreator"
+    },
+    {
+      "label": ".Create()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L9",
+      "id": "openness_networkdevicecreator_networkdevicecreator_create",
+      "community": 20,
+      "norm_label": ".create()"
+    },
+    {
+      "label": ".GetFirstDeviceItem()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L55",
+      "id": "openness_networkdevicecreator_networkdevicecreator_getfirstdeviceitem",
+      "community": 20,
+      "norm_label": ".getfirstdeviceitem()"
+    },
+    {
+      "label": ".ReadString()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L72",
+      "id": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "community": 20,
+      "norm_label": ".readstring()"
+    },
+    {
       "label": "ProjectTreeWalker.cs",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_projecttreewalker_cs",
-      "community": 5,
+      "community": 7,
       "norm_label": "projecttreewalker.cs"
     },
     {
@@ -1503,7 +2043,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L15",
       "id": "openness_projecttreewalker_projecttreewalker",
-      "community": 5,
+      "community": 7,
       "norm_label": "projecttreewalker"
     },
     {
@@ -1512,7 +2052,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L17",
       "id": "openness_projecttreewalker_projecttreewalker_walk",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walk()"
     },
     {
@@ -1521,7 +2061,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L45",
       "id": "openness_projecttreewalker_projecttreewalker_findplcsoftwareindevice",
-      "community": 5,
+      "community": 7,
       "norm_label": ".findplcsoftwareindevice()"
     },
     {
@@ -1530,7 +2070,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L50",
       "id": "openness_projecttreewalker_projecttreewalker_findplcsoftwareindeviceitems",
-      "community": 5,
+      "community": 7,
       "norm_label": ".findplcsoftwareindeviceitems()"
     },
     {
@@ -1539,7 +2079,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L78",
       "id": "openness_projecttreewalker_projecttreewalker_walkplcsoftware",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walkplcsoftware()"
     },
     {
@@ -1548,7 +2088,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L101",
       "id": "openness_projecttreewalker_projecttreewalker_walksoftwareunits",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walksoftwareunits()"
     },
     {
@@ -1557,7 +2097,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L141",
       "id": "openness_projecttreewalker_projecttreewalker_walkblockgroup",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walkblockgroup()"
     },
     {
@@ -1566,7 +2106,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L207",
       "id": "openness_projecttreewalker_projecttreewalker_walktagtablegroup",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walktagtablegroup()"
     },
     {
@@ -1575,7 +2115,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L255",
       "id": "openness_projecttreewalker_projecttreewalker_walktypegroup",
-      "community": 5,
+      "community": 7,
       "norm_label": ".walktypegroup()"
     },
     {
@@ -1584,7 +2124,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\ProjectTreeWalker.cs",
       "source_location": "L303",
       "id": "openness_projecttreewalker_projecttreewalker_combinepath",
-      "community": 5,
+      "community": 7,
       "norm_label": ".combinepath()"
     },
     {
@@ -1593,7 +2133,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_tagtablereader_cs",
-      "community": 8,
+      "community": 10,
       "norm_label": "tagtablereader.cs"
     },
     {
@@ -1602,7 +2142,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L10",
       "id": "openness_tagtablereader_tagtablereader",
-      "community": 8,
+      "community": 10,
       "norm_label": "tagtablereader"
     },
     {
@@ -1611,7 +2151,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L12",
       "id": "openness_tagtablereader_tagtablereader_readall",
-      "community": 8,
+      "community": 10,
       "norm_label": ".readall()"
     },
     {
@@ -1620,7 +2160,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L23",
       "id": "openness_tagtablereader_tagtablereader_findplcsoftware",
-      "community": 8,
+      "community": 10,
       "norm_label": ".findplcsoftware()"
     },
     {
@@ -1629,7 +2169,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L45",
       "id": "openness_tagtablereader_tagtablereader_findplcsoftwareindeviceitems",
-      "community": 8,
+      "community": 10,
       "norm_label": ".findplcsoftwareindeviceitems()"
     },
     {
@@ -1638,7 +2178,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L73",
       "id": "openness_tagtablereader_tagtablereader_collecttablesfromgroup",
-      "community": 8,
+      "community": 10,
       "norm_label": ".collecttablesfromgroup()"
     },
     {
@@ -1647,7 +2187,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L109",
       "id": "openness_tagtablereader_tagtablereader_readtagtable",
-      "community": 8,
+      "community": 10,
       "norm_label": ".readtagtable()"
     },
     {
@@ -1656,7 +2196,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L123",
       "id": "openness_tagtablereader_tagtablereader_readtags",
-      "community": 8,
+      "community": 10,
       "norm_label": ".readtags()"
     },
     {
@@ -1665,7 +2205,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TagTableReader.cs",
       "source_location": "L148",
       "id": "openness_tagtablereader_tagtablereader_readuserconstants",
-      "community": 8,
+      "community": 10,
       "norm_label": ".readuserconstants()"
     },
     {
@@ -1674,7 +2214,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
       "source_location": "L1",
       "id": "tiamcpserver_opennessworker_openness_tiaportalsession_cs",
-      "community": 6,
+      "community": 8,
       "norm_label": "tiaportalsession.cs"
     },
     {
@@ -1683,7 +2223,7 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
       "source_location": "L8",
       "id": "openness_tiaportalsession_tiaportalsession",
-      "community": 6,
+      "community": 8,
       "norm_label": "tiaportalsession"
     },
     {
@@ -1692,80 +2232,170 @@
       "source_file": "",
       "source_location": "",
       "id": "idisposable",
-      "community": 6,
+      "community": 8,
       "norm_label": "idisposable"
     },
     {
       "label": ".Connect()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L23",
+      "source_location": "L25",
       "id": "openness_tiaportalsession_tiaportalsession_connect",
-      "community": 6,
+      "community": 8,
       "norm_label": ".connect()"
     },
     {
       "label": ".OpenProject()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L47",
+      "source_location": "L49",
       "id": "openness_tiaportalsession_tiaportalsession_openproject",
-      "community": 6,
+      "community": 8,
       "norm_label": ".openproject()"
     },
     {
       "label": ".EnsureConnected()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L64",
+      "source_location": "L66",
       "id": "openness_tiaportalsession_tiaportalsession_ensureconnected",
-      "community": 6,
+      "community": 8,
       "norm_label": ".ensureconnected()"
     },
     {
       "label": ".OnNotification()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L74",
+      "source_location": "L76",
       "id": "openness_tiaportalsession_tiaportalsession_onnotification",
-      "community": 6,
+      "community": 8,
       "norm_label": ".onnotification()"
     },
     {
       "label": ".OnConfirmation()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L79",
+      "source_location": "L81",
       "id": "openness_tiaportalsession_tiaportalsession_onconfirmation",
-      "community": 6,
+      "community": 8,
       "norm_label": ".onconfirmation()"
     },
     {
       "label": ".OnDisposed()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L86",
+      "source_location": "L88",
       "id": "openness_tiaportalsession_tiaportalsession_ondisposed",
-      "community": 6,
+      "community": 8,
       "norm_label": ".ondisposed()"
     },
     {
       "label": ".Dispose()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L93",
+      "source_location": "L95",
       "id": "openness_tiaportalsession_tiaportalsession_dispose",
-      "community": 6,
+      "community": 8,
       "norm_label": ".dispose()"
     },
     {
       "label": ".ThrowIfDisposed()",
       "file_type": "code",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L120",
+      "source_location": "L122",
       "id": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
-      "community": 6,
+      "community": 8,
       "norm_label": ".throwifdisposed()"
+    },
+    {
+      "label": "AddDeviceResultInfoTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_adddeviceresultinfotests_cs",
+      "community": 21,
+      "norm_label": "adddeviceresultinfotests.cs"
+    },
+    {
+      "label": "AddDeviceResultInfoTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L8",
+      "id": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "community": 21,
+      "norm_label": "adddeviceresultinfotests"
+    },
+    {
+      "label": ".SerializesEmptyResult()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L17",
+      "id": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_serializesemptyresult",
+      "community": 21,
+      "norm_label": ".serializesemptyresult()"
+    },
+    {
+      "label": ".RoundTripsResultWithWarnings()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L31",
+      "id": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtripsresultwithwarnings",
+      "community": 21,
+      "norm_label": ".roundtripsresultwithwarnings()"
+    },
+    {
+      "label": ".RoundTrip()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L50",
+      "id": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "community": 21,
+      "norm_label": ".roundtrip()"
+    },
+    {
+      "label": "AddNetworkDeviceToolTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_addnetworkdevicetooltests_cs",
+      "community": 22,
+      "norm_label": "addnetworkdevicetooltests.cs"
+    },
+    {
+      "label": "AddNetworkDeviceToolTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L10",
+      "id": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "community": 22,
+      "norm_label": "addnetworkdevicetooltests"
+    },
+    {
+      "label": ".AddNetworkDeviceToolHasMcpMetadata()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L12",
+      "id": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicetoolhasmcpmetadata",
+      "community": 22,
+      "norm_label": ".addnetworkdevicetoolhasmcpmetadata()"
+    },
+    {
+      "label": ".AddNetworkDeviceRejectsUnconfirmedRequests()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L34",
+      "id": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicerejectsunconfirmedrequests",
+      "community": 22,
+      "norm_label": ".addnetworkdevicerejectsunconfirmedrequests()"
+    },
+    {
+      "label": ".OpennessWorkerClientExposesAddNetworkDeviceAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L46",
+      "id": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_opennessworkerclientexposesaddnetworkdeviceasync",
+      "community": 22,
+      "norm_label": ".opennessworkerclientexposesaddnetworkdeviceasync()"
     },
     {
       "label": "BlockAddressTests.cs",
@@ -1773,7 +2403,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tests_blockaddresstests_cs",
-      "community": 10,
+      "community": 12,
       "norm_label": "blockaddresstests.cs"
     },
     {
@@ -1782,7 +2412,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L6",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests",
-      "community": 10,
+      "community": 12,
       "norm_label": "blockaddresstests"
     },
     {
@@ -1791,7 +2421,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L8",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parsesupportslegacyblockonly",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parsesupportslegacyblockonly()"
     },
     {
@@ -1800,7 +2430,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L21",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parsesupportslegacyplcqualifiedblock",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parsesupportslegacyplcqualifiedblock()"
     },
     {
@@ -1809,7 +2439,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L33",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parsesupportsnestedblockfolderpath",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parsesupportsnestedblockfolderpath()"
     },
     {
@@ -1818,7 +2448,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L46",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parsesupportssoftwareunitblockpath",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parsesupportssoftwareunitblockpath()"
     },
     {
@@ -1827,7 +2457,7 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L59",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parsestripsblocksuffixfromfinalsegment",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parsestripsblocksuffixfromfinalsegment()"
     },
     {
@@ -1836,8 +2466,197 @@
       "source_file": "TiaMcpServer.Tests\\BlockAddressTests.cs",
       "source_location": "L67",
       "id": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parserejectsinvalidpaths",
-      "community": 10,
+      "community": 12,
       "norm_label": ".parserejectsinvalidpaths()"
+    },
+    {
+      "label": "CatalogEntryInfoTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_catalogentryinfotests_cs",
+      "community": 18,
+      "norm_label": "catalogentryinfotests.cs"
+    },
+    {
+      "label": "CatalogEntryInfoTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L8",
+      "id": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "community": 18,
+      "norm_label": "catalogentryinfotests"
+    },
+    {
+      "label": ".SerializesDefaultCatalogEntry()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L17",
+      "id": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_serializesdefaultcatalogentry",
+      "community": 18,
+      "norm_label": ".serializesdefaultcatalogentry()"
+    },
+    {
+      "label": ".RoundTripsFullCatalogEntry()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L33",
+      "id": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtripsfullcatalogentry",
+      "community": 18,
+      "norm_label": ".roundtripsfullcatalogentry()"
+    },
+    {
+      "label": ".NullableFieldsOmittedWhenNull()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L58",
+      "id": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_nullablefieldsomittedwhennull",
+      "community": 18,
+      "norm_label": ".nullablefieldsomittedwhennull()"
+    },
+    {
+      "label": ".RoundTrip()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L88",
+      "id": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "community": 18,
+      "norm_label": ".roundtrip()"
+    },
+    {
+      "label": "CatalogTypeIdentifierTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_catalogtypeidentifiertests_cs",
+      "community": 23,
+      "norm_label": "catalogtypeidentifiertests.cs"
+    },
+    {
+      "label": "CatalogTypeIdentifierTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L6",
+      "id": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "community": 23,
+      "norm_label": "catalogtypeidentifiertests"
+    },
+    {
+      "label": ".CreatableIdentifiersUseSupportedPrefixes()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L8",
+      "id": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_creatableidentifiersusesupportedprefixes",
+      "community": 23,
+      "norm_label": ".creatableidentifiersusesupportedprefixes()"
+    },
+    {
+      "label": ".NonCreatableIdentifiersAreRejected()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L17",
+      "id": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_noncreatableidentifiersarerejected",
+      "community": 23,
+      "norm_label": ".noncreatableidentifiersarerejected()"
+    },
+    {
+      "label": ".ValidationMessagePointsUserBackToCatalogTypeIdentifierField()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L27",
+      "id": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_validationmessagepointsuserbacktocatalogtypeidentifierfield",
+      "community": 23,
+      "norm_label": ".validationmessagepointsuserbacktocatalogtypeidentifierfield()"
+    },
+    {
+      "label": "ConfigureNetworkDeviceResultInfoTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_cs",
+      "community": 24,
+      "norm_label": "configurenetworkdeviceresultinfotests.cs"
+    },
+    {
+      "label": "ConfigureNetworkDeviceResultInfoTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L8",
+      "id": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "community": 24,
+      "norm_label": "configurenetworkdeviceresultinfotests"
+    },
+    {
+      "label": ".SerializesEmptyResult()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L17",
+      "id": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_serializesemptyresult",
+      "community": 24,
+      "norm_label": ".serializesemptyresult()"
+    },
+    {
+      "label": ".RoundTripsResultWithSettingsAndMessages()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L33",
+      "id": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtripsresultwithsettingsandmessages",
+      "community": 24,
+      "norm_label": ".roundtripsresultwithsettingsandmessages()"
+    },
+    {
+      "label": ".RoundTrip()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L60",
+      "id": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "community": 24,
+      "norm_label": ".roundtrip()"
+    },
+    {
+      "label": "ConfigureNetworkDeviceToolTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_configurenetworkdevicetooltests_cs",
+      "community": 25,
+      "norm_label": "configurenetworkdevicetooltests.cs"
+    },
+    {
+      "label": "ConfigureNetworkDeviceToolTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L10",
+      "id": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "community": 25,
+      "norm_label": "configurenetworkdevicetooltests"
+    },
+    {
+      "label": ".ConfigureNetworkDeviceToolHasMcpMetadata()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L12",
+      "id": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicetoolhasmcpmetadata",
+      "community": 25,
+      "norm_label": ".configurenetworkdevicetoolhasmcpmetadata()"
+    },
+    {
+      "label": ".ConfigureNetworkDeviceRejectsUnconfirmedRequests()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L34",
+      "id": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicerejectsunconfirmedrequests",
+      "community": 25,
+      "norm_label": ".configurenetworkdevicerejectsunconfirmedrequests()"
+    },
+    {
+      "label": ".OpennessWorkerClientExposesConfigureNetworkDeviceAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L46",
+      "id": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_opennessworkerclientexposesconfigurenetworkdeviceasync",
+      "community": 25,
+      "norm_label": ".opennessworkerclientexposesconfigurenetworkdeviceasync()"
     },
     {
       "label": "CrossReferenceInfoTests.cs",
@@ -1845,7 +2664,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tests_crossreferenceinfotests_cs",
-      "community": 7,
+      "community": 9,
       "norm_label": "crossreferenceinfotests.cs"
     },
     {
@@ -1854,7 +2673,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L8",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests",
-      "community": 7,
+      "community": 9,
       "norm_label": "crossreferenceinfotests"
     },
     {
@@ -1863,7 +2682,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L17",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_emptyreportserializeswithemptyplclist",
-      "community": 7,
+      "community": 9,
       "norm_label": ".emptyreportserializeswithemptyplclist()"
     },
     {
@@ -1872,7 +2691,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L32",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_fullreportroundtripssourcereferenceandlocation",
-      "community": 7,
+      "community": 9,
       "norm_label": ".fullreportroundtripssourcereferenceandlocation()"
     },
     {
@@ -1881,7 +2700,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L123",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_unusedobjectreportroundtripssourceswithemptyreferences",
-      "community": 7,
+      "community": 9,
       "norm_label": ".unusedobjectreportroundtripssourceswithemptyreferences()"
     },
     {
@@ -1890,7 +2709,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L156",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_plcmessagesroundtrip",
-      "community": 7,
+      "community": 9,
       "norm_label": ".plcmessagesroundtrip()"
     },
     {
@@ -1899,7 +2718,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L177",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_nulloremptyfilterdefaultstoobjectswithreferences",
-      "community": 7,
+      "community": 9,
       "norm_label": ".nulloremptyfilterdefaultstoobjectswithreferences()"
     },
     {
@@ -1908,7 +2727,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L189",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_validfilternamesparsecaseinsensitively",
-      "community": 7,
+      "community": 9,
       "norm_label": ".validfilternamesparsecaseinsensitively()"
     },
     {
@@ -1917,7 +2736,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L198",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_invalidfilterreturnsallowedvalues",
-      "community": 7,
+      "community": 9,
       "norm_label": ".invalidfilterreturnsallowedvalues()"
     },
     {
@@ -1926,7 +2745,7 @@
       "source_file": "TiaMcpServer.Tests\\CrossReferenceInfoTests.cs",
       "source_location": "L212",
       "id": "tiamcpserver_tests_crossreferenceinfotests_crossreferenceinfotests_roundtrip",
-      "community": 7,
+      "community": 9,
       "norm_label": ".roundtrip()"
     },
     {
@@ -1935,7 +2754,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_cs",
-      "community": 11,
+      "community": 13,
       "norm_label": "hardwareconfiginfotests.cs"
     },
     {
@@ -1944,7 +2763,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L8",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests",
-      "community": 11,
+      "community": 13,
       "norm_label": "hardwareconfiginfotests"
     },
     {
@@ -1953,7 +2772,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L17",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests_serializesemptyconfig",
-      "community": 11,
+      "community": 13,
       "norm_label": ".serializesemptyconfig()"
     },
     {
@@ -1962,7 +2781,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L30",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests_roundtripsfulldevicetree",
-      "community": 11,
+      "community": 13,
       "norm_label": ".roundtripsfulldevicetree()"
     },
     {
@@ -1971,7 +2790,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L109",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests_roundtripssubnetwithiosystem",
-      "community": 11,
+      "community": 13,
       "norm_label": ".roundtripssubnetwithiosystem()"
     },
     {
@@ -1980,7 +2799,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L146",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests_nullablefieldsserializeasnull",
-      "community": 11,
+      "community": 13,
       "norm_label": ".nullablefieldsserializeasnull()"
     },
     {
@@ -1989,7 +2808,7 @@
       "source_file": "TiaMcpServer.Tests\\HardwareConfigInfoTests.cs",
       "source_location": "L167",
       "id": "tiamcpserver_tests_hardwareconfiginfotests_hardwareconfiginfotests_roundtrip",
-      "community": 11,
+      "community": 13,
       "norm_label": ".roundtrip()"
     },
     {
@@ -1998,7 +2817,7 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L1",
       "id": "tiamcpserver_tests_projectsessionbindingtests_cs",
-      "community": 16,
+      "community": 19,
       "norm_label": "projectsessionbindingtests.cs"
     },
     {
@@ -2007,7 +2826,7 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L6",
       "id": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests",
-      "community": 16,
+      "community": 19,
       "norm_label": "projectsessionbindingtests"
     },
     {
@@ -2016,7 +2835,7 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L8",
       "id": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_firstexplicitprojectpathbindssession",
-      "community": 16,
+      "community": 19,
       "norm_label": ".firstexplicitprojectpathbindssession()"
     },
     {
@@ -2025,7 +2844,7 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L20",
       "id": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_repeatedsameprojectpathisaccepted",
-      "community": 16,
+      "community": 19,
       "norm_label": ".repeatedsameprojectpathisaccepted()"
     },
     {
@@ -2034,7 +2853,7 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L32",
       "id": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_differentprojectpathisrejectedafterbinding",
-      "community": 16,
+      "community": 19,
       "norm_label": ".differentprojectpathisrejectedafterbinding()"
     },
     {
@@ -2043,8 +2862,44 @@
       "source_file": "TiaMcpServer.Tests\\ProjectSessionBindingTests.cs",
       "source_location": "L44",
       "id": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_omittedprojectpathusesstartupprojectpath",
-      "community": 16,
+      "community": 19,
       "norm_label": ".omittedprojectpathusesstartupprojectpath()"
+    },
+    {
+      "label": "SearchEquipmentCatalogToolTests.cs",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L1",
+      "id": "tiamcpserver_tests_searchequipmentcatalogtooltests_cs",
+      "community": 37,
+      "norm_label": "searchequipmentcatalogtooltests.cs"
+    },
+    {
+      "label": "SearchEquipmentCatalogToolTests",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L10",
+      "id": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "community": 37,
+      "norm_label": "searchequipmentcatalogtooltests"
+    },
+    {
+      "label": ".SearchEquipmentCatalogToolHasMcpMetadata()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L12",
+      "id": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_searchequipmentcatalogtoolhasmcpmetadata",
+      "community": 37,
+      "norm_label": ".searchequipmentcatalogtoolhasmcpmetadata()"
+    },
+    {
+      "label": ".OpennessWorkerClientExposesSearchEquipmentCatalogAsync()",
+      "file_type": "code",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L33",
+      "id": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_opennessworkerclientexposessearchequipmentcatalogasync",
+      "community": 37,
+      "norm_label": ".opennessworkerclientexposessearchequipmentcatalogasync()"
     },
     {
       "label": "tia-portal-mcp",
@@ -2055,7 +2910,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "tia-portal-mcp",
       "id": "readme_tia_portal_mcp"
     },
@@ -2068,7 +2923,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "model context protocol",
       "id": "readme_mcp"
     },
@@ -2081,7 +2936,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 44,
+      "community": 61,
       "norm_label": "multi-process architecture rationale",
       "id": "readme_arch_rationale"
     },
@@ -2094,7 +2949,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 44,
+      "community": 61,
       "norm_label": ".net remoting incompatibility in .net 8",
       "id": "readme_remoting_limitation"
     },
@@ -2107,7 +2962,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "phase 1: implementation",
       "id": "readme_phase1"
     },
@@ -2120,7 +2975,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "phase 2: universal block support",
       "id": "readme_phase2"
     },
@@ -2133,7 +2988,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "phase 3: hardware and network discovery",
       "id": "readme_phase3"
     },
@@ -2146,7 +3001,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "phase 4: advanced diagnostics",
       "id": "readme_phase4"
     },
@@ -2159,7 +3014,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 12,
+      "community": 14,
       "norm_label": "siemens tia openness user group",
       "id": "readme_openness_group"
     },
@@ -2172,7 +3027,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 45,
+      "community": 62,
       "norm_label": ".net 8",
       "id": "readme_dotnet8"
     },
@@ -2185,7 +3040,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 46,
+      "community": 63,
       "norm_label": ".net framework 4.8",
       "id": "readme_dotnet48"
     }
@@ -2266,6 +3121,42 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_addnetworkdevicetool_cs",
+      "_tgt": "tools_addnetworkdevicetool_tiamcpserver_tools",
+      "source": "tiamcpserver_tools_addnetworkdevicetool_cs",
+      "target": "tools_addnetworkdevicetool_tiamcpserver_tools",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_addnetworkdevicetool_cs",
+      "_tgt": "tools_addnetworkdevicetool_addnetworkdevicetool",
+      "source": "tiamcpserver_tools_addnetworkdevicetool_cs",
+      "target": "tools_addnetworkdevicetool_addnetworkdevicetool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\AddNetworkDeviceTool.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tools_addnetworkdevicetool_addnetworkdevicetool",
+      "_tgt": "tools_addnetworkdevicetool_addnetworkdevicetool_addnetworkdevice",
+      "source": "tools_addnetworkdevicetool_addnetworkdevicetool",
+      "target": "tools_addnetworkdevicetool_addnetworkdevicetool_addnetworkdevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Tools\\BrowseProjectTreeTool.cs",
       "source_location": "L5",
       "weight": 1.0,
@@ -2297,6 +3188,42 @@
       "_tgt": "tools_browseprojecttreetool_browseprojecttreetool_browseprojecttree",
       "source": "tools_browseprojecttreetool_browseprojecttreetool",
       "target": "tools_browseprojecttreetool_browseprojecttreetool_browseprojecttree",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_configurenetworkdevicetool_cs",
+      "_tgt": "tools_configurenetworkdevicetool_tiamcpserver_tools",
+      "source": "tiamcpserver_tools_configurenetworkdevicetool_cs",
+      "target": "tools_configurenetworkdevicetool_tiamcpserver_tools",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_configurenetworkdevicetool_cs",
+      "_tgt": "tools_configurenetworkdevicetool_configurenetworkdevicetool",
+      "source": "tiamcpserver_tools_configurenetworkdevicetool_cs",
+      "target": "tools_configurenetworkdevicetool_configurenetworkdevicetool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\ConfigureNetworkDeviceTool.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tools_configurenetworkdevicetool_configurenetworkdevicetool",
+      "_tgt": "tools_configurenetworkdevicetool_configurenetworkdevicetool_configurenetworkdevice",
+      "source": "tools_configurenetworkdevicetool_configurenetworkdevicetool",
+      "target": "tools_configurenetworkdevicetool_configurenetworkdevicetool_configurenetworkdevice",
       "confidence_score": 1.0
     },
     {
@@ -2446,6 +3373,42 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_searchequipmentcatalogtool_cs",
+      "_tgt": "tools_searchequipmentcatalogtool_tiamcpserver_tools",
+      "source": "tiamcpserver_tools_searchequipmentcatalogtool_cs",
+      "target": "tools_searchequipmentcatalogtool_tiamcpserver_tools",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tools_searchequipmentcatalogtool_cs",
+      "_tgt": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool",
+      "source": "tiamcpserver_tools_searchequipmentcatalogtool_cs",
+      "target": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Tools\\SearchEquipmentCatalogTool.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool",
+      "_tgt": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool_searchequipmentcatalog",
+      "source": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool",
+      "target": "tools_searchequipmentcatalogtool_searchequipmentcatalogtool_searchequipmentcatalog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Tools\\UpdateBlockLogicTool.cs",
       "source_location": "L5",
       "weight": 1.0,
@@ -2522,6 +3485,42 @@
       "source_location": "L77",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_searchequipmentcatalogasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient",
+      "target": "worker_opennessworkerclient_opennessworkerclient_searchequipmentcatalogasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L104",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_addnetworkdeviceasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient",
+      "target": "worker_opennessworkerclient_opennessworkerclient_addnetworkdeviceasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L139",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_configurenetworkdeviceasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient",
+      "target": "worker_opennessworkerclient_opennessworkerclient_configurenetworkdeviceasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L180",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_readcrossreferencesasync",
       "source": "worker_opennessworkerclient_opennessworkerclient",
       "target": "worker_opennessworkerclient_opennessworkerclient_readcrossreferencesasync",
@@ -2531,7 +3530,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L110",
+      "source_location": "L213",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_getblockcontentasync",
@@ -2543,7 +3542,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L137",
+      "source_location": "L240",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_updateblocklogicasync",
@@ -2555,7 +3554,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L166",
+      "source_location": "L269",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_listtagtablesasync",
@@ -2567,7 +3566,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L193",
+      "source_location": "L296",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
@@ -2579,7 +3578,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L241",
+      "source_location": "L344",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_locateworkerexecutable",
@@ -2591,7 +3590,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L276",
+      "source_location": "L379",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_trykill",
@@ -2627,7 +3626,43 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L91",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient_searchequipmentcatalogasync",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient_searchequipmentcatalogasync",
+      "target": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L117",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient_addnetworkdeviceasync",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient_addnetworkdeviceasync",
+      "target": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L155",
+      "weight": 1.0,
+      "_src": "worker_opennessworkerclient_opennessworkerclient_configurenetworkdeviceasync",
+      "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "source": "worker_opennessworkerclient_opennessworkerclient_configurenetworkdeviceasync",
+      "target": "worker_opennessworkerclient_opennessworkerclient_sendasync",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
+      "source_location": "L194",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_readcrossreferencesasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
@@ -2639,7 +3674,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L119",
+      "source_location": "L222",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_getblockcontentasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
@@ -2651,7 +3686,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L146",
+      "source_location": "L249",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_updateblocklogicasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
@@ -2663,7 +3698,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L175",
+      "source_location": "L278",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_listtagtablesasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_sendasync",
@@ -2675,7 +3710,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L195",
+      "source_location": "L298",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_sendasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_locateworkerexecutable",
@@ -2687,12 +3722,24 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer\\Worker\\OpennessWorkerClient.cs",
-      "source_location": "L223",
+      "source_location": "L326",
       "weight": 1.0,
       "_src": "worker_opennessworkerclient_opennessworkerclient_sendasync",
       "_tgt": "worker_opennessworkerclient_opennessworkerclient_trykill",
       "source": "worker_opennessworkerclient_opennessworkerclient_sendasync",
       "target": "worker_opennessworkerclient_opennessworkerclient_trykill",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\AddDeviceResultInfo.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_adddeviceresultinfo_cs",
+      "_tgt": "tiamcpserver_contracts_adddeviceresultinfo_adddeviceresultinfo",
+      "source": "tiamcpserver_contracts_adddeviceresultinfo_cs",
+      "target": "tiamcpserver_contracts_adddeviceresultinfo_adddeviceresultinfo",
       "confidence_score": 1.0
     },
     {
@@ -2837,6 +3884,66 @@
       "_tgt": "tiamcpserver_contracts_blockaddress_blockaddress_stripblocksuffix",
       "source": "tiamcpserver_contracts_blockaddress_blockaddress_fromblocksegments",
       "target": "tiamcpserver_contracts_blockaddress_blockaddress_stripblocksuffix",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\CatalogEntryInfo.cs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_catalogentryinfo_cs",
+      "_tgt": "tiamcpserver_contracts_catalogentryinfo_catalogentryinfo",
+      "source": "tiamcpserver_contracts_catalogentryinfo_cs",
+      "target": "tiamcpserver_contracts_catalogentryinfo_catalogentryinfo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_catalogtypeidentifier_cs",
+      "_tgt": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "source": "tiamcpserver_contracts_catalogtypeidentifier_cs",
+      "target": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "_tgt": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_iscreatable",
+      "source": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "target": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_iscreatable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\CatalogTypeIdentifier.cs",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "_tgt": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_buildvalidationmessage",
+      "source": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier",
+      "target": "tiamcpserver_contracts_catalogtypeidentifier_catalogtypeidentifier_buildvalidationmessage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Contracts\\ConfigureNetworkDeviceResultInfo.cs",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_src": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_cs",
+      "_tgt": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_configurenetworkdeviceresultinfo",
+      "source": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_cs",
+      "target": "tiamcpserver_contracts_configurenetworkdeviceresultinfo_configurenetworkdeviceresultinfo",
       "confidence_score": 1.0
     },
     {
@@ -3167,7 +4274,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L70",
+      "source_location": "L73",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_browseprojecttree",
@@ -3179,7 +4286,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L114",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_readhardwareconfig",
@@ -3191,7 +4298,43 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L157",
+      "source_location": "L160",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program",
+      "_tgt": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "source": "tiamcpserver_opennessworker_program_program",
+      "target": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L208",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program",
+      "_tgt": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "source": "tiamcpserver_opennessworker_program_program",
+      "target": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L271",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program",
+      "_tgt": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "source": "tiamcpserver_opennessworker_program_program",
+      "target": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L332",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_readcrossreferences",
@@ -3203,7 +4346,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L208",
+      "source_location": "L383",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_getblockcontent",
@@ -3215,7 +4358,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L250",
+      "source_location": "L425",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_updateblocklogic",
@@ -3227,7 +4370,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L299",
+      "source_location": "L474",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_listtagtables",
@@ -3239,7 +4382,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L342",
+      "source_location": "L517",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -3302,6 +4445,42 @@
       "source_location": "L52",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_handleline",
+      "_tgt": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "source": "tiamcpserver_opennessworker_program_program_handleline",
+      "target": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L53",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_handleline",
+      "_tgt": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "source": "tiamcpserver_opennessworker_program_program_handleline",
+      "target": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L54",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_handleline",
+      "_tgt": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "source": "tiamcpserver_opennessworker_program_program_handleline",
+      "target": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_handleline",
       "_tgt": "tiamcpserver_opennessworker_program_program_readcrossreferences",
       "source": "tiamcpserver_opennessworker_program_program_handleline",
       "target": "tiamcpserver_opennessworker_program_program_readcrossreferences",
@@ -3311,7 +4490,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L53",
+      "source_location": "L56",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_handleline",
       "_tgt": "tiamcpserver_opennessworker_program_program_getblockcontent",
@@ -3323,7 +4502,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L54",
+      "source_location": "L57",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_handleline",
       "_tgt": "tiamcpserver_opennessworker_program_program_updateblocklogic",
@@ -3335,7 +4514,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L55",
+      "source_location": "L58",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_handleline",
       "_tgt": "tiamcpserver_opennessworker_program_program_listtagtables",
@@ -3347,7 +4526,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L86",
+      "source_location": "L89",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_browseprojecttree",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -3359,7 +4538,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L129",
+      "source_location": "L132",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_readhardwareconfig",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -3373,6 +4552,42 @@
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
       "source_location": "L164",
       "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "_tgt": "tiamcpserver_opennessworker_program_program_failure",
+      "source": "tiamcpserver_opennessworker_program_program_searchequipmentcatalog",
+      "target": "tiamcpserver_opennessworker_program_program_failure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L212",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "_tgt": "tiamcpserver_opennessworker_program_program_failure",
+      "source": "tiamcpserver_opennessworker_program_program_addnetworkdevice",
+      "target": "tiamcpserver_opennessworker_program_program_failure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L275",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "_tgt": "tiamcpserver_opennessworker_program_program_failure",
+      "source": "tiamcpserver_opennessworker_program_program_configurenetworkdevice",
+      "target": "tiamcpserver_opennessworker_program_program_failure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
+      "source_location": "L339",
+      "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_readcrossreferences",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
       "source": "tiamcpserver_opennessworker_program_program_readcrossreferences",
@@ -3383,7 +4598,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L211",
+      "source_location": "L386",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_getblockcontent",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -3395,7 +4610,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L254",
+      "source_location": "L429",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_updateblocklogic",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -3407,7 +4622,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Program.cs",
-      "source_location": "L314",
+      "source_location": "L489",
       "weight": 1.0,
       "_src": "tiamcpserver_opennessworker_program_program_listtagtables",
       "_tgt": "tiamcpserver_opennessworker_program_program_failure",
@@ -4198,6 +5413,330 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_openness_equipmentcatalogsearcher_cs",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "source": "tiamcpserver_opennessworker_openness_equipmentcatalogsearcher_cs",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L61",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L81",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L148",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L201",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_hasreadableproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_hasreadableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L206",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_appendpath",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_appendpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L213",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_contains",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_contains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L218",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L223",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L258",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_search",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatchesfromhardwarecatalogfind",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L86",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L94",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_findcatalogroots",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L121",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L124",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_hasreadableproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_hasreadableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L130",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L135",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_appendpath",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_appendpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L140",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L141",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_traverse",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_enumerate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L155",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L162",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_contains",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_addmatch",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_contains",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\EquipmentCatalogSearcher.cs",
+      "source_location": "L220",
+      "weight": 1.0,
+      "_src": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "_tgt": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "source": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readstringproperty",
+      "target": "openness_equipmentcatalogsearcher_equipmentcatalogsearcher_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\HardwareConfigReader.cs",
       "source_location": "L10",
       "weight": 1.0,
@@ -4470,6 +6009,18 @@
       "source": "openness_hardwareconfigreader_hardwareconfigreader_read",
       "target": "openness_hardwareconfigreader_hardwareconfigreader_readint",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L76",
+      "weight": 1.0,
+      "_src": "openness_hardwareconfigreader_hardwareconfigreader_read",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "source": "openness_hardwareconfigreader_hardwareconfigreader_read",
+      "target": "openness_networkdevicecreator_networkdevicecreator_readstring"
     },
     {
       "relation": "calls",
@@ -4877,6 +6428,402 @@
       "_tgt": "openness_hardwareconfigreader_hardwareconfigreader_readproperty",
       "source": "openness_hardwareconfigreader_hardwareconfigreader_readproperty",
       "target": "openness_hardwareconfigreader_hardwareconfigreader_readenumerableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_openness_networkdeviceconfigurator_cs",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "source": "tiamcpserver_opennessworker_openness_networkdeviceconfigurator_cs",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L80",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_finddevice",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_finddevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L107",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnetworkinterface",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnetworkinterface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L134",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_getfirstnode",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_getfirstnode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L144",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_applynodeattribute",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_applynodeattribute",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L166",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L202",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findsubnet",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findsubnet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L215",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L255",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L269",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L297",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L317",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_finddevice",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_finddevice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnetworkinterface",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnetworkinterface",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_getfirstnode",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_getfirstnode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_applynodeattribute",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_applynodeattribute",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L59",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L68",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_configure",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L172",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findsubnet",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findsubnet",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L182",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectsubnet",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L221",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L238",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_connectiosystem",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_invokefirstavailable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L259",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_findnameditem",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceConfigurator.cs",
+      "source_location": "L319",
+      "weight": 1.0,
+      "_src": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "_tgt": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "source": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readproperty",
+      "target": "openness_networkdeviceconfigurator_networkdeviceconfigurator_readenumerableproperty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_src": "tiamcpserver_opennessworker_openness_networkdevicecreator_cs",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator",
+      "source": "tiamcpserver_opennessworker_openness_networkdevicecreator_cs",
+      "target": "openness_networkdevicecreator_networkdevicecreator",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_src": "openness_networkdevicecreator_networkdevicecreator",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_create",
+      "source": "openness_networkdevicecreator_networkdevicecreator",
+      "target": "openness_networkdevicecreator_networkdevicecreator_create",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L55",
+      "weight": 1.0,
+      "_src": "openness_networkdevicecreator_networkdevicecreator",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_getfirstdeviceitem",
+      "source": "openness_networkdevicecreator_networkdevicecreator",
+      "target": "openness_networkdevicecreator_networkdevicecreator_getfirstdeviceitem",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_src": "openness_networkdevicecreator_networkdevicecreator",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "source": "openness_networkdevicecreator_networkdevicecreator",
+      "target": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_src": "openness_networkdevicecreator_networkdevicecreator_create",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "source": "openness_networkdevicecreator_networkdevicecreator_create",
+      "target": "openness_networkdevicecreator_networkdevicecreator_readstring",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.OpennessWorker\\Openness\\NetworkDeviceCreator.cs",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_src": "openness_networkdevicecreator_networkdevicecreator_create",
+      "_tgt": "openness_networkdevicecreator_networkdevicecreator_getfirstdeviceitem",
+      "source": "openness_networkdevicecreator_networkdevicecreator_create",
+      "target": "openness_networkdevicecreator_networkdevicecreator_getfirstdeviceitem",
       "confidence_score": 1.0
     },
     {
@@ -5375,7 +7322,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L23",
+      "source_location": "L25",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_connect",
@@ -5387,7 +7334,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_openproject",
@@ -5399,7 +7346,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L64",
+      "source_location": "L66",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_ensureconnected",
@@ -5411,7 +7358,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L74",
+      "source_location": "L76",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_onnotification",
@@ -5423,7 +7370,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L79",
+      "source_location": "L81",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_onconfirmation",
@@ -5435,7 +7382,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L86",
+      "source_location": "L88",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_ondisposed",
@@ -5447,7 +7394,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L114",
+      "source_location": "L116",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_dispose",
@@ -5459,7 +7406,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L120",
+      "source_location": "L122",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession",
       "_tgt": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
@@ -5471,7 +7418,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L25",
+      "source_location": "L27",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession_connect",
       "_tgt": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
@@ -5483,7 +7430,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L53",
+      "source_location": "L55",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession_openproject",
       "_tgt": "openness_tiaportalsession_tiaportalsession_connect",
@@ -5495,7 +7442,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L70",
+      "source_location": "L72",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession_ensureconnected",
       "_tgt": "openness_tiaportalsession_tiaportalsession_connect",
@@ -5507,7 +7454,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L49",
+      "source_location": "L51",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession_openproject",
       "_tgt": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
@@ -5519,12 +7466,132 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "TiaMcpServer.OpennessWorker\\Openness\\TiaPortalSession.cs",
-      "source_location": "L66",
+      "source_location": "L68",
       "weight": 1.0,
       "_src": "openness_tiaportalsession_tiaportalsession_ensureconnected",
       "_tgt": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
       "source": "openness_tiaportalsession_tiaportalsession_ensureconnected",
       "target": "openness_tiaportalsession_tiaportalsession_throwifdisposed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_cs",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_cs",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_serializesemptyresult",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_serializesemptyresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtripsresultwithwarnings",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtripsresultwithwarnings",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L50",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_serializesemptyresult",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_serializesemptyresult",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddDeviceResultInfoTests.cs",
+      "source_location": "L42",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtripsresultwithwarnings",
+      "_tgt": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtripsresultwithwarnings",
+      "target": "tiamcpserver_tests_adddeviceresultinfotests_adddeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_addnetworkdevicetooltests_cs",
+      "_tgt": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "source": "tiamcpserver_tests_addnetworkdevicetooltests_cs",
+      "target": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicetoolhasmcpmetadata",
+      "source": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "target": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicetoolhasmcpmetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicerejectsunconfirmedrequests",
+      "source": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "target": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_addnetworkdevicerejectsunconfirmedrequests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\AddNetworkDeviceToolTests.cs",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_opennessworkerclientexposesaddnetworkdeviceasync",
+      "source": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests",
+      "target": "tiamcpserver_tests_addnetworkdevicetooltests_addnetworkdevicetooltests_opennessworkerclientexposesaddnetworkdeviceasync",
       "confidence_score": 1.0
     },
     {
@@ -5609,6 +7676,258 @@
       "_tgt": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parserejectsinvalidpaths",
       "source": "tiamcpserver_tests_blockaddresstests_blockaddresstests",
       "target": "tiamcpserver_tests_blockaddresstests_blockaddresstests_parserejectsinvalidpaths",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_cs",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "source": "tiamcpserver_tests_catalogentryinfotests_cs",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_serializesdefaultcatalogentry",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_serializesdefaultcatalogentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtripsfullcatalogentry",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtripsfullcatalogentry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L58",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_nullablefieldsomittedwhennull",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_nullablefieldsomittedwhennull",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L88",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_serializesdefaultcatalogentry",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_serializesdefaultcatalogentry",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogEntryInfoTests.cs",
+      "source_location": "L47",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtripsfullcatalogentry",
+      "_tgt": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "source": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtripsfullcatalogentry",
+      "target": "tiamcpserver_tests_catalogentryinfotests_catalogentryinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogtypeidentifiertests_cs",
+      "_tgt": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "source": "tiamcpserver_tests_catalogtypeidentifiertests_cs",
+      "target": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "_tgt": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_creatableidentifiersusesupportedprefixes",
+      "source": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "target": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_creatableidentifiersusesupportedprefixes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "_tgt": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_noncreatableidentifiersarerejected",
+      "source": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "target": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_noncreatableidentifiersarerejected",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\CatalogTypeIdentifierTests.cs",
+      "source_location": "L27",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "_tgt": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_validationmessagepointsuserbacktocatalogtypeidentifierfield",
+      "source": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests",
+      "target": "tiamcpserver_tests_catalogtypeidentifiertests_catalogtypeidentifiertests_validationmessagepointsuserbacktocatalogtypeidentifierfield",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_cs",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_cs",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_serializesemptyresult",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_serializesemptyresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtripsresultwithsettingsandmessages",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtripsresultwithsettingsandmessages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L60",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L22",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_serializesemptyresult",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_serializesemptyresult",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceResultInfoTests.cs",
+      "source_location": "L51",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtripsresultwithsettingsandmessages",
+      "_tgt": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "source": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtripsresultwithsettingsandmessages",
+      "target": "tiamcpserver_tests_configurenetworkdeviceresultinfotests_configurenetworkdeviceresultinfotests_roundtrip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdevicetooltests_cs",
+      "_tgt": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "source": "tiamcpserver_tests_configurenetworkdevicetooltests_cs",
+      "target": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicetoolhasmcpmetadata",
+      "source": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "target": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicetoolhasmcpmetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicerejectsunconfirmedrequests",
+      "source": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "target": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_configurenetworkdevicerejectsunconfirmedrequests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\ConfigureNetworkDeviceToolTests.cs",
+      "source_location": "L46",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "_tgt": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_opennessworkerclientexposesconfigurenetworkdeviceasync",
+      "source": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests",
+      "target": "tiamcpserver_tests_configurenetworkdevicetooltests_configurenetworkdevicetooltests_opennessworkerclientexposesconfigurenetworkdeviceasync",
       "confidence_score": 1.0
     },
     {
@@ -5933,6 +8252,42 @@
       "_tgt": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_omittedprojectpathusesstartupprojectpath",
       "source": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests",
       "target": "tiamcpserver_tests_projectsessionbindingtests_projectsessionbindingtests_omittedprojectpathusesstartupprojectpath",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L10",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_searchequipmentcatalogtooltests_cs",
+      "_tgt": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "source": "tiamcpserver_tests_searchequipmentcatalogtooltests_cs",
+      "target": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "_tgt": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_searchequipmentcatalogtoolhasmcpmetadata",
+      "source": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "target": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_searchequipmentcatalogtoolhasmcpmetadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "TiaMcpServer.Tests\\SearchEquipmentCatalogToolTests.cs",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_src": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "_tgt": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_opennessworkerclientexposessearchequipmentcatalogasync",
+      "source": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests",
+      "target": "tiamcpserver_tests_searchequipmentcatalogtooltests_searchequipmentcatalogtooltests_opennessworkerclientexposessearchequipmentcatalogasync",
       "confidence_score": 1.0
     },
     {

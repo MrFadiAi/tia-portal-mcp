@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.10.0" />
+    <PackageReference Include="ModelContextProtocol" Version="1.2.0" />
     <PackageReference Include="xunit" Version="2.9.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
@@ -21,5 +22,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TiaMcpServer.Contracts\TiaMcpServer.Contracts.csproj" />
+    <Compile Include="..\TiaMcpServer\Worker\OpennessWorkerClient.cs" Link="Host\OpennessWorkerClient.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\SearchEquipmentCatalogTool.cs" Link="Host\SearchEquipmentCatalogTool.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\AddNetworkDeviceTool.cs" Link="Host\AddNetworkDeviceTool.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\ConfigureNetworkDeviceTool.cs" Link="Host\ConfigureNetworkDeviceTool.cs" />
   </ItemGroup>
 </Project>

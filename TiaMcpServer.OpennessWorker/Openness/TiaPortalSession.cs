@@ -18,6 +18,8 @@ public class TiaPortalSession : IDisposable
 
     public Project? Project { get; private set; }
 
+    public TiaPortal? TiaPortal => _tiaPortal;
+
     public bool IsConnected => _tiaPortal != null;
 
     public void Connect()
