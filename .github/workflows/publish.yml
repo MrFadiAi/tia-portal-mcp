@@ -5,6 +5,11 @@ on:
     tags:
       - 'v*'
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to publish, for example 1.2.3 or v1.2.3'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -28,8 +33,33 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore TiaMcpServer.sln
 
+      - name: Resolve package version
+        id: version
+        shell: pwsh
+        run: |
+          if ("${{ github.ref_type }}" -eq "tag") {
+            $releaseTag = "${{ github.ref_name }}"
+          } else {
+            $releaseTag = "${{ inputs.version }}"
+          }
+
+          $packageVersion = $releaseTag -replace '^v', ''
+
+          if ($packageVersion -notmatch '^\d+\.\d+\.\d+(-[0-9A-Za-z.-]+)?$') {
+            throw "Version '$releaseTag' does not resolve to a valid NuGet package version."
+          }
+
+          if (-not $releaseTag.StartsWith('v')) {
+            $releaseTag = "v$packageVersion"
+          }
+
+          "PACKAGE_VERSION=$packageVersion" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "package_version=$packageVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "release_tag=$releaseTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Resolved NuGet package version $packageVersion from release tag $releaseTag"
+
       - name: Build and Pack
-        run: dotnet pack TiaMcpServer/TiaMcpServer.csproj -c Release --no-restore -o ./out
+        run: dotnet pack TiaMcpServer/TiaMcpServer.csproj -c Release --no-restore -o ./out /p:Version=$env:PACKAGE_VERSION /p:PackageVersion=$env:PACKAGE_VERSION
 
        # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)
@@ -53,6 +83,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.release_tag }}
           files: |
             out/*.nupkg
             out/tia-mcp-windows-x64.zip

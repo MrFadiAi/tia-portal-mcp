@@ -1,7 +1,7 @@
-# Graph Report - tia-portal-mcp  (2026-04-30)
+# Graph Report - tia-portal-mcp  (2026-05-01)
 
 ## Corpus Check
-- 43 files · ~10,974 words
+- 43 files · ~10,624 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
