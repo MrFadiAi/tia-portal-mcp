@@ -56,6 +56,7 @@ internal static class Program
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "list_tag_tables"     => ListTagTables(request),
+                "compile_check"       => CompileCheck(request),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
         }
@@ -494,6 +495,49 @@ internal static class Program
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(tables, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse CompileCheck(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession();
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var report = CompileChecker.Compile(session.Project, request.PlcName, request.BlockPath);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(report, JsonOptions)
             };
         }
         catch (EngineeringException ex)

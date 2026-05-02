@@ -2,9 +2,9 @@
 
 MCP server for Siemens SIMATIC TIA Portal V21. It lets MCP clients and AI agents inspect a running TIA Portal project through the Siemens Openness API.
 
-The current implementation covers project discovery, PLC block export/import, tag table reads, hardware/network discovery, cross-reference diagnostics, hardware catalog search, and guarded network-device provisioning. The forward roadmap adds broader compile/check diagnostics.
+The current implementation covers project discovery, PLC block export/import, tag table reads, hardware/network discovery, cross-reference diagnostics, hardware catalog search, guarded network-device provisioning, and compile/check diagnostics.
 
-The server currently exposes nine tools:
+The server currently exposes ten tools:
 
 - `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details.
 - `get_block_content` - exports a PLC block to its SIMATIC SD document representation.
@@ -15,10 +15,11 @@ The server currently exposes nine tools:
 - `search_equipment_catalog` - search the local TIA Portal hardware catalog, including installed GSD/HSP packages.
 - `add_network_device` - insert an exact catalog `typeIdentifier` into the project with explicit confirmation.
 - `configure_network_device` - configure IP address, subnet mask, PROFINET device name, subnet, and IO-system settings when supported by Openness.
+- `compile_check` - run compile/check operations and return diagnostics.
 
 Planned tools are not exposed yet:
 
-- `compile_check` - run compile/check operations and return diagnostics.
+- (None currently planned for the next immediate release)
 
 ## Architecture
 
@@ -149,10 +150,10 @@ For the safest local MCP test loop, use the official MCP Inspector against a dis
 2. Open a test project, preferably a copied `.ap21` project, not a production project.
 3. Build the repo:
 
-```powershell
-dotnet restore TiaMcpServer.sln
-dotnet build TiaMcpServer.sln -m:1
-```
+    ```powershell
+    dotnet restore TiaMcpServer.sln
+    dotnet build TiaMcpServer.sln -m:1
+    ```
 
 4. Launch MCP Inspector against the built server:
 
@@ -169,8 +170,8 @@ npx -y @modelcontextprotocol/inspector dotnet .\TiaMcpServer\bin\Debug\net8.0\Ti
 In the Inspector UI:
 
 - Open the Tools tab.
-- Click `List Tools` and verify the nine tools appear.
-- Start with read-only tools: `browse_project_tree`, `list_tag_tables`, `read_hardware_config`, and `read_cross_references`.
+- Click `List Tools` and verify the ten tools appear.
+- Start with read-only tools: `browse_project_tree`, `list_tag_tables`, `read_hardware_config`, `read_cross_references`, and `compile_check`.
 - Use `search_equipment_catalog` before hardware insertion so you can copy an exact `typeIdentifier`.
 - Use `get_block_content` on a block path returned by `browse_project_tree`.
 - Avoid `update_block_logic`, `add_network_device`, and `configure_network_device` unless the project is disposable; they write to the TIA project and require `confirm=true`.
@@ -181,7 +182,7 @@ Recommended smoke-test inputs:
 {}
 ```
 
-for `browse_project_tree` and `read_hardware_config`, or:
+for `browse_project_tree`, `read_hardware_config`, and `compile_check`, or:
 
 ```json
 {
@@ -294,10 +295,7 @@ Current status:
 - Phase 3 hardware and network discovery is implemented through `read_hardware_config`.
 - Phase 4 cross-reference diagnostics is implemented through `read_cross_references`.
 - Phase 5 hardware catalog search and guarded network-device provisioning is implemented through `search_equipment_catalog`, `add_network_device`, and `configure_network_device`.
-
-Planned next phases:
-
-- Phase 6: `compile_check` for compile/check-syntax diagnostics and richer post-change validation.
+- Phase 6 compile/check-syntax diagnostics and richer post-change validation is implemented through `compile_check`.
 
 Possible future work:
 

@@ -293,6 +293,34 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> CompileCheckAsync(string? blockPath, string? plcName, string? projectPath)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "compile_check",
+                    BlockPath = blockPath,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
     private static async Task<WorkerResponse> SendAsync(WorkerRequest request)
     {
         var workerPath = LocateWorkerExecutable();

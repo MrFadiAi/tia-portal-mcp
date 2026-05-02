@@ -26,5 +26,6 @@
     <Compile Include="..\TiaMcpServer\Tools\SearchEquipmentCatalogTool.cs" Link="Host\SearchEquipmentCatalogTool.cs" />
     <Compile Include="..\TiaMcpServer\Tools\AddNetworkDeviceTool.cs" Link="Host\AddNetworkDeviceTool.cs" />
     <Compile Include="..\TiaMcpServer\Tools\ConfigureNetworkDeviceTool.cs" Link="Host\ConfigureNetworkDeviceTool.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\CompileCheckTool.cs" Link="Host\CompileCheckTool.cs" />
   </ItemGroup>
 </Project>
