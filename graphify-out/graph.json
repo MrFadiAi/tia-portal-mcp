@@ -5625,9 +5625,9 @@
       "weight": 1.0,
       "_src": "openness_compilechecker_compilechecker",
       "_tgt": "openness_compilechecker_compilechecker_findfirstdevicename",
+      "confidence_score": 1.0,
       "source": "openness_compilechecker_compilechecker",
-      "target": "openness_compilechecker_compilechecker_findfirstdevicename",
-      "confidence_score": 1.0
+      "target": "openness_compilechecker_compilechecker_findfirstdevicename"
     },
     {
       "relation": "method",
@@ -5805,9 +5805,9 @@
       "weight": 1.0,
       "_src": "openness_compilechecker_compilechecker_compileblock",
       "_tgt": "openness_compilechecker_compilechecker_findfirstdevicename",
+      "confidence_score": 1.0,
       "source": "openness_compilechecker_compilechecker_compileblock",
-      "target": "openness_compilechecker_compilechecker_findfirstdevicename",
-      "confidence_score": 1.0
+      "target": "openness_compilechecker_compilechecker_findfirstdevicename"
     },
     {
       "relation": "calls",
@@ -5829,9 +5829,9 @@
       "weight": 1.0,
       "_src": "openness_compilechecker_compilechecker_findfirstdevicename",
       "_tgt": "openness_compilechecker_compilechecker_findallplcsoftware",
+      "confidence_score": 1.0,
       "source": "openness_compilechecker_compilechecker_findfirstdevicename",
-      "target": "openness_compilechecker_compilechecker_findallplcsoftware",
-      "confidence_score": 1.0
+      "target": "openness_compilechecker_compilechecker_findallplcsoftware"
     },
     {
       "relation": "calls",

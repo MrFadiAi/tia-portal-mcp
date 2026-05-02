@@ -44,4 +44,13 @@
           DestinationFiles="@(OpennessWorkerFiles->'$(PublishDir)openness-worker\%(RecursiveDir)%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
   </Target>
+
+  <Target Name="PackOpennessWorker" AfterTargets="PackTool" Condition="'$(PackAsTool)' == 'true'">
+    <ItemGroup>
+      <OpennessWorkerPackageFiles Include="$(OutputPath)openness-worker\**\*.*" />
+      <TfmSpecificPackageFile Include="@(OpennessWorkerPackageFiles)">
+        <PackagePath>tools/$(_NuGetShortFolderName)/any/openness-worker/%(OpennessWorkerPackageFiles.RecursiveDir)%(Filename)%(Extension)</PackagePath>
+      </TfmSpecificPackageFile>
+    </ItemGroup>
+  </Target>
 </Project>
