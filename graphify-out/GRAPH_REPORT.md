@@ -1,13 +1,18 @@
-# Graph Report - tia-portal-mcp  (2026-05-02)
+# Graph Report - tia-portal-mcp  (2026-05-10)
 
 ## Corpus Check
-- 67 files · ~16,344 words
+- 80 files · ~22,529 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 372 nodes · 498 edges · 70 communities detected
-- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 1 edges (avg confidence: 0.8)
+- 614 nodes · 875 edges · 83 communities (6 shown, 77 thin omitted)
+- Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `a0c470e8`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Community 0|Community 0]]
@@ -80,448 +85,79 @@
 - [[_COMMUNITY_Community 67|Community 67]]
 - [[_COMMUNITY_Community 68|Community 68]]
 - [[_COMMUNITY_Community 69|Community 69]]
+- [[_COMMUNITY_Community 70|Community 70]]
+- [[_COMMUNITY_Community 71|Community 71]]
+- [[_COMMUNITY_Community 72|Community 72]]
+- [[_COMMUNITY_Community 73|Community 73]]
+- [[_COMMUNITY_Community 74|Community 74]]
+- [[_COMMUNITY_Community 75|Community 75]]
+- [[_COMMUNITY_Community 76|Community 76]]
+- [[_COMMUNITY_Community 77|Community 77]]
+- [[_COMMUNITY_Community 78|Community 78]]
+- [[_COMMUNITY_Community 79|Community 79]]
+- [[_COMMUNITY_Community 80|Community 80]]
+- [[_COMMUNITY_Community 81|Community 81]]
+- [[_COMMUNITY_Community 82|Community 82]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `HardwareConfigReader` - 19 edges
-2. `CompileChecker` - 15 edges
-3. `OpennessWorkerClient` - 14 edges
-4. `Program` - 14 edges
-5. `CrossReferenceReader` - 13 edges
-6. `NetworkDeviceConfigurator` - 13 edges
-7. `EquipmentCatalogSearcher` - 12 edges
-8. `BlockTargetResolver` - 10 edges
-9. `ProjectTreeWalker` - 10 edges
-10. `TiaPortalSession` - 10 edges
+1. `OpennessWorkerClient` - 36 edges
+2. `Program` - 32 edges
+3. `HardwareConfigReader` - 20 edges
+4. `CompileChecker` - 16 edges
+5. `ProjectLifecycleService` - 16 edges
+6. `TagMutationService` - 15 edges
+7. `CrossReferenceReader` - 14 edges
+8. `NetworkDeviceConfigurator` - 14 edges
+9. `EquipmentCatalogSearcher` - 13 edges
+10. `Local MCP Sandbox Testing` - 13 edges
 
 ## Surprising Connections (you probably didn't know these)
-- None detected - all connections are within the same source files.
+- `OpennessWorkerClient` --references--> `JsonSerializerOptions`  [EXTRACTED]
+  TiaMcpServer/Worker/OpennessWorkerClient.cs → TiaMcpServer.OpennessWorker/Program.cs
+- `ArchiveModeNames` --references--> `string`  [EXTRACTED]
+  TiaMcpServer.Contracts/ArchiveModeNames.cs → TiaMcpServer.Contracts/ProjectSessionBinding.cs
 
-## Communities
+## Communities (83 total, 77 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.21
-Nodes (2): HardwareConfigReader, NetworkDeviceCreator
+Cohesion: 0.04
+Nodes (45): Architecture, Block Paths, Build From Source, code:text (C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21), code:powershell (dotnet run --project TiaMcpServer), code:powershell ('{ "method": "browse_project_tree", "projectPath": null }' |), code:json ({"success":true,"payload":"[...]"}), code:json ({"success":false,"error":"No running TIA Portal V21 instance) (+37 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.24
-Nodes (2): CompileChecker, DiscoveredPlcSoftware
-
-### Community 2 - "Community 2"
-Cohesion: 0.25
-Nodes (1): OpennessWorkerClient
-
-### Community 3 - "Community 3"
-Cohesion: 0.34
-Nodes (1): Program
-
-### Community 4 - "Community 4"
-Cohesion: 0.26
-Nodes (2): CrossReferenceReader, DiscoveredPlcSoftware
-
-### Community 5 - "Community 5"
-Cohesion: 0.3
-Nodes (1): NetworkDeviceConfigurator
-
-### Community 6 - "Community 6"
-Cohesion: 0.35
-Nodes (1): EquipmentCatalogSearcher
-
-### Community 7 - "Community 7"
-Cohesion: 0.32
-Nodes (2): BlockTargetResolver, ResolvedBlockTarget
-
-### Community 8 - "Community 8"
-Cohesion: 0.45
-Nodes (1): ProjectTreeWalker
-
-### Community 9 - "Community 9"
-Cohesion: 0.27
-Nodes (2): IDisposable, TiaPortalSession
+Cohesion: 0.11
+Nodes (4): JsonSerializerOptions, ProjectSessionBinding, TimeSpan, OpennessWorkerClient
 
 ### Community 10 - "Community 10"
-Cohesion: 0.29
-Nodes (1): CrossReferenceInfoTests
-
-### Community 11 - "Community 11"
-Cohesion: 0.39
-Nodes (1): TagTableReader
+Cohesion: 0.15
+Nodes (4): TagOperationsTool, TagTableOperationsTool, TiaMcpServer.Tools, UserConstantOperationsTool
 
 ### Community 12 - "Community 12"
-Cohesion: 0.43
-Nodes (1): BlockAddress
+Cohesion: 0.22
+Nodes (4): bool, IDisposable, TiaPortalSession, TiaPortal
 
-### Community 13 - "Community 13"
-Cohesion: 0.25
-Nodes (1): BlockAddressTests
+### Community 17 - "Community 17"
+Cohesion: 0.27
+Nodes (3): string, ArchiveModeNames, ProjectSessionBinding
 
-### Community 14 - "Community 14"
-Cohesion: 0.43
-Nodes (1): HardwareConfigInfoTests
-
-### Community 15 - "Community 15"
+### Community 28 - "Community 28"
 Cohesion: 0.29
 Nodes (7): Model Context Protocol, Siemens TIA Openness User Group, Phase 1: Implementation, Phase 2: Universal Block Support, Phase 3: Hardware and Network Discovery, Phase 4: Advanced Diagnostics, tia-portal-mcp
 
-### Community 16 - "Community 16"
-Cohesion: 0.4
-Nodes (2): Program, TiaMcpServer
-
-### Community 17 - "Community 17"
-Cohesion: 0.47
-Nodes (1): AssemblyResolver
-
-### Community 18 - "Community 18"
-Cohesion: 0.53
-Nodes (1): BlockImporter
-
-### Community 19 - "Community 19"
-Cohesion: 0.47
-Nodes (1): CatalogEntryInfoTests
-
-### Community 20 - "Community 20"
-Cohesion: 0.53
-Nodes (1): CompileCheckInfoTests
-
-### Community 21 - "Community 21"
-Cohesion: 0.33
-Nodes (1): ProjectSessionBindingTests
-
-### Community 22 - "Community 22"
-Cohesion: 0.6
-Nodes (1): AddDeviceResultInfoTests
-
-### Community 23 - "Community 23"
-Cohesion: 0.4
-Nodes (1): AddNetworkDeviceToolTests
-
-### Community 24 - "Community 24"
-Cohesion: 0.4
-Nodes (1): CatalogTypeIdentifierTests
-
-### Community 25 - "Community 25"
-Cohesion: 0.6
-Nodes (1): ConfigureNetworkDeviceResultInfoTests
-
-### Community 26 - "Community 26"
-Cohesion: 0.4
-Nodes (1): ConfigureNetworkDeviceToolTests
-
-### Community 27 - "Community 27"
-Cohesion: 0.5
-Nodes (2): AddNetworkDeviceTool, TiaMcpServer.Tools
-
-### Community 28 - "Community 28"
-Cohesion: 0.5
-Nodes (2): BrowseProjectTreeTool, TiaMcpServer.Tools
-
-### Community 29 - "Community 29"
-Cohesion: 0.5
-Nodes (2): CompileCheckTool, TiaMcpServer.Tools
-
-### Community 30 - "Community 30"
-Cohesion: 0.5
-Nodes (2): ConfigureNetworkDeviceTool, TiaMcpServer.Tools
-
-### Community 31 - "Community 31"
-Cohesion: 0.5
-Nodes (2): GetBlockContentTool, TiaMcpServer.Tools
-
-### Community 32 - "Community 32"
-Cohesion: 0.5
-Nodes (2): ListTagTablesTool, TiaMcpServer.Tools
-
-### Community 33 - "Community 33"
-Cohesion: 0.5
-Nodes (2): ReadCrossReferencesTool, TiaMcpServer.Tools
-
-### Community 34 - "Community 34"
-Cohesion: 0.5
-Nodes (2): ReadHardwareConfigTool, TiaMcpServer.Tools
-
-### Community 35 - "Community 35"
-Cohesion: 0.5
-Nodes (2): SearchEquipmentCatalogTool, TiaMcpServer.Tools
-
-### Community 36 - "Community 36"
-Cohesion: 0.5
-Nodes (2): TiaMcpServer.Tools, UpdateBlockLogicTool
-
-### Community 37 - "Community 37"
-Cohesion: 0.5
-Nodes (1): CatalogTypeIdentifier
-
-### Community 38 - "Community 38"
-Cohesion: 0.67
-Nodes (1): ProjectSessionBinding
-
-### Community 39 - "Community 39"
-Cohesion: 0.5
-Nodes (1): CompileCheckToolTests
-
-### Community 40 - "Community 40"
-Cohesion: 0.5
-Nodes (1): SearchEquipmentCatalogToolTests
-
-### Community 41 - "Community 41"
-Cohesion: 0.67
-Nodes (1): CrossReferenceFilterNames
-
-### Community 42 - "Community 42"
-Cohesion: 0.67
-Nodes (1): BlockExporter
-
-### Community 43 - "Community 43"
-Cohesion: 1.0
-Nodes (1): AddDeviceResultInfo
-
-### Community 44 - "Community 44"
-Cohesion: 1.0
-Nodes (1): CatalogEntryInfo
-
-### Community 45 - "Community 45"
-Cohesion: 1.0
-Nodes (1): CompileCheckReport
-
-### Community 46 - "Community 46"
-Cohesion: 1.0
-Nodes (1): CompileMessageInfo
-
-### Community 47 - "Community 47"
-Cohesion: 1.0
-Nodes (1): ConfigureNetworkDeviceResultInfo
-
-### Community 48 - "Community 48"
-Cohesion: 1.0
-Nodes (1): CrossReferenceLocationInfo
-
-### Community 49 - "Community 49"
-Cohesion: 1.0
-Nodes (1): CrossReferenceReport
-
-### Community 50 - "Community 50"
-Cohesion: 1.0
-Nodes (1): CrossReferenceSourceInfo
-
-### Community 51 - "Community 51"
-Cohesion: 1.0
-Nodes (1): CrossReferenceTargetInfo
-
-### Community 52 - "Community 52"
-Cohesion: 1.0
-Nodes (1): DeviceInfo
-
-### Community 53 - "Community 53"
-Cohesion: 1.0
-Nodes (1): DeviceItemInfo
-
-### Community 54 - "Community 54"
-Cohesion: 1.0
-Nodes (1): HardwareConfigInfo
-
-### Community 55 - "Community 55"
-Cohesion: 1.0
-Nodes (1): IoSystemInfo
-
-### Community 56 - "Community 56"
-Cohesion: 1.0
-Nodes (1): NetworkInterfaceInfo
-
-### Community 57 - "Community 57"
-Cohesion: 1.0
-Nodes (1): NodeInfo
-
-### Community 58 - "Community 58"
-Cohesion: 1.0
-Nodes (1): PlcCompileInfo
-
-### Community 59 - "Community 59"
-Cohesion: 1.0
-Nodes (1): PlcCrossReferenceInfo
-
-### Community 60 - "Community 60"
-Cohesion: 1.0
-Nodes (1): ProjectTreeNode
-
-### Community 61 - "Community 61"
-Cohesion: 1.0
-Nodes (1): SubnetInfo
-
-### Community 62 - "Community 62"
-Cohesion: 1.0
-Nodes (1): TagInfo
-
-### Community 63 - "Community 63"
-Cohesion: 1.0
-Nodes (1): TagTableInfo
-
-### Community 64 - "Community 64"
-Cohesion: 1.0
-Nodes (1): UserConstantInfo
-
-### Community 65 - "Community 65"
-Cohesion: 1.0
-Nodes (1): WorkerRequest
-
-### Community 66 - "Community 66"
-Cohesion: 1.0
-Nodes (1): WorkerResponse
-
-### Community 67 - "Community 67"
-Cohesion: 1.0
-Nodes (2): Multi-process Architecture Rationale, .NET Remoting Incompatibility in .NET 8
-
-### Community 68 - "Community 68"
-Cohesion: 1.0
-Nodes (1): .NET 8
-
-### Community 69 - "Community 69"
-Cohesion: 1.0
-Nodes (1): .NET Framework 4.8
-
 ## Knowledge Gaps
-- **48 isolated node(s):** `TiaMcpServer`, `TiaMcpServer.Tools`, `TiaMcpServer.Tools`, `TiaMcpServer.Tools`, `TiaMcpServer.Tools` (+43 more)
+- **56 isolated node(s):** `TiaMcpServer.Tools`, `TiaMcpServer.Tools`, `TimeSpan`, `ProjectSessionBinding`, `ProjectLifecycleResultInfo` (+51 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 0`** (25 nodes): `HardwareConfigReader`, `.FindParentDeviceName()`, `.Read()`, `.ReadAttribute()`, `.ReadConnectedSubnetName()`, `.ReadDevice()`, `.ReadDeviceItem()`, `.ReadDeviceItems()`, `.ReadEnumerableProperty()`, `.ReadInt()`, `.ReadIoSystem()`, `.ReadIoSystemName()`, `.ReadNetworkInterface()`, `.ReadNetworkInterfaces()`, `.ReadNode()`, `.ReadProperty()`, `.ReadPropertyOrAttribute()`, `.ReadString()`, `.ReadSubnet()`, `NetworkDeviceCreator`, `.Create()`, `.GetFirstDeviceItem()`, `.ReadString()`, `HardwareConfigReader.cs`, `NetworkDeviceCreator.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 1`** (17 nodes): `CompileChecker`, `.BuildPlcCompileInfo()`, `.Compile()`, `.CompileBlock()`, `.CompileObject()`, `.CompilePlcSoftware()`, `.FindAllPlcSoftware()`, `.FindCompileMethod()`, `.FindFirstDeviceName()`, `.FindPlcSoftwareInDeviceItems()`, `.MapMessages()`, `.MapMessageSeverity()`, `.MapState()`, `.ReadMessagePath()`, `.WorstState()`, `DiscoveredPlcSoftware`, `CompileChecker.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 2`** (15 nodes): `OpennessWorkerClient.cs`, `OpennessWorkerClient`, `.AddNetworkDeviceAsync()`, `.BrowseProjectTreeAsync()`, `.CompileCheckAsync()`, `.ConfigureNetworkDeviceAsync()`, `.GetBlockContentAsync()`, `.ListTagTablesAsync()`, `.LocateWorkerExecutable()`, `.ReadCrossReferencesAsync()`, `.ReadHardwareConfigAsync()`, `.SearchEquipmentCatalogAsync()`, `.SendAsync()`, `.TryKill()`, `.UpdateBlockLogicAsync()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 3`** (15 nodes): `Program.cs`, `Program`, `.AddNetworkDevice()`, `.BrowseProjectTree()`, `.CompileCheck()`, `.ConfigureNetworkDevice()`, `.Failure()`, `.GetBlockContent()`, `.HandleLine()`, `.ListTagTables()`, `.Main()`, `.ReadCrossReferences()`, `.ReadHardwareConfig()`, `.SearchEquipmentCatalog()`, `.UpdateBlockLogic()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 4`** (15 nodes): `CrossReferenceReader`, `.CountLocations()`, `.CountReferences()`, `.CountSources()`, `.FindPlcSoftware()`, `.FindPlcSoftwareInDeviceItems()`, `.Read()`, `.ReadLocation()`, `.ReadPlc()`, `.ReadReference()`, `.ReadSource()`, `.SafeString()`, `.ToOpennessFilter()`, `DiscoveredPlcSoftware`, `CrossReferenceReader.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 5`** (14 nodes): `NetworkDeviceConfigurator`, `.ApplyNodeAttribute()`, `.Configure()`, `.ConnectIoSystem()`, `.ConnectSubnet()`, `.FindDevice()`, `.FindNamedItem()`, `.FindNetworkInterface()`, `.FindSubnet()`, `.GetFirstNode()`, `.InvokeFirstAvailable()`, `.ReadEnumerableProperty()`, `.ReadProperty()`, `NetworkDeviceConfigurator.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 6`** (13 nodes): `EquipmentCatalogSearcher`, `.AddMatch()`, `.AddMatchesFromHardwareCatalogFind()`, `.AppendPath()`, `.Contains()`, `.Enumerate()`, `.FindCatalogRoots()`, `.HasReadableProperty()`, `.ReadProperty()`, `.ReadStringProperty()`, `.Search()`, `.Traverse()`, `EquipmentCatalogSearcher.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 7`** (12 nodes): `BlockTargetResolver`, `.CollectMatches()`, `.FindBlockGroup()`, `.FindLegacyMatches()`, `.FindPlcSoftware()`, `.FindPlcSoftwareInDeviceItems()`, `.FindSoftwareUnit()`, `.ResolveDeterministicBlockGroup()`, `.ResolveForExport()`, `.ResolveForImport()`, `ResolvedBlockTarget`, `BlockTargetResolver.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 8`** (11 nodes): `ProjectTreeWalker`, `.CombinePath()`, `.FindPlcSoftwareInDevice()`, `.FindPlcSoftwareInDeviceItems()`, `.Walk()`, `.WalkBlockGroup()`, `.WalkPlcSoftware()`, `.WalkSoftwareUnits()`, `.WalkTagTableGroup()`, `.WalkTypeGroup()`, `ProjectTreeWalker.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 9`** (11 nodes): `IDisposable`, `TiaPortalSession`, `.Connect()`, `.Dispose()`, `.EnsureConnected()`, `.OnConfirmation()`, `.OnDisposed()`, `.OnNotification()`, `.OpenProject()`, `.ThrowIfDisposed()`, `TiaPortalSession.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 10`** (10 nodes): `CrossReferenceInfoTests`, `.EmptyReportSerializesWithEmptyPlcList()`, `.FullReportRoundTripsSourceReferenceAndLocation()`, `.InvalidFilterReturnsAllowedValues()`, `.NullOrEmptyFilterDefaultsToObjectsWithReferences()`, `.PlcMessagesRoundTrip()`, `.RoundTrip()`, `.UnusedObjectReportRoundTripsSourcesWithEmptyReferences()`, `.ValidFilterNamesParseCaseInsensitively()`, `CrossReferenceInfoTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 11`** (9 nodes): `TagTableReader`, `.CollectTablesFromGroup()`, `.FindPlcSoftware()`, `.FindPlcSoftwareInDeviceItems()`, `.ReadAll()`, `.ReadTags()`, `.ReadTagTable()`, `.ReadUserConstants()`, `TagTableReader.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 12`** (8 nodes): `BlockAddress`, `.FromBlockSegments()`, `.IsReservedSegment()`, `.Parse()`, `.SplitSegments()`, `.StripBlockSuffix()`, `.ToDisplayPath()`, `BlockAddress.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 13`** (8 nodes): `BlockAddressTests`, `.ParseRejectsInvalidPaths()`, `.ParseStripsBlockSuffixFromFinalSegment()`, `.ParseSupportsLegacyBlockOnly()`, `.ParseSupportsLegacyPlcQualifiedBlock()`, `.ParseSupportsNestedBlockFolderPath()`, `.ParseSupportsSoftwareUnitBlockPath()`, `BlockAddressTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 14`** (7 nodes): `HardwareConfigInfoTests.cs`, `HardwareConfigInfoTests`, `.NullableFieldsSerializeAsNull()`, `.RoundTrip()`, `.RoundTripsFullDeviceTree()`, `.RoundTripsSubnetWithIoSystem()`, `.SerializesEmptyConfig()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 16`** (6 nodes): `Program.cs`, `Program`, `.CurrentDomain_AssemblyResolve()`, `.Main()`, `.ResolveStartupProjectPath()`, `TiaMcpServer`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 17`** (6 nodes): `AssemblyResolver`, `.ContainsRequiredAssemblies()`, `.GetOpennessInstallPath()`, `.OnAssemblyResolve()`, `.Register()`, `AssemblyResolver.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 18`** (6 nodes): `BlockImporter`, `.ExtractFileName()`, `.FlushSection()`, `.Import()`, `.WriteContentToTempDir()`, `BlockImporter.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 19`** (6 nodes): `CatalogEntryInfoTests`, `.NullableFieldsOmittedWhenNull()`, `.RoundTrip()`, `.RoundTripsFullCatalogEntry()`, `.SerializesDefaultCatalogEntry()`, `CatalogEntryInfoTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 20`** (6 nodes): `CompileCheckInfoTests`, `.BlockScopeReportHasCorrectScopeAndBlockPath()`, `.EmptyReportSerializesWithDefaultValues()`, `.FullReportRoundTripsPlcInfoAndMessages()`, `.RoundTrip()`, `CompileCheckInfoTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 21`** (6 nodes): `ProjectSessionBindingTests.cs`, `ProjectSessionBindingTests`, `.DifferentProjectPathIsRejectedAfterBinding()`, `.FirstExplicitProjectPathBindsSession()`, `.OmittedProjectPathUsesStartupProjectPath()`, `.RepeatedSameProjectPathIsAccepted()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 22`** (5 nodes): `AddDeviceResultInfoTests`, `.RoundTrip()`, `.RoundTripsResultWithWarnings()`, `.SerializesEmptyResult()`, `AddDeviceResultInfoTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 23`** (5 nodes): `AddNetworkDeviceToolTests`, `.AddNetworkDeviceRejectsUnconfirmedRequests()`, `.AddNetworkDeviceToolHasMcpMetadata()`, `.OpennessWorkerClientExposesAddNetworkDeviceAsync()`, `AddNetworkDeviceToolTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 24`** (5 nodes): `CatalogTypeIdentifierTests`, `.CreatableIdentifiersUseSupportedPrefixes()`, `.NonCreatableIdentifiersAreRejected()`, `.ValidationMessagePointsUserBackToCatalogTypeIdentifierField()`, `CatalogTypeIdentifierTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 25`** (5 nodes): `ConfigureNetworkDeviceResultInfoTests`, `.RoundTrip()`, `.RoundTripsResultWithSettingsAndMessages()`, `.SerializesEmptyResult()`, `ConfigureNetworkDeviceResultInfoTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 26`** (5 nodes): `ConfigureNetworkDeviceToolTests`, `.ConfigureNetworkDeviceRejectsUnconfirmedRequests()`, `.ConfigureNetworkDeviceToolHasMcpMetadata()`, `.OpennessWorkerClientExposesConfigureNetworkDeviceAsync()`, `ConfigureNetworkDeviceToolTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 27`** (4 nodes): `AddNetworkDeviceTool.cs`, `AddNetworkDeviceTool`, `.AddNetworkDevice()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 28`** (4 nodes): `BrowseProjectTreeTool.cs`, `BrowseProjectTreeTool`, `.BrowseProjectTree()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 29`** (4 nodes): `CompileCheckTool.cs`, `CompileCheckTool`, `.CompileCheck()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 30`** (4 nodes): `ConfigureNetworkDeviceTool.cs`, `ConfigureNetworkDeviceTool`, `.ConfigureNetworkDevice()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 31`** (4 nodes): `GetBlockContentTool.cs`, `GetBlockContentTool`, `.GetBlockContent()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 32`** (4 nodes): `ListTagTablesTool.cs`, `ListTagTablesTool`, `.ListTagTables()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 33`** (4 nodes): `ReadCrossReferencesTool.cs`, `ReadCrossReferencesTool`, `.ReadCrossReferences()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 34`** (4 nodes): `ReadHardwareConfigTool.cs`, `ReadHardwareConfigTool`, `.ReadHardwareConfig()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 35`** (4 nodes): `SearchEquipmentCatalogTool.cs`, `SearchEquipmentCatalogTool`, `.SearchEquipmentCatalog()`, `TiaMcpServer.Tools`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 36`** (4 nodes): `UpdateBlockLogicTool.cs`, `TiaMcpServer.Tools`, `UpdateBlockLogicTool`, `.UpdateBlockLogic()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 37`** (4 nodes): `CatalogTypeIdentifier`, `.BuildValidationMessage()`, `.IsCreatable()`, `CatalogTypeIdentifier.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 38`** (4 nodes): `ProjectSessionBinding.cs`, `ProjectSessionBinding`, `.Normalize()`, `.TryResolve()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 39`** (4 nodes): `CompileCheckToolTests`, `.CompileCheckToolHasMcpMetadata()`, `.OpennessWorkerClientExposesCompileCheckAsync()`, `CompileCheckToolTests.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 40`** (4 nodes): `SearchEquipmentCatalogToolTests.cs`, `SearchEquipmentCatalogToolTests`, `.OpennessWorkerClientExposesSearchEquipmentCatalogAsync()`, `.SearchEquipmentCatalogToolHasMcpMetadata()`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 41`** (3 nodes): `CrossReferenceFilterNames`, `.TryNormalize()`, `CrossReferenceFilterNames.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 42`** (3 nodes): `BlockExporter`, `.Export()`, `BlockExporter.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 43`** (2 nodes): `AddDeviceResultInfo`, `AddDeviceResultInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 44`** (2 nodes): `CatalogEntryInfo`, `CatalogEntryInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 45`** (2 nodes): `CompileCheckReport`, `CompileCheckReport.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 46`** (2 nodes): `CompileMessageInfo`, `CompileMessageInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (2 nodes): `ConfigureNetworkDeviceResultInfo`, `ConfigureNetworkDeviceResultInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (2 nodes): `CrossReferenceLocationInfo`, `CrossReferenceLocationInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (2 nodes): `CrossReferenceReport`, `CrossReferenceReport.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (2 nodes): `CrossReferenceSourceInfo`, `CrossReferenceSourceInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (2 nodes): `CrossReferenceTargetInfo`, `CrossReferenceTargetInfo.cs`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (2 nodes): `DeviceInfo.cs`, `DeviceInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (2 nodes): `DeviceItemInfo.cs`, `DeviceItemInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (2 nodes): `HardwareConfigInfo.cs`, `HardwareConfigInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 55`** (2 nodes): `IoSystemInfo.cs`, `IoSystemInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 56`** (2 nodes): `NetworkInterfaceInfo.cs`, `NetworkInterfaceInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 57`** (2 nodes): `NodeInfo.cs`, `NodeInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 58`** (2 nodes): `PlcCompileInfo.cs`, `PlcCompileInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 59`** (2 nodes): `PlcCrossReferenceInfo.cs`, `PlcCrossReferenceInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 60`** (2 nodes): `ProjectTreeNode.cs`, `ProjectTreeNode`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 61`** (2 nodes): `SubnetInfo.cs`, `SubnetInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 62`** (2 nodes): `TagInfo.cs`, `TagInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 63`** (2 nodes): `TagTableInfo.cs`, `TagTableInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 64`** (2 nodes): `UserConstantInfo.cs`, `UserConstantInfo`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 65`** (2 nodes): `WorkerRequest.cs`, `WorkerRequest`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 66`** (2 nodes): `WorkerResponse.cs`, `WorkerResponse`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 67`** (2 nodes): `Multi-process Architecture Rationale`, `.NET Remoting Incompatibility in .NET 8`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 68`** (1 nodes): `.NET 8`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 69`** (1 nodes): `.NET Framework 4.8`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **77 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **What connects `TiaMcpServer`, `TiaMcpServer.Tools`, `TiaMcpServer.Tools` to the rest of the system?**
-  _48 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `Program` connect `Community 2` to `Community 1`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Why does `JsonSerializerOptions` connect `Community 1` to `Community 2`?**
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **What connects `TiaMcpServer.Tools`, `TiaMcpServer.Tools`, `TimeSpan` to the rest of the system?**
+  _56 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Should `Community 0` be split into smaller, more focused modules?**
+  _Cohesion score 0.04 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.11 - nodes in this community are weakly interconnected._

@@ -57,6 +57,21 @@ internal static class Program
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "list_tag_tables"     => ListTagTables(request),
                 "compile_check"       => CompileCheck(request),
+                "create_tag_table"    => CreateTagTable(request),
+                "delete_tag_table"    => DeleteTagTable(request),
+                "create_tag"          => CreateTag(request),
+                "update_tag"          => UpdateTag(request),
+                "delete_tag"          => DeleteTag(request),
+                "create_user_constant" => CreateUserConstant(request),
+                "update_user_constant" => UpdateUserConstant(request),
+                "delete_user_constant" => DeleteUserConstant(request),
+                "get_project_status"  => GetProjectStatus(request),
+                "open_project"        => OpenProject(request),
+                "create_project"      => CreateProject(request),
+                "save_project"        => SaveProject(request),
+                "save_project_as"     => SaveProjectAs(request),
+                "archive_project"     => ArchiveProject(request),
+                "close_project"       => CloseProject(request),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
         }
@@ -538,6 +553,266 @@ internal static class Program
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(report, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse CreateTagTable(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.CreateTagTable(project, request.PlcName, request.TableName!, request.FolderPath));
+    }
+
+    private static WorkerResponse DeleteTagTable(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.DeleteTagTable(project, request.PlcName, request.TableName!, request.FolderPath));
+    }
+
+    private static WorkerResponse CreateTag(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.CreateTag(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!,
+                request.DataType!,
+                request.LogicalAddress));
+    }
+
+    private static WorkerResponse UpdateTag(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.UpdateTag(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!,
+                request.NewName,
+                request.DataType,
+                request.LogicalAddress,
+                request.ExternalAccessible,
+                request.ExternalVisible,
+                request.ExternalWritable,
+                request.IsSafety));
+    }
+
+    private static WorkerResponse DeleteTag(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.DeleteTag(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!));
+    }
+
+    private static WorkerResponse CreateUserConstant(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.CreateUserConstant(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!,
+                request.DataType!,
+                request.Value!));
+    }
+
+    private static WorkerResponse UpdateUserConstant(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.UpdateUserConstant(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!,
+                request.DataType,
+                request.Value));
+    }
+
+    private static WorkerResponse DeleteUserConstant(WorkerRequest request)
+    {
+        return TagMutation(request, project =>
+            TagMutationService.DeleteUserConstant(
+                project,
+                request.PlcName,
+                request.TableName!,
+                request.FolderPath,
+                request.Name!));
+    }
+
+    private static WorkerResponse TagMutation(WorkerRequest request, Func<Project, TagMutationResultInfo> mutate)
+    {
+        if (!request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with the tag operation.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = mutate(session.Project);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse GetProjectStatus(WorkerRequest request)
+    {
+        return ProjectLifecycle(request, session =>
+        {
+            var status = ProjectLifecycleService.GetStatus(session, request.ProjectPath);
+            return new ProjectLifecycleResultInfo
+            {
+                Operation = "get_project_status",
+                ProjectPath = status.Path,
+                Project = status
+            };
+        }, requiresConfirm: false);
+    }
+
+    private static WorkerResponse OpenProject(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.ProjectPath))
+        {
+            return Failure("ProjectPath is required.");
+        }
+
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.OpenProject(session, request.ProjectPath!),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse CreateProject(WorkerRequest request)
+    {
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.CreateProject(
+                session,
+                request.ProjectDirectory!,
+                request.ProjectName!,
+                request.Author,
+                request.Comment),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse SaveProject(WorkerRequest request)
+    {
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.SaveProject(session, request.ProjectPath),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse SaveProjectAs(WorkerRequest request)
+    {
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.SaveProjectAs(
+                session,
+                request.ProjectPath,
+                request.TargetDirectory!,
+                request.TargetName!,
+                request.Rebind),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse ArchiveProject(WorkerRequest request)
+    {
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.ArchiveProject(
+                session,
+                request.ProjectPath,
+                request.ArchiveDirectory!,
+                request.ArchiveName!,
+                request.ArchiveMode ?? ArchiveModeNames.Compressed,
+                request.SaveBeforeArchive),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse CloseProject(WorkerRequest request)
+    {
+        return ProjectLifecycle(
+            request,
+            session => ProjectLifecycleService.CloseProject(session, request.ProjectPath, request.SaveBeforeClose),
+            requiresConfirm: true);
+    }
+
+    private static WorkerResponse ProjectLifecycle(
+        WorkerRequest request,
+        Func<WorkerTiaPortalSession, ProjectLifecycleResultInfo> operation,
+        bool requiresConfirm)
+    {
+        if (requiresConfirm && !request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with the project operation.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations);
+            var result = operation(session);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
             };
         }
         catch (EngineeringException ex)

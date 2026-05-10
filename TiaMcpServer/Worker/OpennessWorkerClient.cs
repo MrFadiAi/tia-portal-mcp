@@ -321,6 +321,466 @@ public class OpennessWorkerClient
         }
     }
 
+    public Task<string> CreateTagTableAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "create_tag_table",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> DeleteTagTableAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "delete_tag_table",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> CreateTagAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string dataType,
+        string? logicalAddress,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "create_tag",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.DataType = dataType;
+                request.LogicalAddress = logicalAddress;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> UpdateTagAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string? newName,
+        string? dataType,
+        string? logicalAddress,
+        bool? externalAccessible,
+        bool? externalVisible,
+        bool? externalWritable,
+        bool? isSafety,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "update_tag",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.NewName = newName;
+                request.DataType = dataType;
+                request.LogicalAddress = logicalAddress;
+                request.ExternalAccessible = externalAccessible;
+                request.ExternalVisible = externalVisible;
+                request.ExternalWritable = externalWritable;
+                request.IsSafety = isSafety;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> DeleteTagAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "delete_tag",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> CreateUserConstantAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string dataType,
+        string value,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "create_user_constant",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.DataType = dataType;
+                request.Value = value;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> UpdateUserConstantAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string? dataType,
+        string? value,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "update_user_constant",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.DataType = dataType;
+                request.Value = value;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> DeleteUserConstantAsync(
+        string? plcName,
+        string tableName,
+        string? folderPath,
+        string name,
+        string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "delete_user_constant",
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.TableName = tableName;
+                request.FolderPath = folderPath;
+                request.Name = name;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public Task<string> GetProjectStatusAsync(string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "get_project_status",
+            projectPath,
+            _ => { },
+            "{}");
+    }
+
+    public async Task<string> OpenProjectAsync(string projectPath, bool forceRebind)
+    {
+        if (!CanBind(projectPath, forceRebind, out var bindingError))
+        {
+            return $"Error: {bindingError}";
+        }
+
+        try
+        {
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "open_project",
+                    ProjectPath = projectPath,
+                    Confirm = true,
+                    ForceRebind = forceRebind,
+                    AllowTiaConfirmations = true
+                }).ConfigureAwait(false);
+
+            if (!response.Success)
+            {
+                return FormatWorkerError(response);
+            }
+
+            if (!_projectSessionBinding.Bind(projectPath, forceRebind, out var bindError))
+            {
+                return $"Error: {bindError}";
+            }
+
+            return response.Payload ?? "{}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> CreateProjectAsync(
+        string projectDirectory,
+        string projectName,
+        string? author,
+        string? comment)
+    {
+        try
+        {
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "create_project",
+                    ProjectDirectory = projectDirectory,
+                    ProjectName = projectName,
+                    Author = author,
+                    Comment = comment,
+                    Confirm = true,
+                    AllowTiaConfirmations = true
+                }).ConfigureAwait(false);
+
+            if (!response.Success)
+            {
+                return FormatWorkerError(response);
+            }
+
+            var projectPath = TryReadProjectPath(response.Payload);
+            if (!string.IsNullOrWhiteSpace(projectPath))
+            {
+                _projectSessionBinding.Bind(projectPath!, forceRebind: true, out _);
+            }
+
+            return response.Payload ?? "{}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public Task<string> SaveProjectAsync(string? projectPath)
+    {
+        return SendBoundProjectRequestAsync(
+            "save_project",
+            projectPath,
+            request =>
+            {
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public async Task<string> SaveProjectAsAsync(
+        string? projectPath,
+        string targetDirectory,
+        string targetName,
+        bool rebind)
+    {
+        var result = await SendBoundProjectRequestAsync(
+            "save_project_as",
+            projectPath,
+            request =>
+            {
+                request.TargetDirectory = targetDirectory;
+                request.TargetName = targetName;
+                request.Rebind = rebind;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}").ConfigureAwait(false);
+
+        if (rebind && !result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
+        {
+            var copiedProjectPath = TryReadProjectPath(result);
+            if (!string.IsNullOrWhiteSpace(copiedProjectPath))
+            {
+                _projectSessionBinding.Bind(copiedProjectPath!, forceRebind: true, out _);
+            }
+        }
+
+        return result;
+    }
+
+    public Task<string> ArchiveProjectAsync(
+        string? projectPath,
+        string archiveDirectory,
+        string archiveName,
+        string? mode,
+        bool saveBeforeArchive)
+    {
+        if (!ArchiveModeNames.TryNormalize(mode, out var normalizedMode, out var modeError))
+        {
+            return Task.FromResult($"Error: {modeError}");
+        }
+
+        return SendBoundProjectRequestAsync(
+            "archive_project",
+            projectPath,
+            request =>
+            {
+                request.ArchiveDirectory = archiveDirectory;
+                request.ArchiveName = archiveName;
+                request.ArchiveMode = normalizedMode;
+                request.SaveBeforeArchive = saveBeforeArchive;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}");
+    }
+
+    public async Task<string> CloseProjectAsync(string? projectPath, bool saveBeforeClose)
+    {
+        var result = await SendBoundProjectRequestAsync(
+            "close_project",
+            projectPath,
+            request =>
+            {
+                request.SaveBeforeClose = saveBeforeClose;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}").ConfigureAwait(false);
+
+        if (!result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase) &&
+            _projectSessionBinding.Clear(projectPath, out _) is false)
+        {
+            _projectSessionBinding.Clear(null, out _);
+        }
+
+        return result;
+    }
+
+    private async Task<string> SendBoundProjectRequestAsync(
+        string method,
+        string? projectPath,
+        Action<WorkerRequest> configure,
+        string emptyPayload)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var request = new WorkerRequest
+            {
+                Method = method,
+                ProjectPath = effectiveProjectPath
+            };
+            configure(request);
+
+            var response = await SendAsync(request).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? emptyPayload
+                : FormatWorkerError(response);
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    private bool CanBind(string projectPath, bool forceRebind, out string? error)
+    {
+        error = null;
+
+        if (string.IsNullOrWhiteSpace(projectPath))
+        {
+            error = "Project path is required.";
+            return false;
+        }
+
+        var boundProjectPath = _projectSessionBinding.BoundProjectPath;
+        if (boundProjectPath is null ||
+            forceRebind ||
+            string.Equals(boundProjectPath, projectPath.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        error = $"This MCP session is already bound to project '{boundProjectPath}' and cannot use '{projectPath}'. Start a new MCP session for a different TIA project or set forceRebind=true.";
+        return false;
+    }
+
+    private static string FormatWorkerError(WorkerResponse response)
+    {
+        return $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+    }
+
+    private static string? TryReadProjectPath(string? payload)
+    {
+        if (string.IsNullOrWhiteSpace(payload))
+        {
+            return null;
+        }
+
+        using var document = JsonDocument.Parse(payload);
+        if (document.RootElement.TryGetProperty("projectPath", out var projectPath) &&
+            projectPath.ValueKind == JsonValueKind.String)
+        {
+            return projectPath.GetString();
+        }
+
+        if (document.RootElement.TryGetProperty("project", out var project) &&
+            project.ValueKind == JsonValueKind.Object &&
+            project.TryGetProperty("path", out var statusPath) &&
+            statusPath.ValueKind == JsonValueKind.String)
+        {
+            return statusPath.GetString();
+        }
+
+        return null;
+    }
+
     private static async Task<WorkerResponse> SendAsync(WorkerRequest request)
     {
         var workerPath = LocateWorkerExecutable();

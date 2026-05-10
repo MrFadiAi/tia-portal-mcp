@@ -27,5 +27,7 @@
     <Compile Include="..\TiaMcpServer\Tools\AddNetworkDeviceTool.cs" Link="Host\AddNetworkDeviceTool.cs" />
     <Compile Include="..\TiaMcpServer\Tools\ConfigureNetworkDeviceTool.cs" Link="Host\ConfigureNetworkDeviceTool.cs" />
     <Compile Include="..\TiaMcpServer\Tools\CompileCheckTool.cs" Link="Host\CompileCheckTool.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\TagOperationsTools.cs" Link="Host\TagOperationsTools.cs" />
+    <Compile Include="..\TiaMcpServer\Tools\ProjectLifecycleTools.cs" Link="Host\ProjectLifecycleTools.cs" />
   </ItemGroup>
 </Project>

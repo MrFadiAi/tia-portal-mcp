@@ -35,4 +35,52 @@ public class WorkerRequest
     public string? IoSystemName { get; set; }
 
     public bool Confirm { get; set; }
+
+    public string? TableName { get; set; }
+
+    public string? FolderPath { get; set; }
+
+    public string? Name { get; set; }
+
+    public string? NewName { get; set; }
+
+    public string? DataType { get; set; }
+
+    public string? LogicalAddress { get; set; }
+
+    public bool? ExternalAccessible { get; set; }
+
+    public bool? ExternalVisible { get; set; }
+
+    public bool? ExternalWritable { get; set; }
+
+    public bool? IsSafety { get; set; }
+
+    public string? Value { get; set; }
+
+    public string? ProjectDirectory { get; set; }
+
+    public string? ProjectName { get; set; }
+
+    public string? Author { get; set; }
+
+    public string? Comment { get; set; }
+
+    public string? TargetDirectory { get; set; }
+
+    public string? TargetName { get; set; }
+
+    public bool ForceRebind { get; set; }
+
+    public bool Rebind { get; set; } = true;
+
+    public string? ArchiveDirectory { get; set; }
+
+    public string? ArchiveName { get; set; }
+
+    public string? ArchiveMode { get; set; }
+
+    public bool SaveBeforeArchive { get; set; } = true;
+
+    public bool SaveBeforeClose { get; set; } = true;
 }

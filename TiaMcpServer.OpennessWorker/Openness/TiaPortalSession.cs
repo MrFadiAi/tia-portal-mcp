@@ -16,7 +16,7 @@ public class TiaPortalSession : IDisposable
         _allowTiaConfirmations = allowTiaConfirmations;
     }
 
-    public Project? Project { get; private set; }
+    public Project? Project { get; internal set; }
 
     public TiaPortal? TiaPortal => _tiaPortal;
 

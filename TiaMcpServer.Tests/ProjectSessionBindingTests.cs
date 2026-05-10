@@ -51,4 +51,59 @@ public class ProjectSessionBindingTests
         Assert.Equal("C:\\Projects\\Startup.ap21", effectivePath);
         Assert.Null(error);
     }
+
+    [Fact]
+    public void BindSetsUnboundProjectPath()
+    {
+        var binding = new ProjectSessionBinding(null);
+
+        Assert.True(binding.Bind("C:\\Projects\\Line.ap21", forceRebind: false, out var error));
+
+        Assert.Null(error);
+        Assert.Equal("C:\\Projects\\Line.ap21", binding.BoundProjectPath);
+    }
+
+    [Fact]
+    public void BindRejectsDifferentProjectPathWithoutForce()
+    {
+        var binding = new ProjectSessionBinding("C:\\Projects\\Line.ap21");
+
+        Assert.False(binding.Bind("C:\\Projects\\Other.ap21", forceRebind: false, out var error));
+
+        Assert.Contains("already bound", error);
+        Assert.Equal("C:\\Projects\\Line.ap21", binding.BoundProjectPath);
+    }
+
+    [Fact]
+    public void BindForceRebindsDifferentProjectPath()
+    {
+        var binding = new ProjectSessionBinding("C:\\Projects\\Line.ap21");
+
+        Assert.True(binding.Bind("C:\\Projects\\Other.ap21", forceRebind: true, out var error));
+
+        Assert.Null(error);
+        Assert.Equal("C:\\Projects\\Other.ap21", binding.BoundProjectPath);
+    }
+
+    [Fact]
+    public void ClearRemovesMatchingProjectBinding()
+    {
+        var binding = new ProjectSessionBinding("C:\\Projects\\Line.ap21");
+
+        Assert.True(binding.Clear("C:\\Projects\\Line.ap21", out var error));
+
+        Assert.Null(error);
+        Assert.Null(binding.BoundProjectPath);
+    }
+
+    [Fact]
+    public void ClearRejectsDifferentProjectPath()
+    {
+        var binding = new ProjectSessionBinding("C:\\Projects\\Line.ap21");
+
+        Assert.False(binding.Clear("C:\\Projects\\Other.ap21", out var error));
+
+        Assert.Contains("already bound", error);
+        Assert.Equal("C:\\Projects\\Line.ap21", binding.BoundProjectPath);
+    }
 }

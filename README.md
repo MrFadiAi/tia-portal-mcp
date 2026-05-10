@@ -2,24 +2,25 @@
 
 MCP server for Siemens SIMATIC TIA Portal V21. It lets MCP clients and AI agents inspect a running TIA Portal project through the Siemens Openness API.
 
-The current implementation covers project discovery, PLC block export/import, tag table reads, hardware/network discovery, cross-reference diagnostics, hardware catalog search, guarded network-device provisioning, and compile/check diagnostics.
+The current implementation covers project discovery and lifecycle operations, PLC block export/import, tag table reads and guarded tag mutations, hardware/network discovery, cross-reference diagnostics, hardware catalog search, guarded network-device provisioning, and compile/check diagnostics.
 
-The server currently exposes ten tools:
+The server currently exposes 25 tools:
 
 - `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details.
 - `get_block_content` - exports a PLC block to its SIMATIC SD document representation.
 - `update_block_logic` - imports SIMATIC SD document content to update or create a PLC block. Requires `confirm=true`.
 - `list_tag_tables` - retrieves PLC tag tables, tags, and user constants.
+- `create_tag_table` / `delete_tag_table` - create or delete PLC tag tables. Requires `confirm=true`.
+- `create_tag` / `update_tag` / `delete_tag` - create, modify, or delete PLC tags. Requires `confirm=true`.
+- `create_user_constant` / `update_user_constant` / `delete_user_constant` - create, modify, or delete user constants. Requires `confirm=true`.
 - `read_hardware_config` - exports device hardware, rack/module items, network interfaces, node addressing, subnets, and IO systems as JSON.
 - `read_cross_references` - exports PLC cross-reference diagnostics, including source objects, referenced objects, usage locations, access types, and reference types.
 - `search_equipment_catalog` - search the local TIA Portal hardware catalog, including installed GSD/HSP packages.
 - `add_network_device` - insert an exact catalog `typeIdentifier` into the project with explicit confirmation.
 - `configure_network_device` - configure IP address, subnet mask, PROFINET device name, subnet, and IO-system settings when supported by Openness.
 - `compile_check` - run compile/check operations and return diagnostics.
-
-Planned tools are not exposed yet:
-
-- (None currently planned for the next immediate release)
+- `get_project_status` - read active project metadata.
+- `open_project` / `create_project` / `save_project` / `save_project_as` / `archive_project` / `close_project` - project lifecycle operations. Write operations require `confirm=true`.
 
 ## Architecture
 
@@ -170,11 +171,12 @@ npx -y @modelcontextprotocol/inspector dotnet .\TiaMcpServer\bin\Debug\net8.0\Ti
 In the Inspector UI:
 
 - Open the Tools tab.
-- Click `List Tools` and verify the ten tools appear.
+- Click `List Tools` and verify the 25 tools appear.
 - Start with read-only tools: `browse_project_tree`, `list_tag_tables`, `read_hardware_config`, `read_cross_references`, and `compile_check`.
 - Use `search_equipment_catalog` before hardware insertion so you can copy an exact `typeIdentifier`.
 - Use `get_block_content` on a block path returned by `browse_project_tree`.
-- Avoid `update_block_logic`, `add_network_device`, and `configure_network_device` unless the project is disposable; they write to the TIA project and require `confirm=true`.
+- Use `get_project_status` before lifecycle changes.
+- Avoid write tools unless the project is disposable or backed up; `update_block_logic`, tag mutations, project lifecycle writes, `add_network_device`, and `configure_network_device` require `confirm=true`.
 
 Recommended smoke-test inputs:
 
@@ -241,6 +243,30 @@ Network configuration also requires confirmation:
 }
 ```
 
+Tag writes are atomic and require confirmation:
+
+```json
+{
+  "plcName": "PLC_1",
+  "tableName": "StandardTags",
+  "name": "StartButton",
+  "dataType": "Bool",
+  "logicalAddress": "%I0.0",
+  "confirm": true
+}
+```
+
+Project lifecycle writes also require confirmation:
+
+```json
+{
+  "projectPath": "C:\\Projects\\Sandbox\\Line.ap21",
+  "confirm": true
+}
+```
+
+Use archive mode values `None`, `DiscardRestorableData`, `Compressed`, or `DiscardRestorableDataAndCompressed`.
+
 ## Local Package Build
 
 The package is already published on NuGet. Use this section only when testing package changes locally before publishing a new version.
@@ -285,21 +311,6 @@ PLC_1/Units/UnitName/Blocks/Folder/SubFolder/BlockName
 ```
 
 Legacy `BlockName` and `PLC_1/BlockName` paths are accepted only when the block name is unambiguous. If more than one block has the same name, use the deterministic `Path` returned by `browse_project_tree`.
-
-## Roadmap
-
-Current status:
-
-- Phase 1 is implemented: MCP stdio host, TIA Openness worker bridge, and `browse_project_tree` project discovery, including Software Units.
-- Phase 2 is implemented for SIMATIC SD document export/import through `get_block_content` and `update_block_logic`.
-- Phase 3 hardware and network discovery is implemented through `read_hardware_config`.
-- Phase 4 cross-reference diagnostics is implemented through `read_cross_references`.
-- Phase 5 hardware catalog search and guarded network-device provisioning is implemented through `search_equipment_catalog`, `add_network_device`, and `configure_network_device`.
-- Phase 6 compile/check-syntax diagnostics and richer post-change validation is implemented through `compile_check`.
-
-Possible future work:
-
-- Add an optional `--setup` flow to help auto-register the MCP server in supported AI client configurations.
 
 ## MCP Client Configuration
 
@@ -349,3 +360,8 @@ With an explicit project binding:
 - No running TIA Portal instance: start TIA Portal V21 before calling tools that attach to the current project.
 - Access denied or attach failure: confirm the Windows user belongs to the `Siemens TIA Openness` user group, then sign out and back in.
 - `dotnet` selects the wrong SDK: install .NET SDK 8.0.4xx or update `global.json` to a locally installed .NET 8 SDK feature band.
+
+## Check other tools
+
+- [TIA Portal V21 Git Add-In](https://github.com/Czarnak/tia-git-addin)
+- [Claude Code / Codex / Gemini plugin for TIA Portal development](https://github.com/Czarnak/totally-integrated-claude)
