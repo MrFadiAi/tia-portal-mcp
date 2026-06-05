@@ -1060,21 +1060,16 @@ internal static class Program
     {
         try
         {
-            var versions = TiaVersionDetector.DetectInstalledVersions();
             var active = AssemblyResolver.DetectedVersion;
+            var summary = $"Connected to TIA Portal {active?.DisplayName ?? "Unknown"}. Active version: {active?.MajorVersion}.";
             return new WorkerResponse
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(new
                 {
+                    summary,
                     activeVersion = active?.MajorVersion,
-                    activeDisplayName = active?.DisplayName,
-                    installedVersions = versions.Select(v => new
-                    {
-                        v.MajorVersion,
-                        v.DisplayName,
-                        v.UsesSplitDlls
-                    })
+                    activeDisplayName = active?.DisplayName
                 }, JsonOptions)
             };
         }
