@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Text.Json;
 using ModelContextProtocol.Server;
 using TiaMcpServer.Safety;
 using TiaMcpServer.Worker;
@@ -12,7 +13,32 @@ namespace TiaMcpServer.Tools
         [Description("Detect the installed TIA Portal version(s) and which version the MCP server is connected to.")]
         public static async Task<string> GetTiaVersion(OpennessWorkerClient workerClient)
         {
-            return await workerClient.GetTiaVersionAsync().ConfigureAwait(false);
+            var result = await workerClient.GetTiaVersionAsync().ConfigureAwait(false);
+
+            // Strip installedVersions from AI-facing response to prevent model confusion
+            // when multiple versions are installed. The scan_open_projects tool reads
+            // installedVersions directly from the worker — it doesn't go through this tool.
+            if (!result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
+            {
+                try
+                {
+                    using var doc = JsonDocument.Parse(result);
+                    var root = doc.RootElement;
+                    var clean = new
+                    {
+                        summary = root.TryGetProperty("summary", out var s) ? s.GetString() : null,
+                        activeVersion = root.TryGetProperty("activeVersion", out var av) && av.ValueKind == JsonValueKind.Number ? av.GetInt32() : (int?)null,
+                        activeDisplayName = root.TryGetProperty("activeDisplayName", out var adn) ? adn.GetString() : null
+                    };
+                    return JsonSerializer.Serialize(clean, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+                }
+                catch
+                {
+                    // If parsing fails, return original result
+                }
+            }
+
+            return result;
         }
 
         [McpServerTool(Name = "get_project_status")]
