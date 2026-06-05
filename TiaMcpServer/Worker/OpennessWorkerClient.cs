@@ -22,7 +22,167 @@ public class OpennessWorkerClient
         _projectSessionBinding = projectSessionBinding;
     }
 
-    public async Task<string> BrowseProjectTreeAsync(string? projectPath)
+    public async Task<string> ReadBlockInterfaceAsync(string blockPath, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "read_block_interface",
+                    BlockPath = blockPath,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "Failed to read block interface."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ExportPlcTypeAsync(string typeName, string? plcName, string? folderPath, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "export_plc_type",
+                    TypeName = typeName,
+                    PlcName = plcName,
+                    FolderPath = folderPath,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? string.Empty
+                : $"Error: {response.Error ?? "Failed to export PLC type."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ExportTagTableXmlAsync(string? tableName, string? plcName, string? folderPath, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "export_tag_table_xml",
+                    TableName = tableName,
+                    PlcName = plcName,
+                    FolderPath = folderPath,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? string.Empty
+                : $"Error: {response.Error ?? "Failed to export tag table XML."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ListConnectionsAsync(string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "list_connections",
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "Failed to list connections."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> BrowseHmiScreensAsync(string? deviceName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "browse_hmi_screens",
+                    DeviceName = deviceName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "Failed to browse HMI screens."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> GetTiaVersionAsync(int? tiaVersion = null)
+    {
+        try
+        {
+            var response = await SendAsync(
+                new WorkerRequest { Method = "get_tia_version", TiaVersion = tiaVersion }).ConfigureAwait(false);
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "Failed to detect TIA Portal version."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> BrowseProjectTreeAsync(string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -35,7 +195,8 @@ public class OpennessWorkerClient
                 new WorkerRequest
                 {
                     Method = "browse_project_tree",
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -48,7 +209,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> ReadHardwareConfigAsync(string? projectPath)
+    public async Task<string> ReadHardwareConfigAsync(string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -61,7 +222,8 @@ public class OpennessWorkerClient
                 new WorkerRequest
                 {
                     Method = "read_hardware_config",
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -74,7 +236,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath)
+    public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -88,7 +250,8 @@ public class OpennessWorkerClient
                 {
                     Method = "search_equipment_catalog",
                     Query = query,
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -105,7 +268,8 @@ public class OpennessWorkerClient
         string typeIdentifier,
         string deviceName,
         string deviceItemName,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         try
         {
@@ -123,7 +287,8 @@ public class OpennessWorkerClient
                     DeviceItemName = deviceItemName,
                     ProjectPath = effectiveProjectPath,
                     Confirm = true,
-                    AllowTiaConfirmations = true
+                    AllowTiaConfirmations = true,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -143,7 +308,8 @@ public class OpennessWorkerClient
         string? pnDeviceName,
         string? subnetName,
         string? ioSystemName,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         try
         {
@@ -164,7 +330,8 @@ public class OpennessWorkerClient
                     IoSystemName = ioSystemName,
                     ProjectPath = effectiveProjectPath,
                     Confirm = true,
-                    AllowTiaConfirmations = true
+                    AllowTiaConfirmations = true,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -177,7 +344,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> ReadCrossReferencesAsync(string? projectPath, string? plcName, string? filter)
+    public async Task<string> ReadCrossReferencesAsync(string? projectPath, string? plcName, string? filter, int? tiaVersion = null)
     {
         try
         {
@@ -197,7 +364,8 @@ public class OpennessWorkerClient
                     Method = "read_cross_references",
                     ProjectPath = effectiveProjectPath,
                     PlcName = plcName,
-                    CrossReferenceFilter = normalizedFilter
+                    CrossReferenceFilter = normalizedFilter,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -210,7 +378,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath)
+    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -224,7 +392,8 @@ public class OpennessWorkerClient
                 {
                     Method = "get_block_content",
                     BlockPath = blockPath,
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -237,7 +406,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> UpdateBlockLogicAsync(string blockPath, string yamlContent, string? projectPath)
+    public async Task<string> UpdateBlockLogicAsync(string blockPath, string yamlContent, string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -253,7 +422,8 @@ public class OpennessWorkerClient
                     BlockPath = blockPath,
                     YamlContent = yamlContent,
                     ProjectPath = effectiveProjectPath,
-                    AllowTiaConfirmations = true
+                    AllowTiaConfirmations = true,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -266,7 +436,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> ListTagTablesAsync(string? plcName, string? projectPath)
+    public async Task<string> ListTagTablesAsync(string? plcName, string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -280,7 +450,8 @@ public class OpennessWorkerClient
                 {
                     Method = "list_tag_tables",
                     PlcName = plcName,
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -293,7 +464,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> CompileCheckAsync(string? blockPath, string? plcName, string? projectPath)
+    public async Task<string> CompileCheckAsync(string? blockPath, string? plcName, string? projectPath, int? tiaVersion = null)
     {
         try
         {
@@ -308,7 +479,8 @@ public class OpennessWorkerClient
                     Method = "compile_check",
                     BlockPath = blockPath,
                     PlcName = plcName,
-                    ProjectPath = effectiveProjectPath
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -325,7 +497,8 @@ public class OpennessWorkerClient
         string? plcName,
         string tableName,
         string? folderPath,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "create_tag_table",
@@ -338,14 +511,16 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> DeleteTagTableAsync(
         string? plcName,
         string tableName,
         string? folderPath,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "delete_tag_table",
@@ -358,7 +533,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> CreateTagAsync(
@@ -368,7 +544,8 @@ public class OpennessWorkerClient
         string name,
         string dataType,
         string? logicalAddress,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "create_tag",
@@ -384,7 +561,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> UpdateTagAsync(
@@ -399,7 +577,8 @@ public class OpennessWorkerClient
         bool? externalVisible,
         bool? externalWritable,
         bool? isSafety,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "update_tag",
@@ -420,7 +599,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> DeleteTagAsync(
@@ -428,7 +608,8 @@ public class OpennessWorkerClient
         string tableName,
         string? folderPath,
         string name,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "delete_tag",
@@ -442,7 +623,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> CreateUserConstantAsync(
@@ -452,7 +634,8 @@ public class OpennessWorkerClient
         string name,
         string dataType,
         string value,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "create_user_constant",
@@ -468,7 +651,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> UpdateUserConstantAsync(
@@ -478,7 +662,8 @@ public class OpennessWorkerClient
         string name,
         string? dataType,
         string? value,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "update_user_constant",
@@ -494,7 +679,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public Task<string> DeleteUserConstantAsync(
@@ -502,7 +688,8 @@ public class OpennessWorkerClient
         string tableName,
         string? folderPath,
         string name,
-        string? projectPath)
+        string? projectPath,
+        int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "delete_user_constant",
@@ -516,19 +703,21 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
-    public Task<string> GetProjectStatusAsync(string? projectPath)
+    public Task<string> GetProjectStatusAsync(string? projectPath, int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "get_project_status",
             projectPath,
             _ => { },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
-    public async Task<string> OpenProjectAsync(string projectPath, bool forceRebind)
+    public async Task<string> OpenProjectAsync(string projectPath, bool forceRebind, int? tiaVersion = null)
     {
         if (!CanBind(projectPath, forceRebind, out var bindingError))
         {
@@ -544,7 +733,8 @@ public class OpennessWorkerClient
                     ProjectPath = projectPath,
                     Confirm = true,
                     ForceRebind = forceRebind,
-                    AllowTiaConfirmations = true
+                    AllowTiaConfirmations = true,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             if (!response.Success)
@@ -569,7 +759,8 @@ public class OpennessWorkerClient
         string projectDirectory,
         string projectName,
         string? author,
-        string? comment)
+        string? comment,
+        int? tiaVersion = null)
     {
         try
         {
@@ -582,7 +773,8 @@ public class OpennessWorkerClient
                     Author = author,
                     Comment = comment,
                     Confirm = true,
-                    AllowTiaConfirmations = true
+                    AllowTiaConfirmations = true,
+                    TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             if (!response.Success)
@@ -604,7 +796,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public Task<string> SaveProjectAsync(string? projectPath)
+    public Task<string> SaveProjectAsync(string? projectPath, int? tiaVersion = null)
     {
         return SendBoundProjectRequestAsync(
             "save_project",
@@ -614,14 +806,16 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
     public async Task<string> SaveProjectAsAsync(
         string? projectPath,
         string targetDirectory,
         string targetName,
-        bool rebind)
+        bool rebind,
+        int? tiaVersion = null)
     {
         var result = await SendBoundProjectRequestAsync(
             "save_project_as",
@@ -634,7 +828,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}").ConfigureAwait(false);
+            "{}",
+            tiaVersion).ConfigureAwait(false);
 
         if (rebind && !result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
         {
@@ -653,7 +848,8 @@ public class OpennessWorkerClient
         string archiveDirectory,
         string archiveName,
         string? mode,
-        bool saveBeforeArchive)
+        bool saveBeforeArchive,
+        int? tiaVersion = null)
     {
         if (!ArchiveModeNames.TryNormalize(mode, out var normalizedMode, out var modeError))
         {
@@ -672,10 +868,11 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}");
+            "{}",
+            tiaVersion);
     }
 
-    public async Task<string> CloseProjectAsync(string? projectPath, bool saveBeforeClose)
+    public async Task<string> CloseProjectAsync(string? projectPath, bool saveBeforeClose, int? tiaVersion = null)
     {
         var result = await SendBoundProjectRequestAsync(
             "close_project",
@@ -686,7 +883,8 @@ public class OpennessWorkerClient
                 request.Confirm = true;
                 request.AllowTiaConfirmations = true;
             },
-            "{}").ConfigureAwait(false);
+            "{}",
+            tiaVersion).ConfigureAwait(false);
 
         if (!result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase) &&
             _projectSessionBinding.Clear(projectPath, out _) is false)
@@ -701,7 +899,8 @@ public class OpennessWorkerClient
         string method,
         string? projectPath,
         Action<WorkerRequest> configure,
-        string emptyPayload)
+        string emptyPayload,
+        int? tiaVersion = null)
     {
         try
         {
@@ -713,7 +912,8 @@ public class OpennessWorkerClient
             var request = new WorkerRequest
             {
                 Method = method,
-                ProjectPath = effectiveProjectPath
+                ProjectPath = effectiveProjectPath,
+                TiaVersion = tiaVersion
             };
             configure(request);
 
@@ -783,7 +983,21 @@ public class OpennessWorkerClient
 
     private static async Task<WorkerResponse> SendAsync(WorkerRequest request)
     {
-        var workerPath = LocateWorkerExecutable();
+        // If tiaVersion not specified in the tool call, read default from file
+        if (!request.TiaVersion.HasValue)
+        {
+            var versionFile = Environment.GetEnvironmentVariable("TIA_VERSION_FILE");
+            if (!string.IsNullOrEmpty(versionFile) && File.Exists(versionFile))
+            {
+                var content = File.ReadAllText(versionFile).Trim();
+                if (int.TryParse(content, out var defaultVersion))
+                {
+                    request.TiaVersion = defaultVersion;
+                }
+            }
+        }
+
+        var workerPath = LocateWorkerExecutable(request.TiaVersion);
         var startInfo = new ProcessStartInfo
         {
             FileName = workerPath,
@@ -796,6 +1010,11 @@ public class OpennessWorkerClient
             StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8
         };
+
+        if (request.TiaVersion.HasValue)
+        {
+            startInfo.Environment["TIA_PREFERRED_VERSION"] = request.TiaVersion.Value.ToString();
+        }
 
         using var process = Process.Start(startInfo) ??
             throw new InvalidOperationException("Failed to start the TIA Openness worker process.");
@@ -829,9 +1048,33 @@ public class OpennessWorkerClient
         return response ?? throw new InvalidOperationException("TIA Openness worker returned an empty response.");
     }
 
-    private static string LocateWorkerExecutable()
+    private static string LocateWorkerExecutable(int? tiaVersion = null)
     {
-        var packagedPath = Path.Combine(AppContext.BaseDirectory, "openness-worker", "TiaMcpServer.OpennessWorker.exe");
+        // V16 uses its own worker (compiled against V16's Siemens.Engineering.dll)
+        // V18 uses the legacy worker (compiled against V18's single Siemens.Engineering.dll)
+        // V21+ uses the standard worker (compiled against split DLLs)
+        bool useV16 = tiaVersion.HasValue && tiaVersion.Value == 16;
+        bool useLegacy = tiaVersion.HasValue && tiaVersion.Value >= 17 && tiaVersion.Value < 21;
+        string workerName;
+        string projectDir;
+
+        if (useV16)
+        {
+            workerName = "TiaMcpServer.OpennessWorker.V16.exe";
+            projectDir = "TiaMcpServer.OpennessWorker.V16";
+        }
+        else if (useLegacy)
+        {
+            workerName = "TiaMcpServer.OpennessWorker.Legacy.exe";
+            projectDir = "TiaMcpServer.OpennessWorker.Legacy";
+        }
+        else
+        {
+            workerName = "TiaMcpServer.OpennessWorker.exe";
+            projectDir = "TiaMcpServer.OpennessWorker";
+        }
+
+        var packagedPath = Path.Combine(AppContext.BaseDirectory, "openness-worker", workerName);
         if (File.Exists(packagedPath))
         {
             return packagedPath;
@@ -844,11 +1087,11 @@ public class OpennessWorkerClient
             {
                 var candidatePath = Path.Combine(
                     directory.FullName,
-                    "TiaMcpServer.OpennessWorker",
+                    projectDir,
                     "bin",
                     configuration,
                     "net48",
-                    "TiaMcpServer.OpennessWorker.exe");
+                    workerName);
 
                 if (File.Exists(candidatePath))
                 {
@@ -860,7 +1103,7 @@ public class OpennessWorkerClient
         }
 
         throw new FileNotFoundException(
-            "TIA Openness worker executable was not found. Build the solution and ensure the openness-worker folder is beside the MCP server executable.",
+            $"TIA Openness worker executable was not found ({workerName} for V{tiaVersion?.ToString() ?? "auto"}). Build the solution and ensure the openness-worker folder is beside the MCP server executable.",
             packagedPath);
     }
 
