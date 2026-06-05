@@ -1,28 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using Microsoft.Win32;
+using TiaMcpServer.Contracts;
 
 namespace TiaMcpServer.OpennessWorker.Openness;
 
 public static class AssemblyResolver
 {
-    private const string TiaPortalV21DirEnvironmentVariable = "TiaPortalV21Dir";
-    private const string TiaPortalV21RegistrySubKey =
-        @"SOFTWARE\Siemens\Automation\InstalledApps\Totally Integrated Automation Portal V21";
-    private const string StandardOpennessInstallPath =
-        @"C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48";
+    private static TiaVersionInfo? _detectedVersion;
+    private static Assembly? _singleDllCache;
+    private static readonly object _lock = new();
 
-    private static readonly string[] RequiredAssemblies =
-    {
-        "Siemens.Engineering.Base.dll",
-        "Siemens.Engineering.Step7.dll"
-    };
+    public static TiaVersionInfo? DetectedVersion => _detectedVersion;
 
     public static void Register()
     {
+        // Check for preferred version from environment variable
+        int? preferredVersion = null;
+        var envVersion = Environment.GetEnvironmentVariable("TIA_PREFERRED_VERSION");
+        if (!string.IsNullOrWhiteSpace(envVersion) && int.TryParse(envVersion, out var parsed))
+        {
+            preferredVersion = parsed;
+            Console.Error.WriteLine($"TIA preferred version from env: V{parsed}");
+        }
+
+        _detectedVersion = TiaVersionDetector.DetectInstalledVersion(preferredVersion);
+
+        if (_detectedVersion is not null)
+        {
+            Console.Error.WriteLine(
+                $"TIA Portal detected: {_detectedVersion.DisplayName} " +
+                $"(DLLs: {_detectedVersion.DllDirectory}, SplitDlls: {_detectedVersion.UsesSplitDlls})");
+        }
+        else
+        {
+            Console.Error.WriteLine("No TIA Portal installation detected.");
+        }
+
         AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
         AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
     }
@@ -32,89 +47,69 @@ public static class AssemblyResolver
         var requestedName = new AssemblyName(args.Name);
 
         if (requestedName.Name is null ||
-            !requestedName.Name.StartsWith("Siemens.Engineering.", StringComparison.Ordinal))
+            !requestedName.Name.StartsWith("Siemens.Engineering", StringComparison.Ordinal))
         {
             return null;
         }
 
-        var opennessInstallPath = GetOpennessInstallPath();
-        var assemblyPath = Path.Combine(opennessInstallPath, $"{requestedName.Name}.dll");
-
-        if (!File.Exists(assemblyPath))
+        if (_detectedVersion is null || _detectedVersion.DllDirectory is null)
         {
             return null;
         }
 
-        var loadedAssembly = Assembly.LoadFrom(assemblyPath);
-
-        if (!string.Equals(requestedName.FullName, loadedAssembly.GetName().FullName, StringComparison.Ordinal))
+        if (_detectedVersion.UsesSplitDlls)
         {
-            throw new FileNotFoundException("TIA Portal Openness version does not match the requested assembly.", assemblyPath);
+            // V21+: Load split DLLs directly by name
+            var assemblyPath = Path.Combine(_detectedVersion.DllDirectory, $"{requestedName.Name}.dll");
+            if (File.Exists(assemblyPath))
+            {
+                return Assembly.LoadFrom(assemblyPath);
+            }
+
+            return null;
         }
 
-        return loadedAssembly;
-    }
-
-    private static string GetOpennessInstallPath()
-    {
-        var checkedLocations = new List<string>();
-
-        var environmentPath = Environment.GetEnvironmentVariable(TiaPortalV21DirEnvironmentVariable);
-        if (!string.IsNullOrWhiteSpace(environmentPath))
+        // V16-V19: Single Siemens.Engineering.dll
+        // Only resolve the main 'Siemens.Engineering' assembly ourselves.
+        // Sub-assemblies like 'Siemens.Engineering.Contract' are resolved by the GAC
+        // (installed by TIA Portal). Redirecting them to the single DLL fails because
+        // the manifest doesn't match (different assembly name/version/public key).
+        if (!string.Equals(requestedName.Name, "Siemens.Engineering", StringComparison.Ordinal))
         {
-            var candidatePath = environmentPath.Trim().Trim('"');
-            checkedLocations.Add($"{TiaPortalV21DirEnvironmentVariable}: {candidatePath}");
+            // Let the runtime fall through to GAC / default probing for sub-assemblies
+            return null;
+        }
 
-            if (ContainsRequiredAssemblies(candidatePath))
+        // Legacy workers are compiled against a specific version's DLL. Always load that
+        // version's DLL for type compatibility, regardless of which TIA version we detect.
+        // The TIA_PREFERRED_VERSION env var only controls which process to attach to.
+#if LEGACY_TIA_V16
+        const string legacyDllDirectory = @"C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16";
+        Console.Error.WriteLine($"[AssemblyResolver] V16 worker — loading V16 DLL from {legacyDllDirectory}");
+#elif LEGACY_TIA
+        const string legacyDllDirectory = @"C:\Program Files\Siemens\Automation\Portal V18\PublicAPI\V18";
+        Console.Error.WriteLine($"[AssemblyResolver] Legacy worker — loading V18 DLL from {legacyDllDirectory}");
+#else
+        var legacyDllDirectory = _detectedVersion.DllDirectory;
+        Console.Error.WriteLine($"[AssemblyResolver] Loading single Siemens.Engineering.dll for V{_detectedVersion.MajorVersion}");
+#endif
+
+        // Return the cached single DLL for the main Siemens.Engineering request
+        lock (_lock)
+        {
+            if (_singleDllCache is not null)
             {
-                return candidatePath;
+                return _singleDllCache;
+            }
+
+            var singleDllPath = Path.Combine(legacyDllDirectory, "Siemens.Engineering.dll");
+            if (File.Exists(singleDllPath))
+            {
+                _singleDllCache = Assembly.LoadFrom(singleDllPath);
+                return _singleDllCache;
             }
         }
 
-        foreach (var registryView in new[] { RegistryView.Registry64, RegistryView.Registry32 })
-        {
-            var registryPath = $@"HKLM\{TiaPortalV21RegistrySubKey} ({registryView})";
-            using var baseKey = RegistryKey.OpenBaseKey(RegistryHive.LocalMachine, registryView);
-            using var key = baseKey.OpenSubKey(TiaPortalV21RegistrySubKey);
-
-            if (key is null)
-            {
-                checkedLocations.Add($"{registryPath}: key not found");
-                continue;
-            }
-
-            var installPath = key.GetValue("INSTALLPATH") as string;
-
-            if (string.IsNullOrWhiteSpace(installPath))
-            {
-                checkedLocations.Add($"{registryPath}: INSTALLPATH not set");
-                continue;
-            }
-
-            var candidatePath = Path.Combine(installPath, @"PublicAPI\V21\net48");
-            checkedLocations.Add($"{registryPath}: {candidatePath}");
-
-            if (ContainsRequiredAssemblies(candidatePath))
-            {
-                return candidatePath;
-            }
-        }
-
-        checkedLocations.Add(StandardOpennessInstallPath);
-        if (ContainsRequiredAssemblies(StandardOpennessInstallPath))
-        {
-            return StandardOpennessInstallPath;
-        }
-
-        throw new FileNotFoundException(
-            "TIA Portal V21 Openness assemblies were not found. Checked locations: " +
-            string.Join("; ", checkedLocations) +
-            $". Set {TiaPortalV21DirEnvironmentVariable} to the folder containing Siemens.Engineering.*.dll files.");
-    }
-
-    private static bool ContainsRequiredAssemblies(string directoryPath)
-    {
-        return Directory.Exists(directoryPath) &&
-            RequiredAssemblies.All(assemblyName => File.Exists(Path.Combine(directoryPath, assemblyName)));
+        return null;
     }
 }

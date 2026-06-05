@@ -1,0 +1,26 @@
+info: ModelContextProtocol.Server.StdioServerTransport[857250842]
+      Server (stream) (TiaMcpServer) transport reading messages.
+info: ModelContextProtocol.Server.StdioServerTransport[1221292038]
+      Server (stream) (TiaMcpServer) transport completed reading messages.
+info: Microsoft.Hosting.Lifetime[0]
+      Application started. Press Ctrl+C to shut down.
+info: Microsoft.Hosting.Lifetime[0]
+      Hosting environment: Production
+info: Microsoft.Hosting.Lifetime[0]
+      Content root path: D:\Tools\tia-portal-mcp
+info: ModelContextProtocol.Server.McpServer[570385771]
+      Server (TiaMcpServer 1.0.0.0) method 'initialize' request handler called.
+info: ModelContextProtocol.Server.McpServer[570385771]
+      Server (TiaMcpServer 1.0.0.0) method 'tools/call' request handler called.
+info: ModelContextProtocol.Server.McpServer[1867955179]
+      Server (TiaMcpServer 1.0.0.0), Client (test 1.0.0) method 'initialize' request handler completed in 10.3905ms.
+info: ModelContextProtocol.Server.McpServer[2065726448]
+      "get_tia_version" completed. IsError = False.
+info: ModelContextProtocol.Server.McpServer[1867955179]
+      Server (TiaMcpServer 1.0.0.0), Client (test 1.0.0) method 'tools/call' request handler completed in 350.2254ms.
+info: Microsoft.Hosting.Lifetime[0]
+      Application is shutting down...
+info: ModelContextProtocol.Server.StdioServerTransport[1375634372]
+      Server (stream) (TiaMcpServer) shutting down.
+info: ModelContextProtocol.Server.StdioServerTransport[1256455528]
+      Server (stream) (TiaMcpServer) shut down.

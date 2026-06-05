@@ -12,9 +12,10 @@ namespace TiaMcpServer.Tools
         public static async Task<string> GetBlockContent(
             OpennessWorkerClient workerClient,
             [Description("Block path: 'BlockName' for first PLC, or 'PLC_1/BlockName' to target a specific PLC. Optional suffix like ' [OB1]' is stripped automatically.")] string blockPath,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.GetBlockContentAsync(blockPath, projectPath).ConfigureAwait(false);
+            return await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion).ConfigureAwait(false);
         }
     }
 }

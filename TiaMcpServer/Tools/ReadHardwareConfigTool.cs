@@ -11,9 +11,10 @@ namespace TiaMcpServer.Tools
         [Description("Export the hardware configuration and network topology from the TIA Portal project. Returns a JSON document with all devices, their rack modules, network interfaces, IP addresses, PROFINET device names, subnets, and IO systems.")]
         public static async Task<string> ReadHardwareConfig(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.ReadHardwareConfigAsync(projectPath).ConfigureAwait(false);
+            return await workerClient.ReadHardwareConfigAsync(projectPath, tiaVersion).ConfigureAwait(false);
         }
     }
 }

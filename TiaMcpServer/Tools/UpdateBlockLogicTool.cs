@@ -14,9 +14,10 @@ namespace TiaMcpServer.Tools
             OpennessWorkerClient workerClient,
             [Description("Block path: 'BlockName' for first PLC, or 'PLC_1/BlockName' to target a specific PLC.")] string blockPath,
             [Description("YAML content in SIMATIC SD format to import as the block source.")] string yamlContent,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { blockPath };
             var requestedInput = new { blockPath, yamlContent };
 
@@ -38,7 +39,8 @@ namespace TiaMcpServer.Tools
             [Description("YAML content in SIMATIC SD format to import as the block source.")] string yamlContent,
             [Description("Set to true to confirm the write operation. Required safety flag — operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_update_block_logic for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
                 return "Operation not confirmed. Set confirm=true to proceed with the block update.";
@@ -52,16 +54,16 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetBlockContentAsync(blockPath, projectPath)).ConfigureAwait(false);
+                () => workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
             }
 
-            var result = await workerClient.UpdateBlockLogicAsync(blockPath, yamlContent, projectPath).ConfigureAwait(false);
+            var result = await workerClient.UpdateBlockLogicAsync(blockPath, yamlContent, projectPath, tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(blockPath, null, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(blockPath, null, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit(
                 "update_block_logic",

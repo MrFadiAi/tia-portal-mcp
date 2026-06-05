@@ -13,9 +13,10 @@ namespace TiaMcpServer.Tools
             OpennessWorkerClient workerClient,
             [Description("Optional block path. If supplied, only that block is compiled. If omitted, full PLC software is compiled.")] string? blockPath = null,
             [Description("Optional PLC device name. If omitted, all PLCs in the project are compiled.")] string? plcName = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.CompileCheckAsync(blockPath, plcName, projectPath).ConfigureAwait(false);
+            return await workerClient.CompileCheckAsync(blockPath, plcName, projectPath, tiaVersion).ConfigureAwait(false);
         }
     }
 }

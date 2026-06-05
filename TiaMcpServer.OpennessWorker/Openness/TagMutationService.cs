@@ -91,7 +91,15 @@ public static class TagMutationService
 
         if (!string.IsNullOrWhiteSpace(newName))
         {
+#if LEGACY_TIA
+            // V16-V18: PlcTag.Name and Comment are read-only; delete and recreate with new name
+            var savedDataType = tag.DataTypeName;
+            var savedAddress = tag.LogicalAddress;
+            tag.Delete();
+            table.Tags.Create(newName!, savedDataType, savedAddress);
+#else
             tag.Name = newName!;
+#endif
         }
 
         if (!string.IsNullOrWhiteSpace(dataType))

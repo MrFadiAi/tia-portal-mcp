@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using Siemens.Engineering;
 using Siemens.Engineering.HW;
 using Siemens.Engineering.HW.Features;
@@ -83,6 +85,13 @@ public class ProjectTreeWalker
             WalkTagTableGroup(plcSoftware.TagTableGroup, CombinePath(deviceName, "TagTables")),
             WalkTypeGroup(plcSoftware.TypeGroup, CombinePath(deviceName, "Types"))
         };
+
+        // Walk system block groups (SFBs, SFCs, etc.) if available
+        var systemBlocks = WalkSystemBlockGroups(plcSoftware.BlockGroup, CombinePath(deviceName, "SystemBlocks"));
+        if (systemBlocks is not null)
+        {
+            children.Add(systemBlocks);
+        }
 
         children.AddRange(WalkSoftwareUnits(deviceName, plcSoftware));
 
@@ -298,6 +307,225 @@ public class ProjectTreeWalker
             },
             Children = children
         };
+    }
+
+    /// <summary>
+    /// Walks system block groups (SFBs, SFCs, Program resources, etc.) using reflection
+    /// since the SystemBlockGroups property may not be available in all API versions.
+    /// </summary>
+    private static ProjectTreeNode? WalkSystemBlockGroups(object blockGroup, string path)
+    {
+        // Try to find SystemBlockGroups property
+        var sbgProperty = blockGroup.GetType().GetProperty("SystemBlockGroups",
+            BindingFlags.Instance | BindingFlags.Public);
+
+        if (sbgProperty is null)
+        {
+            return null;
+        }
+
+        object? sbgValue;
+        try
+        {
+            sbgValue = sbgProperty.GetValue(blockGroup);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is EngineeringException)
+        {
+            Console.Error.WriteLine($"Skipping system block groups: {ex.InnerException!.Message}");
+            return null;
+        }
+        catch (EngineeringException ex)
+        {
+            Console.Error.WriteLine($"Skipping system block groups: {ex.Message}");
+            return null;
+        }
+
+        if (sbgValue is not IEnumerable systemGroups)
+        {
+            return null;
+        }
+
+        var children = new List<ProjectTreeNode>();
+
+        foreach (var systemGroup in EnumerateSafe(systemGroups, "system block groups"))
+        {
+            var groupName = ReadPropertySafe(systemGroup, "Name", "system block group")?.ToString();
+            if (string.IsNullOrEmpty(groupName))
+            {
+                continue;
+            }
+
+            var groupPath = CombinePath(path, groupName!);
+            var groupNode = WalkSystemBlockGroup(systemGroup, groupPath);
+            if (groupNode is not null)
+            {
+                children.Add(groupNode);
+            }
+        }
+
+        if (children.Count == 0)
+        {
+            return null;
+        }
+
+        return new ProjectTreeNode
+        {
+            Name = "System Blocks",
+            NodeType = "SystemBlockFolder",
+            Details = new Dictionary<string, string>
+            {
+                ["Path"] = path
+            },
+            Children = children
+        };
+    }
+
+    private static ProjectTreeNode? WalkSystemBlockGroup(object systemGroup, string path)
+    {
+        var children = new List<ProjectTreeNode>();
+
+        // Walk blocks in this system group
+        var blocks = EnumerateSafe(
+            ReadPropertySafe(systemGroup, "Blocks", "system group blocks"),
+            "system blocks");
+
+        foreach (var block in blocks)
+        {
+            var blockName = ReadPropertySafe(block, "Name", "system block")?.ToString();
+            if (string.IsNullOrEmpty(blockName))
+            {
+                continue;
+            }
+
+            var details = new Dictionary<string, string>
+            {
+                ["Path"] = CombinePath(path, blockName!)
+            };
+
+            var number = ReadPropertySafe(block, "Number", "system block number");
+            if (number is not null)
+            {
+                details["Number"] = number.ToString() ?? "";
+            }
+
+            var lang = ReadPropertySafe(block, "ProgrammingLanguage", "system block language");
+            if (lang is not null)
+            {
+                details["ProgrammingLanguage"] = lang.ToString() ?? "";
+            }
+
+            children.Add(new ProjectTreeNode
+            {
+                Name = blockName!,
+                NodeType = "SystemBlock",
+                Details = details
+            });
+        }
+
+        // Walk sub-groups
+        var subGroups = EnumerateSafe(
+            ReadPropertySafe(systemGroup, "Groups", "system group sub-groups"),
+            "system sub-groups");
+
+        foreach (var subGroup in subGroups)
+        {
+            var subGroupName = ReadPropertySafe(subGroup, "Name", "system sub-group")?.ToString();
+            if (string.IsNullOrEmpty(subGroupName))
+            {
+                continue;
+            }
+
+            var subGroupPath = CombinePath(path, subGroupName!);
+            var subGroupNode = WalkSystemBlockGroup(subGroup, subGroupPath);
+            if (subGroupNode is not null)
+            {
+                children.Add(subGroupNode);
+            }
+        }
+
+        if (children.Count == 0)
+        {
+            return null;
+        }
+
+        var groupName = ReadPropertySafe(systemGroup, "Name", "system block group")?.ToString() ?? "System Blocks";
+        return new ProjectTreeNode
+        {
+            Name = groupName,
+            NodeType = "SystemBlockFolder",
+            Details = new Dictionary<string, string>
+            {
+                ["Path"] = path
+            },
+            Children = children
+        };
+    }
+
+    private static object? ReadPropertySafe(object instance, string propertyName, string description)
+    {
+        try
+        {
+            return instance.GetType()
+                .GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public)
+                ?.GetValue(instance);
+        }
+        catch (TargetInvocationException ex) when (ex.InnerException is EngineeringException engineeringException)
+        {
+            Console.Error.WriteLine($"Skipping {description}: {engineeringException.Message}");
+            return null;
+        }
+        catch (EngineeringException ex)
+        {
+            Console.Error.WriteLine($"Skipping {description}: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static IEnumerable<object> EnumerateSafe(object? enumerable, string description)
+    {
+        if (enumerable is null)
+        {
+            yield break;
+        }
+
+        if (enumerable is not IEnumerable ie)
+        {
+            yield break;
+        }
+
+        IEnumerator enumerator;
+        try
+        {
+            enumerator = ie.GetEnumerator();
+        }
+        catch (EngineeringException ex)
+        {
+            Console.Error.WriteLine($"Skipping {description}: {ex.Message}");
+            yield break;
+        }
+
+        while (true)
+        {
+            object? current;
+            try
+            {
+                if (!enumerator.MoveNext())
+                {
+                    yield break;
+                }
+                current = enumerator.Current;
+            }
+            catch (EngineeringException ex)
+            {
+                Console.Error.WriteLine($"Skipping an entry in {description}: {ex.Message}");
+                yield break;
+            }
+
+            if (current is not null)
+            {
+                yield return current;
+            }
+        }
     }
 
     private static string CombinePath(params string[] segments)

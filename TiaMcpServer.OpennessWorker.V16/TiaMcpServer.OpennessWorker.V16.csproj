@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>TiaMcpServer.OpennessWorker.V16</AssemblyName>
+    <RootNamespace>TiaMcpServer.OpennessWorker</RootNamespace>
+    <DefineConstants>$(DefineConstants);LEGACY_TIA;LEGACY_TIA_V16</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="10.0.4" />
+    <ProjectReference Include="..\TiaMcpServer.Contracts\TiaMcpServer.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- V16 single DLL — provides all Siemens.Engineering.* namespaces for V16 -->
+    <Reference Include="Siemens.Engineering">
+      <HintPath>C:\Program Files\Siemens\Automation\Portal V16\PublicAPI\V16\Siemens.Engineering.dll</HintPath>
+      <Private>False</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Share all source files from the main worker project, excluding V16-incompatible features -->
+    <Compile Include="..\TiaMcpServer.OpennessWorker\**\*.cs"
+      Exclude="..\TiaMcpServer.OpennessWorker\bin\**;..\TiaMcpServer.OpennessWorker\obj\**;
+               ..\TiaMcpServer.OpennessWorker\Openness\CrossReferenceReader.cs;
+               ..\TiaMcpServer.OpennessWorker\Openness\EquipmentCatalogSearcher.cs;
+               ..\TiaMcpServer.OpennessWorker\Openness\NetworkDeviceManager.cs" />
+  </ItemGroup>
+</Project>

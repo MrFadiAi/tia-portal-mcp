@@ -15,12 +15,13 @@ namespace TiaMcpServer.Tools
             [Description("Exact catalog type identifier from search_equipment_catalog.")] string typeIdentifier,
             [Description("Name for the new device.")] string deviceName,
             [Description("Name for the root device item. Defaults to deviceName when omitted.")] string? deviceItemName = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             var effectiveDeviceItemName = string.IsNullOrWhiteSpace(deviceItemName)
                 ? deviceName
                 : deviceItemName;
-            var currentState = await workerClient.ReadHardwareConfigAsync(projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ReadHardwareConfigAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { deviceName };
             var requestedInput = new { typeIdentifier, deviceName, deviceItemName = effectiveDeviceItemName };
 
@@ -42,7 +43,8 @@ namespace TiaMcpServer.Tools
             [Description("Name for the root device item. Defaults to deviceName when omitted.")] string? deviceItemName = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_add_network_device for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -62,7 +64,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ReadHardwareConfigAsync(projectPath)).ConfigureAwait(false);
+                () => workerClient.ReadHardwareConfigAsync(projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -72,10 +74,11 @@ namespace TiaMcpServer.Tools
                 typeIdentifier,
                 deviceName,
                 effectiveDeviceItemName!,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var hardwareConfig = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.ReadHardwareConfigAsync(projectPath).ConfigureAwait(false);
+                : await workerClient.ReadHardwareConfigAsync(projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit(
                 "add_network_device",

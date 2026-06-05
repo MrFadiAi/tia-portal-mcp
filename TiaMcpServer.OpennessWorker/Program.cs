@@ -47,12 +47,14 @@ internal static class Program
 
             return request.Method switch
             {
-                "browse_project_tree" => BrowseProjectTree(request.ProjectPath),
-                "read_hardware_config" => ReadHardwareConfig(request.ProjectPath),
+                "browse_project_tree" => BrowseProjectTree(request),
+                "read_hardware_config" => ReadHardwareConfig(request),
+#if !LEGACY_TIA_V16
                 "search_equipment_catalog" => SearchEquipmentCatalog(request),
                 "add_network_device" => AddNetworkDevice(request),
                 "configure_network_device" => ConfigureNetworkDevice(request),
                 "read_cross_references" => ReadCrossReferences(request),
+#endif
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "list_tag_tables"     => ListTagTables(request),
@@ -72,6 +74,12 @@ internal static class Program
                 "save_project_as"     => SaveProjectAs(request),
                 "archive_project"     => ArchiveProject(request),
                 "close_project"       => CloseProject(request),
+                "read_block_interface" => ReadBlockInterface(request),
+                "export_plc_type"     => ExportPlcType(request),
+                "export_tag_table_xml" => ExportTagTableXml(request),
+                "list_connections"    => ListConnections(request),
+                "browse_hmi_screens" => BrowseHmiScreens(request),
+                "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
         }
@@ -86,18 +94,18 @@ internal static class Program
         }
     }
 
-    private static WorkerResponse BrowseProjectTree(string? projectPath)
+    private static WorkerResponse BrowseProjectTree(WorkerRequest request)
     {
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
             var walker = new ProjectTreeWalker();
 
             session.EnsureConnected();
 
-            if (!string.IsNullOrEmpty(projectPath))
+            if (!string.IsNullOrEmpty(request.ProjectPath))
             {
-                session.OpenProject(projectPath!);
+                session.OpenProject(request.ProjectPath!);
             }
 
             if (session.Project is null)
@@ -130,17 +138,17 @@ internal static class Program
         }
     }
 
-    private static WorkerResponse ReadHardwareConfig(string? projectPath)
+    private static WorkerResponse ReadHardwareConfig(WorkerRequest request)
     {
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
-            if (!string.IsNullOrEmpty(projectPath))
+            if (!string.IsNullOrEmpty(request.ProjectPath))
             {
-                session.OpenProject(projectPath!);
+                session.OpenProject(request.ProjectPath!);
             }
 
             if (session.Project is null)
@@ -173,6 +181,7 @@ internal static class Program
         }
     }
 
+#if !LEGACY_TIA_V16
     private static WorkerResponse SearchEquipmentCatalog(WorkerRequest request)
     {
         if (string.IsNullOrWhiteSpace(request.Query))
@@ -182,7 +191,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -240,7 +249,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true);
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -298,7 +307,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true);
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -357,7 +366,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -395,6 +404,7 @@ internal static class Program
             return Failure(ex.Message);
         }
     }
+#endif
 
     private static WorkerResponse GetBlockContent(WorkerRequest request)
     {
@@ -403,7 +413,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -452,7 +462,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations);
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations, request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -491,7 +501,7 @@ internal static class Program
     {
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -534,7 +544,7 @@ internal static class Program
     {
         try
         {
-            using var session = new WorkerTiaPortalSession();
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -673,7 +683,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations);
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations, request.TiaVersion);
 
             session.EnsureConnected();
 
@@ -807,7 +817,7 @@ internal static class Program
 
         try
         {
-            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations);
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations, request.TiaVersion);
             var result = operation(session);
             return new WorkerResponse
             {
@@ -828,6 +838,247 @@ internal static class Program
             return Failure(ex.Message);
         }
         catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ReadBlockInterface(WorkerRequest request)
+    {
+        if (string.IsNullOrEmpty(request.BlockPath))
+            return Failure("BlockPath is required.");
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var info = BlockInterfaceReader.Read(session.Project, request.BlockPath!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(info, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ExportPlcType(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.TypeName))
+            return Failure("TypeName is required.");
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            string xml = PlcTypeExporter.Export(session.Project, request.TypeName!, request.PlcName, request.FolderPath);
+            return new WorkerResponse { Success = true, Payload = xml };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ExportTagTableXml(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            string xml = TagTableExporter.Export(session.Project, request.TableName, request.PlcName, request.FolderPath);
+            return new WorkerResponse { Success = true, Payload = xml };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ListConnections(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var connections = ConnectionReader.Read(session.Project);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(connections, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse BrowseHmiScreens(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var screens = HmiScreenReader.Read(session.Project, request.DeviceName);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(screens, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse GetTiaVersion()
+    {
+        try
+        {
+            var versions = TiaVersionDetector.DetectInstalledVersions();
+            var active = AssemblyResolver.DetectedVersion;
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(new
+                {
+                    activeVersion = active?.MajorVersion,
+                    activeDisplayName = active?.DisplayName,
+                    installedVersions = versions.Select(v => new
+                    {
+                        v.MajorVersion,
+                        v.DisplayName,
+                        v.UsesSplitDlls
+                    })
+                }, JsonOptions)
+            };
+        }
+        catch (Exception ex)
         {
             return Failure(ex.Message);
         }

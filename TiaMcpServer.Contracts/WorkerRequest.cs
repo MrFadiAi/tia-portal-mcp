@@ -83,4 +83,8 @@ public class WorkerRequest
     public bool SaveBeforeArchive { get; set; } = true;
 
     public bool SaveBeforeClose { get; set; } = true;
+
+    public string? TypeName { get; set; }
+
+    public int? TiaVersion { get; set; }
 }

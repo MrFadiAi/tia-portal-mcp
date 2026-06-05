@@ -11,9 +11,10 @@ namespace TiaMcpServer.Tools
         [Description("Recursively enumerate the TIA Portal project tree: devices, PLC software, block folders, blocks, tag tables, and types. Returns a structured JSON tree.")]
         public static async Task<string> BrowseProjectTree(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.BrowseProjectTreeAsync(projectPath).ConfigureAwait(false);
+            return await workerClient.BrowseProjectTreeAsync(projectPath, tiaVersion).ConfigureAwait(false);
         }
     }
 }

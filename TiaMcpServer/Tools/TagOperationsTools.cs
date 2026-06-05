@@ -15,9 +15,10 @@ namespace TiaMcpServer.Tools
             [Description("Name of the tag table to create.")] string tableName,
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath };
             var requestedInput = new { plcName, tableName, folderPath };
             return WriteSafetyTooling.CreatePreview(
@@ -38,7 +39,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_create_tag_table for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -54,7 +56,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -64,10 +66,11 @@ namespace TiaMcpServer.Tools
                 plcName,
                 tableName,
                 folderPath,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("create_tag_table", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("create_tag_table", result, "compile_check", compileResult);
@@ -80,9 +83,10 @@ namespace TiaMcpServer.Tools
             [Description("Name of the tag table to delete.")] string tableName,
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath };
             var requestedInput = new { plcName, tableName, folderPath };
             return WriteSafetyTooling.CreatePreview(
@@ -103,7 +107,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_delete_tag_table for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -119,7 +124,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -129,10 +134,11 @@ namespace TiaMcpServer.Tools
                 plcName,
                 tableName,
                 folderPath,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("delete_tag_table", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("delete_tag_table", result, "compile_check", compileResult);
@@ -152,9 +158,10 @@ namespace TiaMcpServer.Tools
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Optional logical address, such as %I0.0. Use empty to leave unassigned.")] string? logicalAddress = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name, dataType, logicalAddress };
             return WriteSafetyTooling.CreatePreview(
@@ -178,7 +185,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional logical address, such as %I0.0. Use empty to leave unassigned.")] string? logicalAddress = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_create_tag for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -194,7 +202,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -207,10 +215,11 @@ namespace TiaMcpServer.Tools
                 name,
                 dataType,
                 logicalAddress,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("create_tag", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("create_tag", result, "compile_check", compileResult);
@@ -231,9 +240,10 @@ namespace TiaMcpServer.Tools
             [Description("Optional ExternalVisible flag.")] bool? externalVisible = null,
             [Description("Optional ExternalWritable flag.")] bool? externalWritable = null,
             [Description("Optional IsSafety flag.")] bool? isSafety = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name, newName, dataType, logicalAddress, externalAccessible, externalVisible, externalWritable, isSafety };
             return WriteSafetyTooling.CreatePreview(
@@ -262,7 +272,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional IsSafety flag.")] bool? isSafety = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_update_tag for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -278,7 +289,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -296,10 +307,11 @@ namespace TiaMcpServer.Tools
                 externalVisible,
                 externalWritable,
                 isSafety,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("update_tag", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("update_tag", result, "compile_check", compileResult);
@@ -313,9 +325,10 @@ namespace TiaMcpServer.Tools
             [Description("Name of the tag to delete.")] string name,
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name };
             return WriteSafetyTooling.CreatePreview(
@@ -337,7 +350,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_delete_tag for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -353,7 +367,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -364,10 +378,11 @@ namespace TiaMcpServer.Tools
                 tableName,
                 folderPath,
                 name,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("delete_tag", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("delete_tag", result, "compile_check", compileResult);
@@ -387,9 +402,10 @@ namespace TiaMcpServer.Tools
             [Description("Value for the user constant.")] string value,
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name, dataType, value };
             return WriteSafetyTooling.CreatePreview(
@@ -413,7 +429,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_create_user_constant for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -429,7 +446,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -442,10 +459,11 @@ namespace TiaMcpServer.Tools
                 name,
                 dataType,
                 value,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("create_user_constant", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("create_user_constant", result, "compile_check", compileResult);
@@ -461,9 +479,10 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Optional new TIA Portal data type.")] string? dataType = null,
             [Description("Optional new value.")] string? value = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name, dataType, value };
             return WriteSafetyTooling.CreatePreview(
@@ -487,7 +506,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional new value.")] string? value = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_update_user_constant for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -503,7 +523,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -516,10 +536,11 @@ namespace TiaMcpServer.Tools
                 name,
                 dataType,
                 value,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("update_user_constant", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("update_user_constant", result, "compile_check", compileResult);
@@ -533,9 +554,10 @@ namespace TiaMcpServer.Tools
             [Description("Name of the user constant to delete.")] string name,
             [Description("Optional PLC device name to target. If omitted, uses the first PLC found.")] string? plcName = null,
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { plcName, tableName, folderPath, name };
             var requestedInput = new { plcName, tableName, folderPath, name };
             return WriteSafetyTooling.CreatePreview(
@@ -557,7 +579,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional tag table folder path, such as '/' or '/Group/Subgroup'.")] string? folderPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_delete_user_constant for this exact write request.")] string? safetyToken = null,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -573,7 +596,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.ListTagTablesAsync(plcName, projectPath)).ConfigureAwait(false);
+                () => workerClient.ListTagTablesAsync(plcName, projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -584,10 +607,11 @@ namespace TiaMcpServer.Tools
                 tableName,
                 folderPath,
                 name,
-                projectPath).ConfigureAwait(false);
+                projectPath,
+                tiaVersion).ConfigureAwait(false);
             var compileResult = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.CompileCheckAsync(null, plcName, projectPath).ConfigureAwait(false);
+                : await workerClient.CompileCheckAsync(null, plcName, projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("delete_user_constant", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("delete_user_constant", result, "compile_check", compileResult);

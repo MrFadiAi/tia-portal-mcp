@@ -25,6 +25,12 @@ public static class BlockImporter
         {
             WriteContentToTempDir(tempDir, target.DocumentName, yamlContent);
 
+#if LEGACY_TIA
+            // V16-V18: Use legacy Import API (XML import)
+            var importPath = Path.Combine(tempDir, target.DocumentName);
+            target.Group.Blocks.Import(new FileInfo(importPath), ImportOptions.Override);
+            return "Import succeeded";
+#else
             var result = target.Group.Blocks.ImportFromDocuments(
                 new DirectoryInfo(tempDir),
                 target.DocumentName,
@@ -36,6 +42,7 @@ public static class BlockImporter
             }
 
             return $"Import succeeded: state={result.State}";
+#endif
         }
         finally
         {

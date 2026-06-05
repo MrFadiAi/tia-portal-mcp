@@ -8,19 +8,27 @@ namespace TiaMcpServer.Tools
     [McpServerToolType]
     public static class ProjectLifecycleTools
     {
+        [McpServerTool(Name = "get_tia_version")]
+        [Description("Detect the installed TIA Portal version(s) and which version the MCP server is connected to.")]
+        public static async Task<string> GetTiaVersion(OpennessWorkerClient workerClient)
+        {
+            return await workerClient.GetTiaVersionAsync().ConfigureAwait(false);
+        }
+
         [McpServerTool(Name = "get_project_status")]
         [Description("Get status and metadata for the active TIA Portal project.")]
         public static async Task<string> GetProjectStatus(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+            return await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
         }
 
         [McpServerTool(Name = "preview_open_project")]
         [Description("Preview opening a TIA Portal project and return a short-lived safetyToken. Pass the token to open_project after reviewing the preview.")]
         public static Task<string> PreviewOpenProject(
-            [Description("Path to the .ap21 project file to open.")] string projectPath,
+            [Description("Path to the TIA Portal project file (.ap16, .ap18, .ap19, .ap21) to open.")] string projectPath,
             [Description("Set true to allow rebinding this MCP session from a previously bound project.")] bool forceRebind = false)
         {
             var target = new { projectPath };
@@ -38,10 +46,11 @@ namespace TiaMcpServer.Tools
         [Description("Open a TIA Portal project and bind this MCP session to it. Requires confirm=true and a safetyToken from preview_open_project.")]
         public static async Task<string> OpenProject(
             OpennessWorkerClient workerClient,
-            [Description("Path to the .ap21 project file to open.")] string projectPath,
+            [Description("Path to the TIA Portal project file (.ap16, .ap18, .ap19, .ap21) to open.")] string projectPath,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
             [Description("Safety token returned by preview_open_project for this exact write request.")] string? safetyToken = null,
-            [Description("Set true to allow rebinding this MCP session from a previously bound project.")] bool forceRebind = false)
+            [Description("Set true to allow rebinding this MCP session from a previously bound project.")] bool forceRebind = false,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -63,10 +72,10 @@ namespace TiaMcpServer.Tools
                 return safety.Error!;
             }
 
-            var result = await workerClient.OpenProjectAsync(projectPath, forceRebind).ConfigureAwait(false);
+            var result = await workerClient.OpenProjectAsync(projectPath, forceRebind, tiaVersion).ConfigureAwait(false);
             var status = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+                : await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("open_project", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("open_project", result, "get_project_status", status);
@@ -100,7 +109,8 @@ namespace TiaMcpServer.Tools
             [Description("Optional project author metadata.")] string? author = null,
             [Description("Optional project comment metadata.")] string? comment = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
-            [Description("Safety token returned by preview_create_project for this exact write request.")] string? safetyToken = null)
+            [Description("Safety token returned by preview_create_project for this exact write request.")] string? safetyToken = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -122,11 +132,11 @@ namespace TiaMcpServer.Tools
                 return safety.Error!;
             }
 
-            var result = await workerClient.CreateProjectAsync(projectDirectory, projectName, author, comment)
+            var result = await workerClient.CreateProjectAsync(projectDirectory, projectName, author, comment, tiaVersion)
                 .ConfigureAwait(false);
             var status = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.GetProjectStatusAsync(null).ConfigureAwait(false);
+                : await workerClient.GetProjectStatusAsync(null, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("create_project", null, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("create_project", result, "get_project_status", status);
@@ -136,9 +146,10 @@ namespace TiaMcpServer.Tools
         [Description("Preview saving the active TIA Portal project and return a short-lived safetyToken. Pass the token to save_project after reviewing the preview.")]
         public static async Task<string> PreviewSaveProject(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { projectPath };
             var requestedInput = new { projectPath };
             return WriteSafetyTooling.CreatePreview(
@@ -154,9 +165,10 @@ namespace TiaMcpServer.Tools
         [Description("Save the active TIA Portal project. Requires confirm=true and a safetyToken from preview_save_project.")]
         public static async Task<string> SaveProject(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
-            [Description("Safety token returned by preview_save_project for this exact write request.")] string? safetyToken = null)
+            [Description("Safety token returned by preview_save_project for this exact write request.")] string? safetyToken = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -172,16 +184,16 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetProjectStatusAsync(projectPath)).ConfigureAwait(false);
+                () => workerClient.GetProjectStatusAsync(projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
             }
 
-            var result = await workerClient.SaveProjectAsync(projectPath).ConfigureAwait(false);
+            var result = await workerClient.SaveProjectAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var status = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+                : await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("save_project", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("save_project", result, "get_project_status", status);
@@ -193,10 +205,11 @@ namespace TiaMcpServer.Tools
             OpennessWorkerClient workerClient,
             [Description("Parent directory for the copied project.")] string targetDirectory,
             [Description("Name of the copied project directory.")] string targetName,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
-            [Description("Set true to bind this MCP session to the copied project path after save-as.")] bool rebind = true)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("Set true to bind this MCP session to the copied project path after save-as.")] bool rebind = true,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { projectPath, targetDirectory, targetName };
             var requestedInput = new { projectPath, targetDirectory, targetName, rebind };
             return WriteSafetyTooling.CreatePreview(
@@ -214,10 +227,11 @@ namespace TiaMcpServer.Tools
             OpennessWorkerClient workerClient,
             [Description("Parent directory for the copied project.")] string targetDirectory,
             [Description("Name of the copied project directory.")] string targetName,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("Set true to bind this MCP session to the copied project path after save-as.")] bool rebind = true,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
-            [Description("Safety token returned by preview_save_project_as for this exact write request.")] string? safetyToken = null)
+            [Description("Safety token returned by preview_save_project_as for this exact write request.")] string? safetyToken = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -233,17 +247,17 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetProjectStatusAsync(projectPath)).ConfigureAwait(false);
+                () => workerClient.GetProjectStatusAsync(projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
             }
 
-            var result = await workerClient.SaveProjectAsAsync(projectPath, targetDirectory, targetName, rebind)
+            var result = await workerClient.SaveProjectAsAsync(projectPath, targetDirectory, targetName, rebind, tiaVersion)
                 .ConfigureAwait(false);
             var status = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.GetProjectStatusAsync(rebind ? null : projectPath).ConfigureAwait(false);
+                : await workerClient.GetProjectStatusAsync(rebind ? null : projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("save_project_as", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("save_project_as", result, "get_project_status", status);
@@ -257,9 +271,10 @@ namespace TiaMcpServer.Tools
             [Description("Archive file name, with or without extension.")] string archiveName,
             [Description("Archive mode: None, DiscardRestorableData, Compressed, or DiscardRestorableDataAndCompressed.")] string? mode = null,
             [Description("Save the project before archiving.")] bool saveBeforeArchive = true,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { projectPath, archiveDirectory, archiveName };
             var requestedInput = new { projectPath, archiveDirectory, archiveName, mode, saveBeforeArchive };
             return WriteSafetyTooling.CreatePreview(
@@ -279,9 +294,10 @@ namespace TiaMcpServer.Tools
             [Description("Archive file name, with or without extension.")] string archiveName,
             [Description("Archive mode: None, DiscardRestorableData, Compressed, or DiscardRestorableDataAndCompressed.")] string? mode = null,
             [Description("Save the project before archiving.")] bool saveBeforeArchive = true,
-            [Description("Optional path to a .ap21 project file. If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
-            [Description("Safety token returned by preview_archive_project for this exact write request.")] string? safetyToken = null)
+            [Description("Safety token returned by preview_archive_project for this exact write request.")] string? safetyToken = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -297,7 +313,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetProjectStatusAsync(projectPath)).ConfigureAwait(false);
+                () => workerClient.GetProjectStatusAsync(projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
@@ -308,10 +324,11 @@ namespace TiaMcpServer.Tools
                 archiveDirectory,
                 archiveName,
                 mode,
-                saveBeforeArchive).ConfigureAwait(false);
+                saveBeforeArchive,
+                tiaVersion).ConfigureAwait(false);
             var status = result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase)
                 ? null
-                : await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+                : await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("archive_project", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("archive_project", result, "get_project_status", status);
@@ -321,10 +338,11 @@ namespace TiaMcpServer.Tools
         [Description("Preview closing the active TIA Portal project and return a short-lived safetyToken. Pass the token to close_project after reviewing the preview.")]
         public static async Task<string> PreviewCloseProject(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, closes the currently bound/open project.")] string? projectPath = null,
-            [Description("Save the project before closing it.")] bool saveBeforeClose = true)
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, closes the currently bound/open project.")] string? projectPath = null,
+            [Description("Save the project before closing it.")] bool saveBeforeClose = true,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetProjectStatusAsync(projectPath).ConfigureAwait(false);
+            var currentState = await workerClient.GetProjectStatusAsync(projectPath, tiaVersion).ConfigureAwait(false);
             var target = new { projectPath };
             var requestedInput = new { projectPath, saveBeforeClose };
             return WriteSafetyTooling.CreatePreview(
@@ -340,10 +358,11 @@ namespace TiaMcpServer.Tools
         [Description("Close the active TIA Portal project and clear this MCP session binding. Requires confirm=true and a safetyToken from preview_close_project.")]
         public static async Task<string> CloseProject(
             OpennessWorkerClient workerClient,
-            [Description("Optional path to a .ap21 project file. If omitted, closes the currently bound/open project.")] string? projectPath = null,
+            [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, closes the currently bound/open project.")] string? projectPath = null,
             [Description("Save the project before closing it.")] bool saveBeforeClose = true,
             [Description("Set to true to confirm the write operation. Required safety flag; operation is rejected when false.")] bool confirm = false,
-            [Description("Safety token returned by preview_close_project for this exact write request.")] string? safetyToken = null)
+            [Description("Safety token returned by preview_close_project for this exact write request.")] string? safetyToken = null,
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
             if (!confirm)
             {
@@ -359,13 +378,13 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetProjectStatusAsync(projectPath)).ConfigureAwait(false);
+                () => workerClient.GetProjectStatusAsync(projectPath, tiaVersion)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;
             }
 
-            var result = await workerClient.CloseProjectAsync(projectPath, saveBeforeClose).ConfigureAwait(false);
+            var result = await workerClient.CloseProjectAsync(projectPath, saveBeforeClose, tiaVersion).ConfigureAwait(false);
 
             WriteSafetyService.Shared.AppendAudit("close_project", projectPath, target, requestedInput, safety.CurrentState, result);
             return WriteSafetyTooling.BuildApplyResult("close_project", result, "get_project_status", null);

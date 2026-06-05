@@ -8,12 +8,14 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 public class TiaPortalSession : IDisposable
 {
     private readonly bool _allowTiaConfirmations;
+    private readonly int? _tiaVersion;
     private TiaPortal? _tiaPortal;
     private bool _disposed;
 
-    public TiaPortalSession(bool allowTiaConfirmations = false)
+    public TiaPortalSession(bool allowTiaConfirmations = false, int? tiaVersion = null)
     {
         _allowTiaConfirmations = allowTiaConfirmations;
+        _tiaVersion = tiaVersion;
     }
 
     public Project? Project { get; internal set; }
@@ -34,16 +36,44 @@ public class TiaPortalSession : IDisposable
         var processes = TiaPortal.GetProcesses();
         if (!processes.Any())
         {
-            throw new InvalidOperationException("No running TIA Portal V21 instance found. Please start TIA Portal before using the MCP server.");
+            throw new InvalidOperationException($"No running TIA Portal {AssemblyResolver.DetectedVersion?.DisplayName ?? "TIA Portal"} instance found. Please start TIA Portal before using the MCP server.");
         }
 
-        _tiaPortal = processes.First().Attach();
-        _tiaPortal.Notification += OnNotification;
-        _tiaPortal.Confirmation += OnConfirmation;
-        _tiaPortal.Disposed += OnDisposed;
+        // Always iterate through all processes — try Attach() on each until one succeeds.
+        // This handles both multi-version scenarios and cases where some processes
+        // can't accept connections (e.g., background workers).
+        foreach (var proc in processes)
+        {
+            try
+            {
+                _tiaPortal = proc.Attach();
+
+                // Register confirmation handler IMMEDIATELY after Attach() returns,
+                // before any other operations that might trigger confirmations.
+                _tiaPortal.Confirmation += OnConfirmation;
+                _tiaPortal.Notification += OnNotification;
+                _tiaPortal.Disposed += OnDisposed;
+
+                Console.Error.WriteLine($"Successfully attached to TIA Portal (requested V{_tiaVersion?.ToString() ?? "auto"}).");
+                break;
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"Attach attempt failed (requested V{_tiaVersion?.ToString() ?? "auto"}): {ex.Message}");
+                _tiaPortal = null;
+            }
+        }
+
+        if (_tiaPortal is null)
+        {
+            throw new InvalidOperationException(
+                $"Could not attach to TIA Portal V{_tiaVersion?.ToString() ?? "auto"}. " +
+                $"Tried {processes.Count()} running process(es) but none could be reached. " +
+                $"Ensure TIA Portal has a project open and Openness is enabled.");
+        }
         Project = _tiaPortal.Projects.FirstOrDefault();
 
-        Console.Error.WriteLine("Connected to running TIA Portal instance.");
+        Console.Error.WriteLine($"Connected to running TIA Portal instance (requested V{_tiaVersion?.ToString() ?? "auto"}).");
     }
 
     public void OpenProject(string projectPath)

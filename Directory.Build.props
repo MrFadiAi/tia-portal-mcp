@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
     <TiaPortalV21Dir Condition="'$(TiaPortalV21Dir)' == ''">C:\Program Files\Siemens\Automation\Portal V21\PublicAPI\V21\net48</TiaPortalV21Dir>
+    <TiaPortalV18Dir Condition="'$(TiaPortalV18Dir)' == ''">C:\Program Files\Siemens\Automation\Portal V18\PublicAPI\V18</TiaPortalV18Dir>
   </PropertyGroup>
 </Project>

@@ -987,17 +987,33 @@ public class OpennessWorkerClient
         if (!request.TiaVersion.HasValue)
         {
             var versionFile = Environment.GetEnvironmentVariable("TIA_VERSION_FILE");
+            Console.Error.WriteLine($"[TIA-VERSION] tiaVersion not set in tool call. TIA_VERSION_FILE env={versionFile ?? "(null)"}");
             if (!string.IsNullOrEmpty(versionFile) && File.Exists(versionFile))
             {
                 var content = File.ReadAllText(versionFile).Trim();
+                Console.Error.WriteLine($"[TIA-VERSION] Read version file content: '{content}'");
                 if (int.TryParse(content, out var defaultVersion))
                 {
                     request.TiaVersion = defaultVersion;
+                    Console.Error.WriteLine($"[TIA-VERSION] Set tiaVersion={defaultVersion} from file");
                 }
             }
+            else if (string.IsNullOrEmpty(versionFile))
+            {
+                Console.Error.WriteLine($"[TIA-VERSION] TIA_VERSION_FILE env var not set - falling back to auto-detect");
+            }
+            else
+            {
+                Console.Error.WriteLine($"[TIA-VERSION] Version file not found at: {versionFile} - falling back to auto-detect");
+            }
+        }
+        else
+        {
+            Console.Error.WriteLine($"[TIA-VERSION] tiaVersion={request.TiaVersion.Value} from tool call argument");
         }
 
         var workerPath = LocateWorkerExecutable(request.TiaVersion);
+        Console.Error.WriteLine($"[TIA-VERSION] Worker path: {workerPath}");
         var startInfo = new ProcessStartInfo
         {
             FileName = workerPath,
