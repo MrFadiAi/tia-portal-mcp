@@ -138,7 +138,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> BrowseHmiScreensAsync(string? deviceName, string? projectPath, int? tiaVersion = null)
+    public async Task<string> BrowseHmiScreensAsync(string? deviceName, string? projectPath, string? mode = null, string? screenName = null, int? tiaVersion = null)
     {
         try
         {
@@ -153,12 +153,74 @@ public class OpennessWorkerClient
                     Method = "browse_hmi_screens",
                     DeviceName = deviceName,
                     ProjectPath = effectiveProjectPath,
+                    Mode = mode,
+                    ScreenName = screenName,
                     TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
                 ? response.Payload ?? "[]"
                 : $"Error: {response.Error ?? "Failed to browse HMI screens."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ExportHmiScreenAsync(string deviceName, string screenName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "export_hmi_screen",
+                    DeviceName = deviceName,
+                    ScreenName = screenName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? ""
+                : $"Error: {response.Error ?? "Failed to export HMI screen."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ImportHmiScreenAsync(string deviceName, string screenName, string? folderPath, string xmlContent, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "import_hmi_screen",
+                    DeviceName = deviceName,
+                    ScreenName = screenName,
+                    FolderPath = folderPath,
+                    YamlContent = xmlContent,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "Import succeeded"
+                : $"Error: {response.Error ?? "Failed to import HMI screen."}";
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
         {

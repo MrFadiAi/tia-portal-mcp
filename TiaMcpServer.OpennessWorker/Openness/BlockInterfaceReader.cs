@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 using Siemens.Engineering;
 using Siemens.Engineering.SW;
@@ -69,11 +70,18 @@ public static class BlockInterfaceReader
 #endif
             ParseInterfaceFromXml(xml, info);
         }
+        catch (XmlException ex)
+        {
+            // XML parsing failed — return partial info with diagnostic instead of crashing
+            info.Sections.Clear();
+            info.DiagnosticMessage = $"XML parsing error for block '{info.BlockName}': {ex.Message}. " +
+                                     "The block may use an unsupported format or contain corrupted data.";
+        }
         finally
         {
             if (Directory.Exists(tempDir))
             {
-                Directory.Delete(tempDir, true);
+                try { Directory.Delete(tempDir, true); } catch { }
             }
         }
 

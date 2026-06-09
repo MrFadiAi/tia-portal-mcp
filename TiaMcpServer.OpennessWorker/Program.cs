@@ -78,7 +78,9 @@ internal static class Program
                 "export_plc_type"     => ExportPlcType(request),
                 "export_tag_table_xml" => ExportTagTableXml(request),
                 "list_connections"    => ListConnections(request),
-                "browse_hmi_screens" => BrowseHmiScreens(request),
+                "browse_hmi_screens"  => BrowseHmiScreens(request),
+                "export_hmi_screen"   => ExportHmiScreen(request),
+                "import_hmi_screen"   => ImportHmiScreen(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
@@ -887,6 +889,10 @@ internal static class Program
         {
             return Failure(ex.Message);
         }
+        catch (System.Xml.XmlException ex)
+        {
+            return Failure($"XML parsing error: {ex.Message}. The block may use an unsupported format or contain corrupted export data.");
+        }
     }
 
     private static WorkerResponse ExportPlcType(WorkerRequest request)
@@ -1031,11 +1037,166 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
-            var screens = HmiScreenReader.Read(session.Project, request.DeviceName);
+            var screens = HmiScreenReader.Read(session.Project, request.DeviceName, request.Mode, request.ScreenName);
+
+            // Detail mode: export screen XML and parse into rich structured items.
+            // This gives unified, complete data (animations, events, fonts, texts, links, colors)
+            // across ALL TIA versions (V16, V18, V21+), rather than relying on the
+            // Openness API which returns minimal data and fails entirely on V16.
+            var isDetailMode = !string.Equals(request.Mode, "list", StringComparison.OrdinalIgnoreCase);
+            if (isDetailMode && !string.IsNullOrEmpty(request.DeviceName))
+            {
+                foreach (var device in screens)
+                {
+                    foreach (var screen in device.Screens)
+                    {
+                        try
+                        {
+                            var xml = HmiScreenExporter.Export(session.Project!, device.DeviceName, screen.ScreenName);
+
+                            var parsedItems = HmiScreenXmlParser.Parse(xml);
+                            if (parsedItems.Count > 0)
+                            {
+                                screen.Items = parsedItems;
+                                screen.ItemCount = parsedItems.Count;
+                            }
+                            else
+                            {
+                                // Parser found nothing — keep API results if any, else save raw XML
+                                if (screen.Items.Count == 0)
+                                {
+                                    var tempPath = Path.Combine(
+                                        Path.GetTempPath(),
+                                        $"hmi_screen_{device.DeviceName}_{screen.ScreenName}.xml");
+                                    File.WriteAllText(tempPath, xml);
+                                    screen.RawXml = $"Full XML saved to: {tempPath} ({xml.Length:N0} chars). Parser returned no items.";
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // XML export failed — keep whatever the API returned
+                            Console.Error.WriteLine($"XML export/parse for '{screen.ScreenName}' failed: {ex.Message}");
+                        }
+                    }
+                }
+            }
+
             return new WorkerResponse
             {
                 Success = true,
                 Payload = JsonSerializer.Serialize(screens, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ExportHmiScreen(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            if (string.IsNullOrEmpty(request.DeviceName))
+            {
+                return Failure("deviceName is required. Specify the HMI device name containing the screen.");
+            }
+
+            if (string.IsNullOrEmpty(request.ScreenName))
+            {
+                return Failure("screenName is required. Specify the name of the screen to export.");
+            }
+
+            var xml = HmiScreenExporter.Export(session.Project, request.DeviceName!, request.ScreenName!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = xml
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ImportHmiScreen(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            if (string.IsNullOrEmpty(request.DeviceName))
+            {
+                return Failure("deviceName is required. Specify the HMI device name to import into.");
+            }
+
+            if (string.IsNullOrEmpty(request.ScreenName))
+            {
+                return Failure("screenName is required. Specify the name for the imported screen.");
+            }
+
+            if (string.IsNullOrEmpty(request.YamlContent))
+            {
+                return Failure("xmlContent is required. Provide the XML content of the HMI screen to import.");
+            }
+
+            var result = HmiScreenImporter.Import(session.Project, request.DeviceName!, request.ScreenName!, request.FolderPath, request.YamlContent!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = result
             };
         }
         catch (EngineeringException ex)

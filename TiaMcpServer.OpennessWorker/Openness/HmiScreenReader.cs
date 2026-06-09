@@ -16,9 +16,10 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 /// </summary>
 public static class HmiScreenReader
 {
-    public static List<HmiDeviceInfo> Read(Project project, string? deviceName)
+    public static List<HmiDeviceInfo> Read(Project project, string? deviceName, string? mode, string? screenName)
     {
         var result = new List<HmiDeviceInfo>();
+        var listOnly = string.Equals(mode, "list", StringComparison.OrdinalIgnoreCase);
 
         foreach (Device device in project.Devices)
         {
@@ -30,7 +31,7 @@ public static class HmiScreenReader
 
             try
             {
-                var hmiData = ReadDeviceHmi(device);
+                var hmiData = ReadDeviceHmi(device, listOnly, screenName);
                 if (hmiData is not null)
                 {
                     result.Add(hmiData);
@@ -45,7 +46,7 @@ public static class HmiScreenReader
         return result;
     }
 
-    private static HmiDeviceInfo? ReadDeviceHmi(Device device)
+    private static HmiDeviceInfo? ReadDeviceHmi(Device device, bool listOnly, string? screenName)
     {
         foreach (DeviceItem item in device.DeviceItems)
         {
@@ -67,7 +68,7 @@ public static class HmiScreenReader
                 }
 
                 var typeIdentifier = ReadPropertySafe(device, "TypeIdentifier")?.ToString() ?? "";
-                var screens = ReadScreensFromSoftware(software);
+                var screens = ReadScreensFromSoftware(software, listOnly, screenName);
 
                 return new HmiDeviceInfo
                 {
@@ -95,7 +96,7 @@ public static class HmiScreenReader
                name.Contains("ScreenProvider");
     }
 
-    private static List<HmiScreenInfo> ReadScreensFromSoftware(object software)
+    private static List<HmiScreenInfo> ReadScreensFromSoftware(object software, bool listOnly, string? screenName)
     {
         var screens = new List<HmiScreenInfo>();
 
@@ -109,7 +110,7 @@ public static class HmiScreenReader
 
             if (screenFolder is not null)
             {
-                WalkScreenFolder(screenFolder, screens);
+                WalkScreenFolder(screenFolder, screens, listOnly, screenName);
             }
 
             return screens;
@@ -119,7 +120,7 @@ public static class HmiScreenReader
         {
             try
             {
-                var screenInfo = ReadScreen(screenObj);
+                var screenInfo = ReadScreen(screenObj, listOnly, screenName);
                 if (screenInfo is not null)
                 {
                     screens.Add(screenInfo);
@@ -134,7 +135,7 @@ public static class HmiScreenReader
         return screens;
     }
 
-    private static void WalkScreenFolder(object folder, List<HmiScreenInfo> screens)
+    private static void WalkScreenFolder(object folder, List<HmiScreenInfo> screens, bool listOnly, string? screenName)
     {
         // Walk screens in this folder
         var screensProp = ReadPropertySafe(folder, "Screens") ??
@@ -146,7 +147,7 @@ public static class HmiScreenReader
             {
                 try
                 {
-                    var screenInfo = ReadScreen(screenObj);
+                    var screenInfo = ReadScreen(screenObj, listOnly, screenName);
                     if (screenInfo is not null)
                     {
                         screens.Add(screenInfo);
@@ -167,32 +168,59 @@ public static class HmiScreenReader
         {
             foreach (var subFolder in EnumerateSafe(folders, "screen folders"))
             {
-                WalkScreenFolder(subFolder, screens);
+                WalkScreenFolder(subFolder, screens, listOnly, screenName);
             }
         }
     }
 
-    private static HmiScreenInfo? ReadScreen(object screenObj)
+    private static HmiScreenInfo? ReadScreen(object screenObj, bool listOnly, string? screenName)
     {
-        var screenName = ReadPropertySafe(screenObj, "Name")?.ToString();
-        if (string.IsNullOrEmpty(screenName))
+        var name = ReadPropertySafe(screenObj, "Name")?.ToString();
+        if (string.IsNullOrEmpty(name))
+        {
+            return null;
+        }
+
+        // In detail mode with a screenName filter, skip non-matching screens
+        if (!string.IsNullOrEmpty(screenName) &&
+            !string.Equals(name, screenName, StringComparison.OrdinalIgnoreCase))
         {
             return null;
         }
 
         var screenInfo = new HmiScreenInfo
         {
-            ScreenName = screenName!
+            ScreenName = name!
         };
 
-        // Walk screen items (buttons, IO fields, etc.)
-        var items = ReadPropertySafe(screenObj, "ScreenItems") ??
-                    ReadPropertySafe(screenObj, "Items") ??
-                    ReadPropertySafe(screenObj, "Children");
-
-        if (items is not null)
+        // In list mode, just count items — don't read full details
+        if (listOnly)
         {
-            foreach (var itemObj in EnumerateSafe(items, $"screen '{screenName}' items"))
+            var items = ReadPropertySafe(screenObj, "ScreenItems") ??
+                        ReadPropertySafe(screenObj, "Items") ??
+                        ReadPropertySafe(screenObj, "Children");
+
+            if (items is not null)
+            {
+                var count = 0;
+                foreach (var _ in EnumerateSafe(items, $"screen '{name}' items"))
+                {
+                    count++;
+                }
+                screenInfo.ItemCount = count;
+            }
+
+            return screenInfo;
+        }
+
+        // Full detail mode — walk screen items (buttons, IO fields, etc.)
+        var detailItems = ReadPropertySafe(screenObj, "ScreenItems") ??
+                          ReadPropertySafe(screenObj, "Items") ??
+                          ReadPropertySafe(screenObj, "Children");
+
+        if (detailItems is not null)
+        {
+            foreach (var itemObj in EnumerateSafe(detailItems, $"screen '{name}' items"))
             {
                 try
                 {
@@ -204,7 +232,7 @@ public static class HmiScreenReader
                 }
                 catch (EngineeringException ex)
                 {
-                    Console.Error.WriteLine($"Skipping screen item in '{screenName}': {ex.Message}");
+                    Console.Error.WriteLine($"Skipping screen item in '{name}': {ex.Message}");
                 }
             }
         }
@@ -329,10 +357,8 @@ public static class HmiScreenReader
         return new HmiEventInfo
         {
             EventName = eventName,
-            ActionType = ReadPropertySafe(evt, "ActionType")?.ToString() ??
-                         ReadPropertySafe(evt, "Type")?.ToString(),
-            Description = ReadPropertySafe(evt, "Comment")?.ToString() ??
-                          ReadPropertySafe(evt, "Description")?.ToString()
+            FunctionName = ReadPropertySafe(evt, "ActionType")?.ToString() ??
+                           ReadPropertySafe(evt, "Type")?.ToString()
         };
     }
 
@@ -383,7 +409,7 @@ public static class HmiScreenReader
             catch (EngineeringException ex)
             {
                 Console.Error.WriteLine($"Skipping an entry in {description}: {ex.Message}");
-                yield break;
+                continue;
             }
 
             if (current is not null)

@@ -9,6 +9,7 @@ public class BlockInterfaceInfo
     public int BlockNumber { get; set; }
     public string ProgrammingLanguage { get; set; } = string.Empty;
     public List<BlockSectionInfo> Sections { get; set; } = new();
+    public string? DiagnosticMessage { get; set; }
 }
 
 public class BlockSectionInfo

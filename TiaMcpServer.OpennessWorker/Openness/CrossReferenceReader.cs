@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+using System.Reflection;
 using Siemens.Engineering;
 using Siemens.Engineering.CrossReference;
 using Siemens.Engineering.HW;
@@ -52,14 +55,42 @@ public static class CrossReferenceReader
         }
         catch (EngineeringException ex)
         {
-            result.Messages.Add($"Could not get cross-reference service for PLC '{deviceName}': {ex.Message}");
+            result.Messages.Add(
+                $"Could not get cross-reference service for PLC '{deviceName}': {ex.Message}. " +
+                "The project may need to be compiled first — cross-reference data is generated during compilation.");
             return result;
         }
 
         if (service is null)
         {
-            result.Messages.Add($"PLC '{deviceName}' does not expose the cross-reference service.");
-            return result;
+            // Cross-reference service requires compilation. Try to compile and retry.
+            result.Messages.Add(
+                $"Cross-reference service not available for PLC '{deviceName}'. " +
+                "Attempting to compile PLC software to generate cross-reference data...");
+
+            try
+            {
+                CompilePlcSoftware(plcSoftware);
+                result.Messages.Add("Compilation completed. Retrying cross-reference retrieval...");
+
+                service = plcSoftware.GetService<CrossReferenceService>();
+            }
+            catch (Exception compileEx)
+            {
+                result.Messages.Add(
+                    $"Auto-compile failed: {compileEx.Message}. " +
+                    "Cross-reference data requires a compiled project. " +
+                    "Compile the PLC software manually and retry.");
+                return result;
+            }
+
+            if (service is null)
+            {
+                result.Messages.Add(
+                    $"Cross-reference service still unavailable after compilation for PLC '{deviceName}'. " +
+                    "The project may be in an inconsistent state. Try closing and reopening the project.");
+                return result;
+            }
         }
 
         CrossReferenceResult crossReferenceResult;
@@ -69,7 +100,9 @@ public static class CrossReferenceReader
         }
         catch (EngineeringException ex)
         {
-            result.Messages.Add($"Could not read cross references for PLC '{deviceName}': {ex.Message}");
+            result.Messages.Add(
+                $"Could not read cross references for PLC '{deviceName}': {ex.Message}. " +
+                "Try compiling the project first and ensure no blocks are currently being edited.");
             return result;
         }
 
@@ -240,6 +273,34 @@ public static class CrossReferenceReader
     private static string SafeString(object? value)
     {
         return value?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Compile PLC software via reflection (same approach as CompileChecker).
+    /// Cross-reference service requires compiled data to be available.
+    /// </summary>
+    private static void CompilePlcSoftware(PlcSoftware plcSoftware)
+    {
+        var type = plcSoftware.GetType();
+        var compileMethod = type.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public)
+            ?? type.GetMethod("Compile", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        if (compileMethod is null)
+        {
+            // Search interfaces (explicit implementations are private)
+            foreach (var iface in type.GetInterfaces())
+            {
+                compileMethod = iface.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public);
+                if (compileMethod is not null) break;
+            }
+        }
+
+        if (compileMethod is null)
+        {
+            throw new InvalidOperationException("PlcSoftware does not expose a Compile method.");
+        }
+
+        compileMethod.Invoke(plcSoftware, null);
     }
 
     private sealed class DiscoveredPlcSoftware

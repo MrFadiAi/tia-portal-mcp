@@ -51,42 +51,52 @@ public static class ScanOpenProjectsTool
             return JsonSerializer.Serialize(new { projects = Array.Empty<object>() });
         }
 
-        // Step 2: For each version, browse project tree in parallel
-        var scanTasks = installedVersions.Select(async v =>
+        // Step 2: Browse project tree for each installed version SEQUENTIALLY.
+        // Running workers in parallel causes COM contention between different
+        // TIA Portal versions, making some workers hang indefinitely.
+        // Sequential execution: each worker finishes in 2-5s, so the total scan
+        // is still fast (~10s for 3 versions) and reliable.
+        var results = new List<ScannedProject>();
+        foreach (var v in installedVersions)
         {
             try
             {
+                Console.Error.WriteLine($"[SCAN] Scanning {v.DisplayName}...");
                 var treeResult = await workerClient.BrowseProjectTreeAsync(
                     projectPath: null, tiaVersion: v.MajorVersion);
 
                 if (treeResult.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
                 {
-                    return new ScannedProject
+                    Console.Error.WriteLine($"[SCAN] {v.DisplayName}: {treeResult}");
+                    results.Add(new ScannedProject
                     {
                         Error = treeResult,
                         Version = v.MajorVersion,
                         DisplayName = v.DisplayName
-                    };
+                    });
                 }
-
-                return ParseProjectFromTree(treeResult, v.MajorVersion, v.DisplayName);
+                else
+                {
+                    var project = ParseProjectFromTree(treeResult, v.MajorVersion, v.DisplayName);
+                    Console.Error.WriteLine($"[SCAN] {v.DisplayName}: found project with {project.DeviceCount} devices, {project.BlockCount} blocks");
+                    results.Add(project);
+                }
             }
             catch (Exception ex)
             {
-                return new ScannedProject
+                Console.Error.WriteLine($"[SCAN] {v.DisplayName} exception: {ex.Message}");
+                results.Add(new ScannedProject
                 {
                     Error = $"Error scanning V{v.MajorVersion}: {ex.Message}",
                     Version = v.MajorVersion,
                     DisplayName = v.DisplayName
-                };
+                });
             }
-        }).ToArray();
-
-        var results = await Task.WhenAll(scanTasks);
+        }
 
         return JsonSerializer.Serialize(new
         {
-            projects = results.Where(p => p is not null).ToList()
+            projects = results
         }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
     }
 

@@ -87,4 +87,8 @@ public class WorkerRequest
     public string? TypeName { get; set; }
 
     public int? TiaVersion { get; set; }
+
+    public string? Mode { get; set; }
+
+    public string? ScreenName { get; set; }
 }

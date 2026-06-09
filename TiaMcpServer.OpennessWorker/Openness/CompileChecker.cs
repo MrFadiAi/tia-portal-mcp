@@ -178,7 +178,34 @@ public static class CompileChecker
         var compileMethod = FindCompileMethod(compilable.GetType());
         if (compileMethod == null)
         {
-            throw new InvalidOperationException($"Object '{compilable.GetType().Name}' does not expose a Compile method.");
+            // Fallback: try COM late-binding via Type.InvokeMember (V21 COM interop wrappers)
+            try
+            {
+                var result = compilable.GetType().InvokeMember(
+                    "Compile",
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.InvokeMethod,
+                    null,
+                    compilable,
+                    null);
+                if (result is CompilerResult cr)
+                    return cr;
+            }
+            catch (MissingMethodException)
+            {
+                // Not available via COM either
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException is not null)
+            {
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                throw;
+            }
+
+            var runtimeType = compilable.GetType().FullName ?? compilable.GetType().Name;
+            var interfaces = string.Join(", ", compilable.GetType().GetInterfaces().Select(i => i.Name));
+            throw new InvalidOperationException(
+                $"Object '{runtimeType}' does not expose a Compile method. " +
+                $"Implemented interfaces: [{interfaces}]. " +
+                "The PLC software may not support compilation through the Openness API in this state.");
         }
 
         try
@@ -194,12 +221,16 @@ public static class CompileChecker
 
     private static MethodInfo? FindCompileMethod(Type type)
     {
-        var compileMethod = type.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public);
+        const BindingFlags allFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
+        // 1. Search the type itself (public and non-public — explicit interface implementations are private)
+        var compileMethod = type.GetMethod("Compile", allFlags);
         if (compileMethod != null)
         {
             return compileMethod;
         }
 
+        // 2. Search all implemented interfaces
         foreach (var interfaceType in type.GetInterfaces())
         {
             compileMethod = interfaceType.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public);
@@ -207,6 +238,18 @@ public static class CompileChecker
             {
                 return compileMethod;
             }
+        }
+
+        // 3. Walk base types (COM wrappers may hide Compile in a base class)
+        var baseType = type.BaseType;
+        while (baseType is not null)
+        {
+            compileMethod = baseType.GetMethod("Compile", allFlags);
+            if (compileMethod != null)
+            {
+                return compileMethod;
+            }
+            baseType = baseType.BaseType;
         }
 
         return null;
