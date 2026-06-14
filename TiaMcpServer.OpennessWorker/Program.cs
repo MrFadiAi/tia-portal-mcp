@@ -45,18 +45,47 @@ internal static class Program
                 return Failure("Worker request was empty.");
             }
 
-            return request.Method switch
+            // Mutations invalidate the structural-read cache AND the code index before running.
+            if (WorkerCache.IsMutating(request.Method))
+            {
+                WorkerCache.Invalidate();
+                CodeIndexCache.Clear();
+            }
+
+            // Cacheable structural reads: serve from cache before opening a TIA session.
+            string? cacheKey = null;
+            if (WorkerCache.IsCacheable(request.Method))
+            {
+                cacheKey = WorkerCache.BuildKey(request.Method, request.ProjectPath, request.TiaVersion, request.PlcName);
+                var cached = WorkerCache.TryGet(cacheKey);
+                if (cached != null)
+                {
+                    return new WorkerResponse { Success = true, Payload = cached, Cached = true };
+                }
+            }
+
+            var response = request.Method switch
             {
                 "browse_project_tree" => BrowseProjectTree(request),
+                "list_plcs" => ListPlcs(request),
+                "list_blocks" => ListBlocks(request),
+                "list_plc_types" => ListPlcTypes(request),
+                "find_tags" => FindTags(request),
+                "search_code" => SearchCode(request),
+                "tag_usage" => TagUsage(request),
+                "knowhow_unlock" => KnowHowUnlock(request),
                 "read_hardware_config" => ReadHardwareConfig(request),
 #if !LEGACY_TIA_V16
                 "search_equipment_catalog" => SearchEquipmentCatalog(request),
                 "add_network_device" => AddNetworkDevice(request),
                 "configure_network_device" => ConfigureNetworkDevice(request),
                 "read_cross_references" => ReadCrossReferences(request),
+                "tag_xref" => TagXref(request),
+                "call_graph" => CallGraph(request),
 #endif
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
+                "delete_block"        => DeleteBlock(request),
                 "list_tag_tables"     => ListTagTables(request),
                 "compile_check"       => CompileCheck(request),
                 "create_tag_table"    => CreateTagTable(request),
@@ -79,11 +108,19 @@ internal static class Program
                 "export_tag_table_xml" => ExportTagTableXml(request),
                 "list_connections"    => ListConnections(request),
                 "browse_hmi_screens"  => BrowseHmiScreens(request),
+                "hmi_tag_trace"       => HmiTagTrace(request),
                 "export_hmi_screen"   => ExportHmiScreen(request),
                 "import_hmi_screen"   => ImportHmiScreen(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
+
+            if (response.Success && cacheKey != null)
+            {
+                WorkerCache.Set(cacheKey, response.Payload ?? string.Empty);
+            }
+
+            return response;
         }
         catch (JsonException ex)
         {
@@ -115,7 +152,7 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
-            var tree = walker.Walk(session.Project);
+            var tree = walker.Walk(session.Project, request.PlcName);
             return new WorkerResponse
             {
                 Success = true,
@@ -135,6 +172,396 @@ internal static class Program
             return Failure(ex.Message);
         }
         catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ListPlcs(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var plcs = PlcInventoryReader.ReadAll(session.Project);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(plcs, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ListBlocks(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var blocks = BlockListReader.Read(session.Project, request.PlcName);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(blocks, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ListPlcTypes(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var types = PlcTypeListReader.Read(session.Project, request.PlcName);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(types, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse FindTags(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query (tag name pattern) is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var matches = TagSearchReader.Search(session.Project, request.PlcName, request.Query!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(matches, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse DeleteBlock(WorkerRequest request)
+    {
+        if (string.IsNullOrEmpty(request.BlockPath))
+        {
+            return Failure("BlockPath is required.");
+        }
+
+        if (!request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with the block deletion.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(request.AllowTiaConfirmations, request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = BlockDeleter.Delete(session.Project, request.BlockPath!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse SearchCode(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query (search pattern) is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = CodeSearcher.Search(
+                session.Project, request.ProjectPath, request.PlcName, request.Query!, request.IgnoreCase, request.ContextLines);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse TagUsage(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query (tag name) is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = CodeSearcher.TagUsage(session.Project, request.ProjectPath, request.PlcName, request.Query!);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse KnowHowUnlock(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            // Resolve the password: explicit arg -> cached for this project -> env var.
+            var password = KnowHowPasswordStore.Resolve(request.Password, request.ProjectPath);
+            if (string.IsNullOrEmpty(password))
+            {
+                // No password available anywhere: signal the caller (AI) to ask the user.
+                var need = new KnowHowUnlockResultInfo
+                {
+                    PasswordRequired = true,
+                    Message = "Know-how password required. Ask the user for this project's know-how password and call knowhow_unlock with it; it will then be cached and never asked again.",
+                };
+                return new WorkerResponse { Success = true, Payload = JsonSerializer.Serialize(need, JsonOptions) };
+            }
+
+            var result = KnowHowUnlocker.Unlock(session.Project, request.PlcName, password!);
+
+            // Cache the password for this project unless it was clearly wrong.
+            if (!result.PasswordLikelyIncorrect)
+            {
+                KnowHowPasswordStore.Set(request.ProjectPath, password!);
+                result.PasswordCached = true;
+            }
+
+            return new WorkerResponse { Success = true, Payload = JsonSerializer.Serialize(result, JsonOptions) };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse HmiTagTrace(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var trace = HmiTagTracer.Trace(
+                session.Project, request.ProjectPath, request.DeviceName, request.ScreenName, request.PlcName);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(trace, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
         {
             return Failure(ex.Message);
         }
@@ -406,6 +833,91 @@ internal static class Program
             return Failure(ex.Message);
         }
     }
+
+    // Authoritative read/write locations for ONE tag, from the compiled cross-reference
+    // (pierces know-how protection). Concise alternative to read_cross_references' full dump.
+    private static WorkerResponse TagXref(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query (tag name) is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var report = CrossReferenceReader.Read(
+                session.Project, request.PlcName, CrossReferenceFilterNames.ObjectsWithReferences);
+            var result = XrefWalker.BuildTagXref(report, request.Query!, request.LogicalAddress);
+            return new WorkerResponse { Success = true, Payload = JsonSerializer.Serialize(result, JsonOptions) };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // Callers + callees of ONE block, from the compiled cross-reference.
+    private static WorkerResponse CallGraph(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return Failure("Query (block name) is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var report = CrossReferenceReader.Read(
+                session.Project, request.PlcName, CrossReferenceFilterNames.ObjectsWithReferences);
+            var result = XrefWalker.BuildCallGraph(report, request.Query!);
+            return new WorkerResponse { Success = true, Payload = JsonSerializer.Serialize(result, JsonOptions) };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
 #endif
 
     private static WorkerResponse GetBlockContent(WorkerRequest request)
@@ -429,8 +941,41 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
-            string yaml = BlockExporter.Export(session.Project, request.BlockPath!);
-            return new WorkerResponse { Success = true, Payload = yaml };
+            try
+            {
+                string yaml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath);
+                return new WorkerResponse { Success = true, Payload = yaml };
+            }
+            catch (EngineeringException ex) when (IsKnowHowProtected(ex))
+            {
+                // The block's CODE is know-how-protected and cannot be exported.
+                // The interface (parameter names/types) is usually still readable —
+                // return that as a fallback so the caller gets partial info instead
+                // of a bare error.
+                var name = TryGetBlockName(request.BlockPath);
+                try
+                {
+                    var iface = BlockInterfaceReader.Read(session.Project, request.BlockPath!);
+                    var payload = JsonSerializer.Serialize(iface, JsonOptions);
+                    return new WorkerResponse
+                    {
+                        Success = true,
+                        Payload =
+                            $"--- Block '{iface.BlockName}' is KNOW-HOW-PROTECTED: code body cannot be exported. ---\n" +
+                            $"Returning the interface (parameter names/types) only. " +
+                            $"To read the code, the block must be unlocked in TIA Portal with its password.\n\n" +
+                            payload,
+                    };
+                }
+                catch
+                {
+                    // Interface export also blocked — return an actionable error.
+                    return Failure(
+                        $"Block '{name}' is know-how-protected and cannot be read. " +
+                        "The protection must be removed in TIA Portal (requires the know-how password) " +
+                        "before its code can be exported.");
+                }
+            }
         }
         catch (EngineeringException ex)
         {
@@ -448,6 +993,25 @@ internal static class Program
         {
             return Failure(ex.Message);
         }
+    }
+
+    private static bool IsKnowHowProtected(EngineeringException ex)
+    {
+        var msg = ex.Message ?? string.Empty;
+        return msg.IndexOf("know-how-protected", StringComparison.OrdinalIgnoreCase) >= 0
+            || msg.IndexOf("know how protected", StringComparison.OrdinalIgnoreCase) >= 0
+            || msg.IndexOf("knowhow", StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private static string TryGetBlockName(string? blockPath)
+    {
+        if (string.IsNullOrWhiteSpace(blockPath))
+        {
+            return "block";
+        }
+
+        var parts = blockPath.Split('/');
+        return parts[parts.Length - 1];
     }
 
     private static WorkerResponse UpdateBlockLogic(WorkerRequest request)

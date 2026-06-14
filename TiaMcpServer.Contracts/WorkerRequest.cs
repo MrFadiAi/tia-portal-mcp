@@ -14,6 +14,9 @@ public class WorkerRequest
 
     public string? CrossReferenceFilter { get; set; }
 
+    /// <summary>knowhow_unlock: the know-how protection password (provided once by the user, then cached to disk).</summary>
+    public string? Password { get; set; }
+
     public bool AllowTiaConfirmations { get; set; }
 
     public string? Query { get; set; }
@@ -91,4 +94,10 @@ public class WorkerRequest
     public string? Mode { get; set; }
 
     public string? ScreenName { get; set; }
+
+    /// <summary>search_code: case-insensitive matching (default true).</summary>
+    public bool IgnoreCase { get; set; } = true;
+
+    /// <summary>search_code: lines of context around each match (default 2).</summary>
+    public int ContextLines { get; set; } = 2;
 }

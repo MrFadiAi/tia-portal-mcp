@@ -16,15 +16,46 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 public class ProjectTreeWalker
 {
-    public List<ProjectTreeNode> Walk(Project project)
+    public List<ProjectTreeNode> Walk(Project project, string? plcNameFilter = null)
     {
         var rootNodes = new List<ProjectTreeNode>();
 
+        // The filter can match EITHER the device name OR a PLC-software name.
+        // In TIA Portal these are often different (e.g. device "PLF_01A_PLC_CARROUSEL_2"
+        // hosts PLC software "PLF_03A_PLC_CARROUSEL"), so we must accept both.
+        string? filter = string.IsNullOrWhiteSpace(plcNameFilter) ? null : plcNameFilter!.Trim();
+
         foreach (Device device in project.Devices)
         {
-            var children = new List<ProjectTreeNode>();
+            var plcSoftwares = FindPlcSoftwareInDevice(device).ToList();
 
-            foreach (var plcSoftware in FindPlcSoftwareInDevice(device))
+            if (filter is not null)
+            {
+                bool deviceMatches = string.Equals(
+                    device.Name, filter, StringComparison.OrdinalIgnoreCase);
+                bool anyPlcMatches = plcSoftwares.Any(p =>
+                    string.Equals(p.Name, filter, StringComparison.OrdinalIgnoreCase));
+
+                // Skip if neither the device nor any of its PLCs match.
+                if (!deviceMatches && !anyPlcMatches)
+                {
+                    continue;
+                }
+
+                // If only a specific PLC software matched (not the whole device),
+                // narrow to just that PLC. If the device name matched, keep ALL
+                // of its PLC software containers.
+                if (!deviceMatches)
+                {
+                    plcSoftwares = plcSoftwares
+                        .Where(p => string.Equals(
+                            p.Name, filter, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+            }
+
+            var children = new List<ProjectTreeNode>();
+            foreach (var plcSoftware in plcSoftwares)
             {
                 children.Add(WalkPlcSoftware(device.Name, plcSoftware));
             }

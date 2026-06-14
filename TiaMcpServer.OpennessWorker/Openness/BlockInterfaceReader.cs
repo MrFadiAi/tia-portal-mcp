@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Linq;
 using Siemens.Engineering;
@@ -51,10 +52,11 @@ public static class BlockInterfaceReader
             }
 
 #if LEGACY_TIA
-            // V16-V18: Use legacy Export API
+            // V16-V18: Use legacy Export API (always XML)
             var exportPath = Path.Combine(tempDir, target.DocumentName);
             block.Export(new FileInfo(exportPath), ExportOptions.WithDefaults);
             var xml = XDocument.Load(exportPath);
+            ParseInterfaceFromXml(xml, info);
 #else
             var result = block.ExportAsDocuments(new DirectoryInfo(tempDir), target.DocumentName);
 
@@ -66,9 +68,20 @@ public static class BlockInterfaceReader
             var exportedFile = result.ExportedDocuments.FirstOrDefault()
                 ?? throw new InvalidOperationException("Block export produced no documents.");
 
-            var xml = XDocument.Load(exportedFile.FullName);
+            // V16-V19 export blocks as XML; V21+ exports as .s7dcl (YAML).
+            // Detect the format so DBs/FCs exported as .s7dcl still yield an interface
+            // instead of crashing with "Data at the root level is invalid".
+            var content = File.ReadAllText(exportedFile.FullName);
+            if (content.TrimStart().StartsWith("<", StringComparison.Ordinal))
+            {
+                var xml = XDocument.Parse(content);
+                ParseInterfaceFromXml(xml, info);
+            }
+            else
+            {
+                ParseInterfaceFromS7Dcl(content, info);
+            }
 #endif
-            ParseInterfaceFromXml(xml, info);
         }
         catch (XmlException ex)
         {
@@ -131,6 +144,87 @@ public static class BlockInterfaceReader
             }
         }
     }
+
+    // Matches a VAR member declaration like:  ACTUEEL_IN : Int;
+    // or quoted names:  "DODE BAND" : Int;
+    // The negative lookahead (?!=) avoids matching code assignments (Name := expr;).
+    private static readonly Regex S7MemberRe = new(
+        @"^\s*(?<name>""[^""]+""|[^\s:]+)\s*:(?!=)\s*(?<type>[^;{]+);",
+        RegexOptions.Compiled);
+
+    private static readonly Dictionary<string, string> S7SectionMap = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["VAR_INPUT"] = "Input",
+        ["VAR_OUTPUT"] = "Output",
+        ["VAR_IN_OUT"] = "InOut",
+        ["VAR_TEMP"] = "Temp",
+        ["VAR_CONSTANT"] = "Constant",
+        ["VAR_STATIC"] = "Static",
+        ["VAR"] = "Static", // DB fields / FB static
+    };
+
+    /// <summary>
+    /// Best-effort parser for the V21+ .s7dcl (SIMATIC SD YAML) interface format.
+    /// Extracts VAR_* sections and their member name/type declarations. Code in
+    /// NETWORK blocks and complex multi-line initializers are skipped.
+    /// </summary>
+    private static void ParseInterfaceFromS7Dcl(string content, BlockInterfaceInfo info)
+    {
+        BlockSectionInfo? currentSection = null;
+
+        foreach (var rawLine in content.Replace("\r\n", "\n").Split('\n'))
+        {
+            var line = rawLine.Trim();
+            if (line.Length == 0)
+            {
+                continue;
+            }
+
+            // Section start: VAR_INPUT, VAR_OUTPUT, VAR_TEMP, VAR (alone), etc.
+            if (line.StartsWith("VAR", StringComparison.OrdinalIgnoreCase))
+            {
+                var keyword = line.Split(' ', '(')[0];
+                if (S7SectionMap.TryGetValue(keyword, out var sectionName))
+                {
+                    currentSection = new BlockSectionInfo { SectionName = sectionName };
+                }
+
+                continue;
+            }
+
+            if (line.Equals("END_VAR", StringComparison.OrdinalIgnoreCase))
+            {
+                if (currentSection is not null &&
+                    (currentSection.Parameters.Count > 0 ||
+                     IsStandardSection(currentSection.SectionName)))
+                {
+                    info.Sections.Add(currentSection);
+                }
+
+                currentSection = null;
+                continue;
+            }
+
+            // Member declarations only appear inside a VAR section
+            if (currentSection is null)
+            {
+                continue;
+            }
+
+            var match = S7MemberRe.Match(rawLine);
+            if (match.Success)
+            {
+                currentSection.Parameters.Add(new BlockParameterInfo
+                {
+                    Name = match.Groups["name"].Value.Trim().Trim('"'),
+                    DataType = match.Groups["type"].Value.Trim(),
+                });
+            }
+        }
+    }
+
+    private static bool IsStandardSection(string sectionName) =>
+        sectionName is "Input" or "Output" or "InOut" or "Static" or "Temp" or "Constant" or "Return";
 
     private static BlockParameterInfo ParseMember(XElement member)
     {

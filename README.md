@@ -4,11 +4,20 @@ MCP server for Siemens SIMATIC TIA Portal V21. It lets MCP clients and AI agents
 
 The current implementation covers project discovery and lifecycle operations, PLC block export/import, tag table reads and guarded tag mutations, hardware/network discovery, cross-reference diagnostics, hardware catalog search, guarded network-device provisioning, and compile/check diagnostics.
 
-The server currently exposes 42 tools:
+The server currently exposes 61 tools:
 
-- `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details.
-- `get_block_content` - exports a PLC block to its SIMATIC SD document representation.
+- `list_plcs` - **(start here)** lightweight inventory of every PLC in the project: device name, PLC-software name, and block/tag-table/type counts. Use this first to learn exact PLC names.
+- `list_blocks` - lightweight block index for one PLC (or all): name, type (FC/FB/OB/DB), number, language, and path — no code. Much smaller than `browse_project_tree` when you only need to locate blocks.
+- `list_plc_types` - lists PLC user types (UDTs): name and path.
+- `find_tags` - search PLC tags by name (case-insensitive substring) across all tag tables; returns table, data type, and address.
+- `search_code` - **full-text grep across block source code.** Answers "where is X used / where is this logic / who writes this address" in one call instead of reading blocks one-by-one. Returns matches with block, line, and context.
+- `tag_usage` - cross-reference for a single tag that works WITHOUT compiling: every block/line referencing the tag, with a heuristic read/write classification.
+- `hmi_tag_trace` - trace HMI screen elements → PLC tags → block code in one pass (button → tag → block logic).
+- `browse_project_tree` - recursively enumerates TIA devices, PLC software, Software Units, program blocks, PLC tags, and PLC data types, returning a JSON project tree with callable `Path` details. Accepts an optional `plcName` filter (matches device name OR PLC-software name) to return a single PLC's tree and avoid truncation on large projects.
+- `get_block_content` - exports a PLC block to its SIMATIC SD document representation. Know-how-protected blocks fall back to returning the interface (or an actionable error).
+- `read_block_interface` - reads a block's parameter interface (sections, names, types, start values). Handles both XML (V16-V19) and `.s7dcl` (V21+) exports.
 - `preview_update_block_logic` / `update_block_logic` - preview and then import SIMATIC SD document content to update or create a PLC block. Writes require `confirm=true` and `safetyToken`.
+- `preview_delete_block` / `delete_block` - preview and then delete a PLC block from the project. Writes require `confirm=true` and `safetyToken`.
 - `list_tag_tables` - retrieves PLC tag tables, tags, and user constants.
 - `preview_create_tag_table` / `preview_delete_tag_table` / `create_tag_table` / `delete_tag_table` - preview and then create or delete PLC tag tables. Writes require `confirm=true` and `safetyToken`.
 - `preview_create_tag` / `preview_update_tag` / `preview_delete_tag` / `create_tag` / `update_tag` / `delete_tag` - preview and then create, modify, or delete PLC tags. Writes require `confirm=true` and `safetyToken`.
@@ -25,6 +34,10 @@ The server currently exposes 42 tools:
 ## Write safety
 
 Every MCP write operation uses a preview-then-apply workflow. Call the matching `preview_*` tool first, review its summary, `currentStateHash`, `requestedInputHash`, and any diff, then pass the returned `safetyToken` to the write tool with `confirm=true`.
+
+## Read caching
+
+The structural reads `browse_project_tree`, `list_plcs`, `list_blocks`, and `list_plc_types` are cached in-memory in the worker process (30s TTL) so repeated calls across a conversation don't re-walk the project. Any mutating operation invalidates the cache immediately. The TTL guards against edits made directly inside TIA Portal. Cache hits are flagged with `cached: true` on the worker response.
 
 Safety tokens are short-lived, single-use, and bound to the exact tool name, normalized project path, target, requested input, and current project state. The server rejects missing, expired, reused, mismatched, or stale-state tokens. Successful write attempts append audit JSONL records under `%LOCALAPPDATA%\TiaMcpServer\audit`.
 

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace TiaMcpServer.Contracts;
 
@@ -12,6 +13,22 @@ public sealed class ProjectSessionBinding
     }
 
     public string? BoundProjectPath => _boundProjectPath;
+
+    /// <summary>
+    /// Check if a path looks like a TIA Portal project file (.ap16, .ap18, .ap19, .ap21, etc.).
+    /// This prevents PLC device names like "PLF_01A_PLC_SNIJTOOL" from being auto-bound as project paths.
+    /// </summary>
+    private static bool LooksLikeProjectFile(string? path)
+    {
+        if (string.IsNullOrWhiteSpace(path))
+            return false;
+
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        // TIA Portal project files have extensions like .ap16, .ap18, .ap19, .ap21
+        return ext.Length >= 4
+            && ext.StartsWith(".ap", StringComparison.Ordinal)
+            && char.IsDigit(ext[3]);
+    }
 
     public bool TryResolve(string? requestedProjectPath, out string? effectiveProjectPath, out string? error)
     {
@@ -27,7 +44,13 @@ public sealed class ProjectSessionBinding
 
         if (_boundProjectPath is null)
         {
-            _boundProjectPath = requested;
+            // Only auto-bind if the path looks like a real TIA project file.
+            // PLC/device names like "PLF_01A_PLC_SNIJTOOL" will pass through
+            // as effectiveProjectPath without being persisted as the binding.
+            if (LooksLikeProjectFile(requested))
+            {
+                _boundProjectPath = requested;
+            }
             effectiveProjectPath = requested;
             return true;
         }

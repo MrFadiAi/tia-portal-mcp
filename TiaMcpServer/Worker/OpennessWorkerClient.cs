@@ -244,7 +244,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> BrowseProjectTreeAsync(string? projectPath, int? tiaVersion = null)
+    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null)
     {
         try
         {
@@ -258,11 +258,321 @@ public class OpennessWorkerClient
                 {
                     Method = "browse_project_tree",
                     ProjectPath = effectiveProjectPath,
+                    PlcName = plcName,
                     TiaVersion = tiaVersion
                 }).ConfigureAwait(false);
 
             return response.Success
                 ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ListPlcsAsync(string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "list_plcs",
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ListBlocksAsync(string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "list_blocks",
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ListPlcTypesAsync(string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "list_plc_types",
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> FindTagsAsync(string query, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "find_tags",
+                    Query = query,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public Task<string> DeleteBlockAsync(
+        string blockPath,
+        string? projectPath,
+        int? tiaVersion = null)
+    {
+        return SendBoundProjectRequestAsync(
+            "delete_block",
+            projectPath,
+            request =>
+            {
+                request.BlockPath = blockPath;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}",
+            tiaVersion);
+    }
+
+    public async Task<string> SearchCodeAsync(
+        string query, bool ignoreCase, int contextLines, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "search_code",
+                    Query = query,
+                    PlcName = plcName,
+                    IgnoreCase = ignoreCase,
+                    ContextLines = contextLines,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> TagUsageAsync(string tag, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "tag_usage",
+                    Query = tag,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> TagXrefAsync(string tag, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "tag_xref",
+                    Query = tag,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> CallGraphAsync(string block, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "call_graph",
+                    Query = block,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> HmiTagTraceAsync(
+        string? deviceName, string? screenName, string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "hmi_tag_trace",
+                    DeviceName = deviceName,
+                    ScreenName = screenName,
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
+                : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> KnowHowUnlockAsync(string? plcName, string? password, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "knowhow_unlock",
+                    PlcName = plcName,
+                    Password = password,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "{}"
                 : $"Error: {response.Error ?? "The TIA Openness worker failed without an error message."}";
         }
         catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
@@ -1043,38 +1353,90 @@ public class OpennessWorkerClient
         return null;
     }
 
-    private static async Task<WorkerResponse> SendAsync(WorkerRequest request)
+    // --- Persistent worker process -------------------------------------------------------
+    // The worker's Main() loops on stdin (one request line -> one response line), so a single
+    // process can serve many requests. Keeping it alive lets the worker's STATIC caches
+    // (CodeIndexCache, WorkerCache) persist across calls, so tag_usage/search_code/hmi_tag_trace
+    // don't re-export every block on every call. OpennessWorkerClient is a singleton, so this one
+    // worker is shared. Access is serialized (TIA Openness is not concurrency-safe).
+    private readonly SemaphoreSlim _workerLock = new(1, 1);
+    private WorkerHandle? _worker;
+
+    private sealed class WorkerHandle : IDisposable
     {
-        // If tiaVersion not specified in the tool call, read default from file
-        if (!request.TiaVersion.HasValue)
+        public WorkerHandle(Process process, int tiaVersion)
         {
-            var versionFile = Environment.GetEnvironmentVariable("TIA_VERSION_FILE");
-            Console.Error.WriteLine($"[TIA-VERSION] tiaVersion not set in tool call. TIA_VERSION_FILE env={versionFile ?? "(null)"}");
-            if (!string.IsNullOrEmpty(versionFile) && File.Exists(versionFile))
+            Process = process;
+            TiaVersion = tiaVersion;
+        }
+
+        public Process Process { get; }
+
+        /// <summary>TIA version this worker was spawned for (0 = auto-detect / V21 worker).</summary>
+        public int TiaVersion { get; }
+
+        public bool Dead { get; set; }
+
+        public void Dispose()
+        {
+            TryKill(Process);
+            Process.Dispose();
+        }
+    }
+
+    private static int ResolveTiaVersion(int? requested)
+    {
+        if (requested.HasValue)
+        {
+            Console.Error.WriteLine($"[TIA-VERSION] tiaVersion={requested.Value} from tool call argument");
+            return requested.Value;
+        }
+
+        var versionFile = Environment.GetEnvironmentVariable("TIA_VERSION_FILE");
+        Console.Error.WriteLine($"[TIA-VERSION] tiaVersion not set in tool call. TIA_VERSION_FILE env={versionFile ?? "(null)"}");
+        if (!string.IsNullOrEmpty(versionFile) && File.Exists(versionFile))
+        {
+            var content = File.ReadAllText(versionFile).Trim();
+            Console.Error.WriteLine($"[TIA-VERSION] Read version file content: '{content}'");
+            if (int.TryParse(content, out var defaultVersion))
             {
-                var content = File.ReadAllText(versionFile).Trim();
-                Console.Error.WriteLine($"[TIA-VERSION] Read version file content: '{content}'");
-                if (int.TryParse(content, out var defaultVersion))
-                {
-                    request.TiaVersion = defaultVersion;
-                    Console.Error.WriteLine($"[TIA-VERSION] Set tiaVersion={defaultVersion} from file");
-                }
+                Console.Error.WriteLine($"[TIA-VERSION] Set tiaVersion={defaultVersion} from file");
+                return defaultVersion;
             }
-            else if (string.IsNullOrEmpty(versionFile))
-            {
-                Console.Error.WriteLine($"[TIA-VERSION] TIA_VERSION_FILE env var not set - falling back to auto-detect");
-            }
-            else
-            {
-                Console.Error.WriteLine($"[TIA-VERSION] Version file not found at: {versionFile} - falling back to auto-detect");
-            }
+        }
+        else if (string.IsNullOrEmpty(versionFile))
+        {
+            Console.Error.WriteLine("[TIA-VERSION] TIA_VERSION_FILE env var not set - falling back to auto-detect");
         }
         else
         {
-            Console.Error.WriteLine($"[TIA-VERSION] tiaVersion={request.TiaVersion.Value} from tool call argument");
+            Console.Error.WriteLine($"[TIA-VERSION] Version file not found at: {versionFile} - falling back to auto-detect");
         }
 
-        var workerPath = LocateWorkerExecutable(request.TiaVersion);
+        return 0; // 0 = auto-detect
+    }
+
+    private WorkerHandle GetOrStartWorker(int tiaVersion)
+    {
+        if (_worker is { Dead: false } live
+            && live.TiaVersion == tiaVersion
+            && !SafelyHasExited(live.Process))
+        {
+            return live;
+        }
+
+        // (Re)start: dispose any dead / version-mismatched worker, then spawn a fresh one.
+        var old = _worker;
+        _worker = null;
+        try { old?.Dispose(); } catch { /* ignore */ }
+
+        _worker = StartWorker(tiaVersion);
+        return _worker;
+    }
+
+    private WorkerHandle StartWorker(int tiaVersion)
+    {
+        var workerPath = LocateWorkerExecutable(tiaVersion == 0 ? null : tiaVersion);
         Console.Error.WriteLine($"[TIA-VERSION] Worker path: {workerPath}");
         var startInfo = new ProcessStartInfo
         {
@@ -1089,41 +1451,97 @@ public class OpennessWorkerClient
             StandardErrorEncoding = Encoding.UTF8
         };
 
-        if (request.TiaVersion.HasValue)
+        if (tiaVersion != 0)
         {
-            startInfo.Environment["TIA_PREFERRED_VERSION"] = request.TiaVersion.Value.ToString();
+            startInfo.Environment["TIA_PREFERRED_VERSION"] = tiaVersion.ToString();
         }
 
-        using var process = Process.Start(startInfo) ??
+        var process = Process.Start(startInfo) ??
             throw new InvalidOperationException("Failed to start the TIA Openness worker process.");
 
-        var stderrTask = process.StandardError.ReadToEndAsync();
-        await process.StandardInput.WriteLineAsync(JsonSerializer.Serialize(request, JsonOptions)).ConfigureAwait(false);
-        process.StandardInput.Close();
+        // Drain stderr continuously so the pipe buffer never deadlocks the worker.
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                string? line;
+                while ((line = await process.StandardError.ReadLineAsync().ConfigureAwait(false)) is not null)
+                {
+                    Console.Error.WriteLine("[TIA worker] " + line);
+                }
+            }
+            catch { /* worker exited */ }
+        });
 
-        using var timeout = new CancellationTokenSource(WorkerTimeout);
-        var responseLineTask = process.StandardOutput.ReadLineAsync();
-        var completed = await Task.WhenAny(responseLineTask, Task.Delay(Timeout.InfiniteTimeSpan, timeout.Token))
+        return new WorkerHandle(process, tiaVersion);
+    }
+
+    private static bool SafelyHasExited(Process process)
+    {
+        try { return process.HasExited; }
+        catch { return true; }
+    }
+
+    private static async Task<string?> ReadLineWithTimeoutAsync(StreamReader reader, TimeSpan timeout)
+    {
+        using var cts = new CancellationTokenSource(timeout);
+        var readTask = reader.ReadLineAsync();
+        var completed = await Task.WhenAny(readTask, Task.Delay(Timeout.InfiniteTimeSpan, cts.Token))
             .ConfigureAwait(false);
-
-        if (completed != responseLineTask)
+        if (completed != readTask)
         {
-            TryKill(process);
-            throw new TimeoutException($"TIA Openness worker did not respond within {WorkerTimeout.TotalMinutes:N0} minutes.");
+            return null; // timed out
         }
 
-        var responseLine = await responseLineTask.ConfigureAwait(false);
-        await process.WaitForExitAsync(timeout.Token).ConfigureAwait(false);
-        var stderr = await stderrTask.ConfigureAwait(false);
+        return await readTask.ConfigureAwait(false);
+    }
 
-        if (string.IsNullOrWhiteSpace(responseLine))
+    private async Task<WorkerResponse> SendAsync(WorkerRequest request)
+    {
+        var tiaVersion = ResolveTiaVersion(request.TiaVersion);
+        request.TiaVersion = tiaVersion == 0 ? null : tiaVersion;
+
+        await _workerLock.WaitAsync().ConfigureAwait(false);
+        try
         {
-            var detail = string.IsNullOrWhiteSpace(stderr) ? "No response was written." : stderr.Trim();
-            throw new InvalidOperationException($"TIA Openness worker exited without a response. {detail}");
-        }
+            var worker = GetOrStartWorker(tiaVersion);
 
-        var response = JsonSerializer.Deserialize<WorkerResponse>(responseLine, JsonOptions);
-        return response ?? throw new InvalidOperationException("TIA Openness worker returned an empty response.");
+            string? responseLine;
+            try
+            {
+                await worker.Process.StandardInput.WriteLineAsync(
+                    JsonSerializer.Serialize(request, JsonOptions)).ConfigureAwait(false);
+                await worker.Process.StandardInput.FlushAsync().ConfigureAwait(false);
+                responseLine = await ReadLineWithTimeoutAsync(
+                    worker.Process.StandardOutput, WorkerTimeout).ConfigureAwait(false);
+            }
+            catch (IOException)
+            {
+                responseLine = null; // pipe broke -> treat the worker as dead below
+            }
+
+            if (string.IsNullOrWhiteSpace(responseLine))
+            {
+                var exited = SafelyHasExited(worker.Process);
+                worker.Dead = true;
+                if (ReferenceEquals(_worker, worker))
+                {
+                    _worker = null;
+                }
+                try { worker.Dispose(); } catch { /* ignore */ }
+
+                throw exited
+                    ? new InvalidOperationException("The TIA Openness worker exited unexpectedly (TIA Portal may have been closed). Please retry.")
+                    : new InvalidOperationException($"The TIA Openness worker did not respond within {WorkerTimeout.TotalMinutes:N0} minutes.");
+            }
+
+            var response = JsonSerializer.Deserialize<WorkerResponse>(responseLine, JsonOptions);
+            return response ?? throw new InvalidOperationException("The TIA Openness worker returned an empty response.");
+        }
+        finally
+        {
+            _workerLock.Release();
+        }
     }
 
     private static string LocateWorkerExecutable(int? tiaVersion = null)
