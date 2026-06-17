@@ -111,6 +111,36 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> ExportTagTableJsonAsync(string? tableName, string? plcName, string? folderPath, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "export_tag_table_json",
+                    TableName = tableName,
+                    PlcName = plcName,
+                    FolderPath = folderPath,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? string.Empty
+                : $"Error: {response.Error ?? "Failed to export tag table JSON."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
     public async Task<string> ListConnectionsAsync(string? projectPath, int? tiaVersion = null)
     {
         try
@@ -244,7 +274,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null)
+    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null, int? maxNodes = null, int? skip = null)
     {
         try
         {
@@ -259,7 +289,9 @@ public class OpennessWorkerClient
                     Method = "browse_project_tree",
                     ProjectPath = effectiveProjectPath,
                     PlcName = plcName,
-                    TiaVersion = tiaVersion
+                    TiaVersion = tiaVersion,
+                    MaxNodes = maxNodes,
+                    Skip = skip
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -1384,7 +1416,33 @@ public class OpennessWorkerClient
         }
     }
 
-    private static int ResolveTiaVersion(int? requested)
+    /// <summary>Snapshot of the persistent worker process status (for diagnostics and the
+    /// <c>worker_status</c> MCP tool). No TIA Portal interaction is needed to produce it.</summary>
+    public sealed record WorkerStatus(bool IsAlive, int TiaVersion, bool EverStarted);
+
+    /// <summary>Pure status evaluation (unit-tested). A worker counts as alive only when one
+    /// exists, is not flagged dead, and has not exited. The version is reported only when alive
+    /// (a dead worker's version is meaningless and could mislead callers).</summary>
+    internal static WorkerStatus EvaluateStatus(bool hasWorker, bool isDead, bool hasExited, int tiaVersion)
+    {
+        var alive = hasWorker && !isDead && !hasExited;
+        return new WorkerStatus(alive, alive ? tiaVersion : 0, hasWorker);
+    }
+
+    /// <summary>Current persistent-worker status. Does NOT touch TIA Portal — reads only the
+    /// cached worker handle.</summary>
+    public WorkerStatus GetStatus()
+    {
+        var worker = _worker;
+        if (worker is null)
+        {
+            return EvaluateStatus(false, false, false, 0);
+        }
+
+        return EvaluateStatus(true, worker.Dead, SafelyHasExited(worker.Process), worker.TiaVersion);
+    }
+
+    internal static int ResolveTiaVersion(int? requested)
     {
         if (requested.HasValue)
         {
@@ -1544,31 +1602,29 @@ public class OpennessWorkerClient
         }
     }
 
+    /// <summary>Map a TIA major version to the worker exe name + its source project dir. Pure (no
+    /// filesystem) so the version-routing is unit-testable. V16 -> V16 worker (own Siemens DLLs);
+    /// V17-V20 -> Legacy worker (single Siemens.Engineering.dll); V21+ and auto-detect (null) ->
+    /// standard worker (split Siemens DLLs).</summary>
+    internal static (string WorkerName, string ProjectDir) WorkerIdentityForVersion(int? tiaVersion)
+    {
+        if (tiaVersion.HasValue && tiaVersion.Value == 16)
+        {
+            return ("TiaMcpServer.OpennessWorker.V16.exe", "TiaMcpServer.OpennessWorker.V16");
+        }
+
+        if (tiaVersion.HasValue && tiaVersion.Value >= 17 && tiaVersion.Value < 21)
+        {
+            return ("TiaMcpServer.OpennessWorker.Legacy.exe", "TiaMcpServer.OpennessWorker.Legacy");
+        }
+
+        return ("TiaMcpServer.OpennessWorker.exe", "TiaMcpServer.OpennessWorker");
+    }
+
     private static string LocateWorkerExecutable(int? tiaVersion = null)
     {
-        // V16 uses its own worker (compiled against V16's Siemens.Engineering.dll)
-        // V18 uses the legacy worker (compiled against V18's single Siemens.Engineering.dll)
-        // V21+ uses the standard worker (compiled against split DLLs)
-        bool useV16 = tiaVersion.HasValue && tiaVersion.Value == 16;
-        bool useLegacy = tiaVersion.HasValue && tiaVersion.Value >= 17 && tiaVersion.Value < 21;
-        string workerName;
-        string projectDir;
-
-        if (useV16)
-        {
-            workerName = "TiaMcpServer.OpennessWorker.V16.exe";
-            projectDir = "TiaMcpServer.OpennessWorker.V16";
-        }
-        else if (useLegacy)
-        {
-            workerName = "TiaMcpServer.OpennessWorker.Legacy.exe";
-            projectDir = "TiaMcpServer.OpennessWorker.Legacy";
-        }
-        else
-        {
-            workerName = "TiaMcpServer.OpennessWorker.exe";
-            projectDir = "TiaMcpServer.OpennessWorker";
-        }
+        var (workerName, projectDir) = WorkerIdentityForVersion(tiaVersion);
+        Console.Error.WriteLine($"[TIA-VERSION] Worker path resolving: {workerName} ({projectDir})");
 
         var packagedPath = Path.Combine(AppContext.BaseDirectory, "openness-worker", workerName);
         if (File.Exists(packagedPath))

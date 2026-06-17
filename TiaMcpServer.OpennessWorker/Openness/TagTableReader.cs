@@ -79,7 +79,8 @@ public static class TagTableReader
                 {
                     Name = tag.Name,
                     DataType = tag.DataTypeName,
-                    LogicalAddress = tag.LogicalAddress
+                    LogicalAddress = tag.LogicalAddress,
+                    Comment = TryReadComment(tag.Comment)
                 });
             }
             catch (EngineeringException ex)
@@ -90,6 +91,36 @@ public static class TagTableReader
         }
 
         return tags;
+    }
+
+    /// <summary>
+    /// Best-effort extraction of a display string from a tag's multilingual comment
+    /// (<c>PlcTag.Comment</c> is a <see cref="MultilingualText"/>, not a string). Comment is optional
+    /// metadata; it must never fail a tag read, so any error is swallowed and null is returned.
+    /// </summary>
+    private static string? TryReadComment(MultilingualText? ml)
+    {
+        if (ml is null)
+        {
+            return null;
+        }
+
+        try
+        {
+            foreach (MultilingualTextItem item in ml.Items)
+            {
+                if (!string.IsNullOrWhiteSpace(item.Text))
+                {
+                    return item.Text;
+                }
+            }
+        }
+        catch
+        {
+            // Swallow: comment is best-effort metadata.
+        }
+
+        return null;
     }
 
     private static List<UserConstantInfo> ReadUserConstants(PlcTagTable table)

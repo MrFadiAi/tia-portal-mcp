@@ -53,8 +53,13 @@ internal static class Program
             }
 
             // Cacheable structural reads: serve from cache before opening a TIA session.
+            // Exception: a paginated browse_project_tree (maxNodes/skip) bypasses the cache — BuildKey
+            // does not include paging params, so a paged page would collide with the default whole-tree
+            // shape. Cache only the default (un-paged) browse.
+            bool pagedBrowse = request.Method == "browse_project_tree"
+                && (request.MaxNodes.HasValue || request.Skip.HasValue);
             string? cacheKey = null;
-            if (WorkerCache.IsCacheable(request.Method))
+            if (WorkerCache.IsCacheable(request.Method) && !pagedBrowse)
             {
                 cacheKey = WorkerCache.BuildKey(request.Method, request.ProjectPath, request.TiaVersion, request.PlcName);
                 var cached = WorkerCache.TryGet(cacheKey);
@@ -106,6 +111,7 @@ internal static class Program
                 "read_block_interface" => ReadBlockInterface(request),
                 "export_plc_type"     => ExportPlcType(request),
                 "export_tag_table_xml" => ExportTagTableXml(request),
+                "export_tag_table_json" => ExportTagTableJson(request),
                 "list_connections"    => ListConnections(request),
                 "browse_hmi_screens"  => BrowseHmiScreens(request),
                 "hmi_tag_trace"       => HmiTagTrace(request),
@@ -153,6 +159,20 @@ internal static class Program
             }
 
             var tree = walker.Walk(session.Project, request.PlcName);
+
+            // Paginate only when the caller opts in (maxNodes/skip). Default = whole tree, byte-identical
+            // to the legacy response, so existing consumers are unaffected.
+            if (request.MaxNodes.HasValue || request.Skip.HasValue)
+            {
+                var (page, totalCount, nextSkip) = TreePagination.Page(tree, request.MaxNodes, request.Skip);
+                var envelope = new TreePage { Nodes = page, TotalCount = totalCount, NextSkip = nextSkip };
+                return new WorkerResponse
+                {
+                    Success = true,
+                    Payload = JsonSerializer.Serialize(envelope, JsonOptions)
+                };
+            }
+
             return new WorkerResponse
             {
                 Success = true,
@@ -1521,6 +1541,50 @@ internal static class Program
 
             string xml = TagTableExporter.Export(session.Project, request.TableName, request.PlcName, request.FolderPath);
             return new WorkerResponse { Success = true, Payload = xml };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private static WorkerResponse ExportTagTableJson(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            // Structured (compact JSON) variant of export_tag_table_xml: same data
+            // (name/address/dataType/comment), no raw XML. folderPath/tableName narrow the set
+            // (TagTableReader.ReadAll reads every table under the PLC; filter afterward).
+            var tables = TagTableReader.ReadAll(session.Project, request.PlcName);
+            tables = TagTableFilter.ByFolder(tables, request.FolderPath);
+            tables = TagTableFilter.ByName(tables, request.TableName);
+            return new WorkerResponse { Success = true, Payload = JsonSerializer.Serialize(tables, JsonOptions) };
         }
         catch (EngineeringException ex)
         {

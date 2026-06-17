@@ -32,5 +32,10 @@
     <Compile Include="..\TiaMcpServer\Tools\CompileCheckTool.cs" Link="Host\CompileCheckTool.cs" />
     <Compile Include="..\TiaMcpServer\Tools\TagOperationsTools.cs" Link="Host\TagOperationsTools.cs" />
     <Compile Include="..\TiaMcpServer\Tools\ProjectLifecycleTools.cs" Link="Host\ProjectLifecycleTools.cs" />
+    <!-- Worker source with NO Siemens dependencies: link-compiled so it is unit-testable. -->
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\BlockSourceReconstructor.cs" Link="Worker\BlockSourceReconstructor.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\StlAccessClassifier.cs" Link="Worker\StlAccessClassifier.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\TagTableFilter.cs" Link="Worker\TagTableFilter.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\TreePagination.cs" Link="Worker\TreePagination.cs" />
   </ItemGroup>
 </Project>

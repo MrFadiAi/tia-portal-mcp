@@ -100,4 +100,10 @@ public class WorkerRequest
 
     /// <summary>search_code: lines of context around each match (default 2).</summary>
     public int ContextLines { get; set; } = 2;
+
+    /// <summary>browse_project_tree: max nodes to return per page (pagination). null = whole tree (legacy behavior).</summary>
+    public int? MaxNodes { get; set; }
+
+    /// <summary>browse_project_tree: nodes to skip (continuation offset from a previous page's nextSkip). null/0 = start.</summary>
+    public int? Skip { get; set; }
 }
