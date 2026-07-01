@@ -7,10 +7,12 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 /// <summary>
 /// Persists the know-how protection password per project so the user only provides it ONCE.
-/// The worker process is spawned fresh per call, so this is FILE-backed (not in-memory):
-/// a JSON map of normalized project path -> password under %AppData%/tia-mcp/knowhow.json.
-/// An env var TIA_KNOWHOW_PASSWORD overrides/supplements it for users who prefer not to type
-/// in chat. The folder is user-private by Windows default ACLs; delete the file to forget.
+/// The worker process now persists across calls (persistent worker), but the store is still
+/// FILE-backed so the password survives worker restarts / TIA-version switches and is shared
+/// across worker variants: a JSON map of normalized project path -> password under
+/// %AppData%/tia-mcp/knowhow.json. An env var TIA_KNOWHOW_PASSWORD overrides/supplements it for
+/// users who prefer not to type in chat. The folder is user-private by Windows default ACLs;
+/// delete the file to forget.
 /// </summary>
 internal static class KnowHowPasswordStore
 {

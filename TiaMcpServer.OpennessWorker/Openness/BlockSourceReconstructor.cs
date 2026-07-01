@@ -51,7 +51,7 @@ internal static class BlockSourceReconstructor
         new(@"<\?xml[^>]*\?>", RegexOptions.Compiled | RegexOptions.Singleline);
 
     /// <summary>
-    /// Reconstruct readable source for a block export. Only STL is reconstructed; any other
+    /// Reconstruct readable source for a block export. STL and SCL are reconstructed; any other
     /// programming language (or an unrecoverable parse failure) returns <paramref name="xml"/>
     /// unchanged so callers never lose data.
     /// </summary>
@@ -62,7 +62,9 @@ internal static class BlockSourceReconstructor
             return string.Empty;
         }
 
-        if (!IsStl(programmingLanguage))
+        var isStl = IsStl(programmingLanguage);
+        var isScl = IsScl(programmingLanguage);
+        if (!isStl && !isScl)
         {
             return xml;
         }
@@ -79,8 +81,8 @@ internal static class BlockSourceReconstructor
             var network = 0;
             foreach (var compileUnit in compileUnits)
             {
-                var statementList = FindStatementList(compileUnit);
-                if (statementList == null)
+                var languageRoot = isStl ? FindStatementList(compileUnit) : FindStructuredText(compileUnit);
+                if (languageRoot == null)
                 {
                     continue;
                 }
@@ -92,7 +94,7 @@ internal static class BlockSourceReconstructor
                 }
 
                 sb.Append("// Network ").Append(network).Append('\n');
-                sb.Append(ReconstructStl(statementList));
+                sb.Append(isStl ? ReconstructStl(languageRoot) : ReconstructScl(languageRoot));
             }
 
             return sb.Length == 0 ? xml : sb.ToString();
@@ -141,6 +143,118 @@ internal static class BlockSourceReconstructor
         var attributeList = compileUnit.Elements().FirstOrDefault(e => e.Name.LocalName == "AttributeList");
         var networkSource = attributeList?.Elements().FirstOrDefault(e => e.Name.LocalName == "NetworkSource");
         return networkSource?.Elements().FirstOrDefault(e => e.Name.LocalName == "StatementList");
+    }
+
+    /// <summary>As <see cref="FindStatementList"/> but for SCL: returns the
+    /// <c>StructuredText</c> element under <c>NetworkSource</c>.</summary>
+    private static XElement? FindStructuredText(XElement compileUnit)
+    {
+        var attributeList = compileUnit.Elements().FirstOrDefault(e => e.Name.LocalName == "AttributeList");
+        var networkSource = attributeList?.Elements().FirstOrDefault(e => e.Name.LocalName == "NetworkSource");
+        return networkSource?.Elements().FirstOrDefault(e => e.Name.LocalName == "StructuredText");
+    }
+
+    /// <summary>
+    /// Reconstruct readable SCL from a <c>StructuredText</c> element. SCL XML is a flat stream of
+    /// layout tokens (Token/Blank/Text/NewLine) plus operands (Access). The common operands reuse
+    /// <see cref="AppendOperand"/> (GlobalVariable/LocalVariable/Constant). Ported from the Python
+    /// <c>_append_scl_part</c>; rare constructs (call parameter lists, absolute addresses) are
+    /// skipped gracefully rather than crashing.
+    /// </summary>
+    private static string ReconstructScl(XElement structuredText)
+    {
+        var sb = new StringBuilder();
+        foreach (var child in structuredText.Elements())
+        {
+            AppendSclPart(sb, child);
+        }
+
+        return sb.ToString();
+    }
+
+    private static void AppendSclPart(StringBuilder sb, XElement element)
+    {
+        switch (element.Name.LocalName)
+        {
+            case "Token":
+            case "NamePart":
+                AppendAttribute(sb, element, "Text");
+                break;
+
+            case "Blank":
+                sb.Append(' ', ParseIntAttribute(element, "Num", 1));
+                break;
+
+            case "Text":
+                sb.Append(element.Value ?? string.Empty);
+                break;
+
+            case "NewLine":
+                sb.Append('\n', ParseIntAttribute(element, "Num", 1));
+                break;
+
+            case "Date":
+            case "Time":
+                AppendAttribute(sb, element, "Value");
+                break;
+
+            case "LineComment":
+                AppendCommentText(sb, element, "//");
+                break;
+
+            case "BlockComment":
+                sb.Append("(*");
+                foreach (var sub in element.Elements())
+                {
+                    if (sub.Name.LocalName == "Text")
+                    {
+                        sb.Append(sub.Value ?? string.Empty);
+                    }
+                    else if (sub.Name.LocalName == "NewLine")
+                    {
+                        sb.Append('\n');
+                    }
+                }
+
+                sb.Append("*)");
+                break;
+
+            case "Access":
+                // Reuses the STL operand handler: GlobalVariable -> "Tag", LocalVariable -> #name,
+                // Literal/TypedConstant -> value, Call -> "Block". SCL-only scopes
+                // (Address/Label/LocalConstant/Input/...) are not handled here and are skipped.
+                AppendOperand(sb, element);
+                break;
+        }
+    }
+
+    private static void AppendAttribute(StringBuilder sb, XElement element, string attributeName)
+    {
+        var value = element.Attribute(attributeName)?.Value;
+        if (!string.IsNullOrEmpty(value))
+        {
+            sb.Append(value);
+        }
+    }
+
+    private static int ParseIntAttribute(XElement element, string attributeName, int defaultValue)
+        => int.TryParse(element.Attribute(attributeName)?.Value, out var n) ? n : defaultValue;
+
+    /// <summary>Append a line/block comment's text. SCL comments carry their text in
+    /// <c>&lt;Text&gt;</c> children (or directly). <paramref name="prefix"/> is <c>//</c> or empty.</summary>
+    private static void AppendCommentText(StringBuilder sb, XElement element, string prefix)
+    {
+        var hasTextChild = false;
+        foreach (var text in element.Elements().Where(e => e.Name.LocalName == "Text"))
+        {
+            hasTextChild = true;
+            sb.Append(prefix).Append(text.Value ?? string.Empty);
+        }
+
+        if (!hasTextChild && !string.IsNullOrEmpty(element.Value))
+        {
+            sb.Append(prefix).Append(element.Value);
+        }
     }
 
     private static string ReconstructStl(XElement statementList)
@@ -218,9 +332,10 @@ internal static class BlockSourceReconstructor
 
             case "LocalVariable":
                 sb.Append('#');
+                // Locals are '#name' (never quoted, unlike globals '"Name"').
                 foreach (var symbol in access.Elements().Where(e => e.Name.LocalName == "Symbol"))
                 {
-                    sb.Append(CollectSymbol(symbol));
+                    sb.Append(CollectSymbol(symbol, quoteFirst: false));
                 }
                 break;
 
@@ -237,23 +352,50 @@ internal static class BlockSourceReconstructor
                 break;
 
             case "Call":
-                // STL call: <CallInfo Name="FC_LIJN" BlockType="FC"/> → "FC_LIJN".
-                foreach (var callInfo in access.Elements().Where(e => e.Name.LocalName == "CallInfo"))
-                {
-                    var name = callInfo.Attribute("Name")?.Value;
-                    if (!string.IsNullOrEmpty(name))
-                    {
-                        sb.Append('"').Append(name).Append('"');
-                    }
-                }
+                AppendCall(sb, access);
                 break;
         }
     }
 
+    /// <summary>Reconstruct a block call: "NAME" followed by one "PARAM := value"
+    /// line per parameter. Real TIA Openness stores each &lt;Parameter&gt; with only
+    /// the value &lt;Access&gt; (no ':=' token, no newline), so the reconstructor
+    /// renders the separator and line breaks itself. Without this the call rendered
+    /// as a bare "NAME" with every parameter dropped — which made the AI report
+    /// "call has NO parameters" (a false finding). Handles STL block calls and the
+    /// SCL Access=Call path (same shape).</summary>
+    private static void AppendCall(StringBuilder sb, XElement access)
+    {
+        foreach (var info in access.Elements().Where(e => e.Name.LocalName == "CallInfo" || e.Name.LocalName == "Instruction"))
+        {
+            var name = info.Attribute("Name")?.Value;
+            if (!string.IsNullOrEmpty(name))
+            {
+                sb.Append('"').Append(name).Append('"');
+            }
+
+            foreach (var parameter in info.Elements().Where(e => e.Name.LocalName == "Parameter"))
+            {
+                var pname = parameter.Attribute("Name")?.Value ?? string.Empty;
+                sb.Append('\n').Append("      ").Append(pname).Append(" := ");
+                foreach (var child in parameter.Elements())
+                {
+                    if (child.Name.LocalName == "Access")
+                    {
+                        AppendOperand(sb, child);
+                    }
+                }
+                // Unconnected parameter (no <Access>) leaves a bare " := " — rare,
+                // and still better than silently dropping it.
+            }
+        }
+    }
+
     /// <summary>Build the dotted symbol path for an operand. The first <c>Component</c>
-    /// (DB/FC/FB) is always quoted in STL; later components quote only when HasQuotes=true.
-    /// Ported from <c>_collect_stl_symbol</c>.</summary>
-    private static string CollectSymbol(XElement symbol)
+    /// (DB/FC/FB) is quoted for GLOBAL symbols (<c>"Name"</c>) but left unquoted for LOCAL
+    /// symbols (<c>#name</c>); later components quote only when HasQuotes=true. Array indexes
+    /// (<c>data[1]</c>, <c>data[#i]</c>) are reconstructed from the indexed Component.</summary>
+    private static string CollectSymbol(XElement symbol, bool quoteFirst = true)
     {
         var segments = new List<string>();
         foreach (var child in symbol.Elements())
@@ -267,7 +409,7 @@ internal static class BlockSourceReconstructor
             string segment;
             if (segments.Count == 0)
             {
-                segment = "\"" + name + "\"";
+                segment = quoteFirst ? "\"" + name + "\"" : name;
             }
             else
             {
@@ -284,10 +426,79 @@ internal static class BlockSourceReconstructor
                 segment = hasQuotes ? "\"" + name + "\"" : name;
             }
 
+            // Array index: current TIA encodes it as Component AccessModifier="Array"
+            // with a child <Access>; older TIA uses Token "[" + Access + Token "]"
+            // inside the Component. Without this the index is silently dropped
+            // (data[1] -> data), which produced false "all registers collide" findings.
+            var index = CollectArrayIndex(child);
+            if (!string.IsNullOrEmpty(index))
+            {
+                segment += "[" + index + "]";
+            }
+
             segments.Add(segment);
         }
 
         return string.Join(".", segments);
+    }
+
+    /// <summary>Extract an array index from a Component's children. Handles both the
+    /// current TIA form (<c>Component AccessModifier="Array"</c> with a child
+    /// <c>&lt;Access&gt;</c>) and the older <c>Token "[" + Access + Token "]"</c> form.
+    /// Ported from the Python <c>_collect_array_index</c>.</summary>
+    private static string CollectArrayIndex(XElement component)
+    {
+        // Current form: <Component Name="x" AccessModifier="Array"><Access>idx</Access></Component>
+        if ((component.Attribute("AccessModifier")?.Value ?? string.Empty) == "Array")
+        {
+            var sb = new StringBuilder();
+            foreach (var access in component.Elements().Where(e => e.Name.LocalName == "Access"))
+            {
+                AppendOperand(sb, access);
+            }
+
+            return sb.ToString();
+        }
+
+        // Older form: Token "[" + Access + Token "]" as children of the Component.
+        var hasOpenBracket = component.Elements()
+            .Any(e => e.Name.LocalName == "Token" && (e.Attribute("Text")?.Value ?? string.Empty) == "[");
+        if (!hasOpenBracket)
+        {
+            return string.Empty;
+        }
+
+        var idx = new StringBuilder();
+        var inBracket = false;
+        foreach (var c in component.Elements())
+        {
+            var tag = c.Name.LocalName;
+            if (tag == "Token")
+            {
+                var text = c.Attribute("Text")?.Value ?? string.Empty;
+                if (text == "[")
+                {
+                    inBracket = true;
+                    continue;
+                }
+
+                if (text == "]")
+                {
+                    break; // closes the index; exits the foreach
+                }
+
+                if (inBracket)
+                {
+                    idx.Append(text);
+                }
+            }
+            else if (tag == "Access" && inBracket)
+            {
+                AppendOperand(idx, c);
+            }
+        }
+
+        return idx.ToString();
     }
 
     private static bool IsCompileUnit(XElement e)
@@ -299,4 +510,8 @@ internal static class BlockSourceReconstructor
     private static bool IsStl(string? programmingLanguage)
         => !string.IsNullOrEmpty(programmingLanguage)
            && programmingLanguage.Equals("STL", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsScl(string? programmingLanguage)
+        => !string.IsNullOrEmpty(programmingLanguage)
+           && programmingLanguage.Equals("SCL", StringComparison.OrdinalIgnoreCase);
 }

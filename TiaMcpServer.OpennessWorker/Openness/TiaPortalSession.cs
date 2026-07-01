@@ -85,6 +85,17 @@ public class TiaPortalSession : IDisposable
             Connect();
         }
 
+        // TIA Portal Openness allows only ONE project open per instance. Calling
+        // Open() when a project is already open throws "Another project is already
+        // open." Connect() already populated Project from Projects.FirstOrDefault(),
+        // so when a project is open reuse it instead of reopening. This is what
+        // keeps repeat tool calls (list_plcs, get_block_content, ...) working
+        // against an already-open project instead of wedging on re-Open().
+        if (ProjectReopenPolicy.Decide(Project is not null) == ProjectReopenPolicy.Decision.Reuse)
+        {
+            return;
+        }
+
         if (!File.Exists(projectPath))
         {
             throw new FileNotFoundException("TIA Portal project file was not found.", projectPath);

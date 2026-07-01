@@ -37,7 +37,13 @@ internal static class KnowHowUnlocker
         foreach (PlcBlock block in group.Blocks)
         {
             result.TotalBlocks++;
-#if !LEGACY_TIA
+            // PlcBlockProtectionProvider.Unprotect(SecureString) exists on V16/V18/V21+ — verified
+            // by reflecting each version's Siemens.Engineering.dll (V16 exposes the identical
+            // Protect/Unprotect(SecureString) pair). The earlier "#if !LEGACY_TIA" guard (claimed
+            // "V21+ only") was a wrong assumption that silently no-op'd unlock on V16/V18 and
+            // reported a misleading "wrong password". Unprotect succeeds only when the block was
+            // protected AND the password is correct; it throws otherwise (already unprotected, or
+            // wrong password) and is counted as Failed.
             try
             {
                 var provider = block.GetService<PlcBlockProtectionProvider>();
@@ -47,16 +53,13 @@ internal static class KnowHowUnlocker
                     continue;
                 }
 
-                provider.Unprotect(KnowHowPasswordStore.ToSecureString(password)); // succeeds only if protected + correct password
+                provider.Unprotect(KnowHowPasswordStore.ToSecureString(password));
                 result.Unprotected++;
             }
             catch (Exception)
             {
                 result.Failed++;
             }
-#else
-            result.Failed++; // know-how unlock requires the V21+ Openness API
-#endif
         }
 
         foreach (PlcBlockGroup child in group.Groups)

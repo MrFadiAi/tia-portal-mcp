@@ -964,7 +964,22 @@ internal static class Program
             try
             {
                 string yaml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath);
-                return new WorkerResponse { Success = true, Payload = yaml };
+
+                // Avoid re-injecting a block's full source when the same (unchanged)
+                // block was already read this session — repeat reads (8x for one block
+                // observed) bloated the context and pushed the model past its quality
+                // cliff. First read / changed block → full source; repeat unchanged →
+                // short note. Edits are detected via the content hash (no invalidation
+                // needed). The worker is a singleton, so the cache persists across calls.
+                var hash = ShownBlocksCache.ContentHash(yaml);
+                bool alreadyShown = ShownBlocksCache.WasAlreadyShown(request.BlockPath!, hash);
+                string payload = BlockRereadResponse.Respond(request.BlockPath!, yaml, alreadyShown);
+                if (!alreadyShown)
+                {
+                    ShownBlocksCache.Remember(request.BlockPath!, hash);
+                }
+
+                return new WorkerResponse { Success = true, Payload = payload };
             }
             catch (EngineeringException ex) when (IsKnowHowProtected(ex))
             {

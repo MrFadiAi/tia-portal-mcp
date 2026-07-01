@@ -37,5 +37,8 @@
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\StlAccessClassifier.cs" Link="Worker\StlAccessClassifier.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\TagTableFilter.cs" Link="Worker\TagTableFilter.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\TreePagination.cs" Link="Worker\TreePagination.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ProjectReopenPolicy.cs" Link="Worker\ProjectReopenPolicy.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\BlockRereadResponse.cs" Link="Worker\BlockRereadResponse.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ShownBlocksCache.cs" Link="Worker\ShownBlocksCache.cs" />
   </ItemGroup>
 </Project>

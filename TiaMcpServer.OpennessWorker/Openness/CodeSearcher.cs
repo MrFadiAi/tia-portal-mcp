@@ -138,6 +138,14 @@ public static class CodeSearcher
                     continue;
                 }
 
+                // Skip reconstructed comments ("// ...") and network headers ("// Network N"):
+                // a tag name appearing only in a comment is NOT a read/write reference, and must
+                // not be miscounted as one. (search_code deliberately keeps comment matches.)
+                if (StlAccessClassifier.IsCommentOrHeader(line))
+                {
+                    continue;
+                }
+
                 result.References.Add(new TagReferenceInfo
                 {
                     PlcName = blk.PlcName,
@@ -289,135 +297,7 @@ public static class CodeSearcher
         return match;
     }
 
-    /// <summary>
-    /// Best-effort read/write classification:
-    /// - SCL source: ':=' with the tag on the LEFT → write.
-    /// - STL source text: a line beginning with 'T ' (transfer) → write.
-    /// - Openness XML export (STL): the instruction is the &lt;StlToken Text="X"/&gt; a few
-    ///   lines above the operand &lt;Component&gt;. Look back for it and map known write
-    ///   instructions (Assign/=, Transfer/T, Set/S, Reset/R) → write; reads (A/AN/O/L/…)
-    ///   → read; if the operand is XML but no instruction is recoverable → "unknown".
-    /// This is a heuristic — the full line text is always returned so the caller can verify.
-    /// </summary>
+    /// <summary>Delegate to the Siemens-free, unit-tested <see cref="StlAccessClassifier"/>.</summary>
     private static string ClassifyAccess(IReadOnlyList<string> lines, int index, string tagName)
-    {
-        var line = lines[index];
-
-        // SCL assignment: '#Tag := ...' / '"Tag" := ...'
-        var assignIndex = line.IndexOf(":=", StringComparison.Ordinal);
-        if (assignIndex >= 0)
-        {
-            var tagIndex = line.IndexOf(tagName, StringComparison.OrdinalIgnoreCase);
-            if (tagIndex >= 0 && tagIndex < assignIndex)
-            {
-                return "write";
-            }
-        }
-
-        // Plain STL source text OR reconstructed readable STL: a line beginning with a write
-        // mnemonic (= assign, T transfer, S set, R reset) writes the operand. Reads
-        // (A / AN / O / ON / L / ...) do not match here and fall through to "read".
-        var trimmed = line.TrimStart();
-        if (StartsWriteMnemonic(trimmed)
-            && line.IndexOf(tagName, StringComparison.OrdinalIgnoreCase) >= 0)
-        {
-            return "write";
-        }
-
-        // Openness XML export: the STL instruction owns the operand. Find it and map it.
-        var token = FindStlToken(lines, index);
-        if (token != null)
-        {
-            return IsWriteInstruction(token) ? "write" : "read";
-        }
-
-        // XML operand with no recoverable instruction — don't guess "read".
-        if (line.IndexOf("<Component", StringComparison.OrdinalIgnoreCase) >= 0
-            || line.IndexOf("<Symbol", StringComparison.OrdinalIgnoreCase) >= 0)
-        {
-            return "unknown";
-        }
-
-        return "read";
-    }
-
-    /// <summary>Look back up to ~15 lines for the nearest &lt;StlToken Text="X"/&gt; — the
-    /// STL instruction that owns the operand at <paramref name="index"/>. Each STL statement
-    /// has exactly one StlToken immediately above its operand Access, so the nearest one is it.</summary>
-    private static string? FindStlToken(IReadOnlyList<string> lines, int index)
-    {
-        var lower = Math.Max(0, index - 15);
-        for (var k = index; k >= lower; k--)
-        {
-            var l = lines[k];
-            var ti = l.IndexOf("<StlToken", StringComparison.OrdinalIgnoreCase);
-            if (ti < 0)
-            {
-                continue;
-            }
-
-            var qs = l.IndexOf("Text=\"", ti, StringComparison.OrdinalIgnoreCase);
-            if (qs < 0)
-            {
-                continue;
-            }
-
-            qs += "Text=\"".Length;
-            var qe = l.IndexOf('"', qs);
-            if (qe > qs)
-            {
-                return l.Substring(qs, qe - qs);
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>TIA Openness STL instruction tokens that WRITE their operand: the spelled
-    /// names (Assign/Transfer/Set/Reset) and the raw mnemonics (= / T / S / R).</summary>
-    private static bool IsWriteInstruction(string token)
-    {
-        switch (token.Trim().ToUpperInvariant())
-        {
-            case "ASSIGN":   // =
-            case "TRANSFER": // T
-            case "SET":      // S
-            case "RESET":    // R
-            case "=":
-            case "T":
-            case "S":
-            case "R":
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    /// <summary>True when a (left-trimmed) reconstructed/STL source line begins with a single
-    /// write mnemonic — <c>=</c> (assign), <c>T</c>/<c>t</c> (transfer), <c>S</c>/<c>s</c> (set),
-    /// <c>R</c>/<c>r</c> (reset) — followed by whitespace, a quote, or end-of-line. The
-    /// whitespace guard prevents matching read/bit-test instructions that share a leading letter
-    /// (e.g. <c>SLD</c>, <c>RND</c>). Reads (<c>A</c>/<c>AN</c>/<c>O</c>/<c>ON</c>/<c>L</c>/…)
-    /// are intentionally not matched.</summary>
-    private static bool StartsWriteMnemonic(string s)
-    {
-        if (s.Length == 0)
-        {
-            return false;
-        }
-
-        var c = s[0];
-        if (c != '=' && c != 'T' && c != 't' && c != 'S' && c != 's' && c != 'R' && c != 'r')
-        {
-            return false;
-        }
-
-        if (s.Length == 1)
-        {
-            return true;
-        }
-
-        var next = s[1];
-        return char.IsWhiteSpace(next) || next == '"';
-    }
+        => StlAccessClassifier.Classify(lines, index, tagName);
 }
