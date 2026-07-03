@@ -19,7 +19,9 @@ namespace TiaMcpServer.Tools
             [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion).ConfigureAwait(false);
+            // forceRefresh: the safety hash must be of the REAL current content, not the
+            // re-read skip-note (which would also make the audit record useless).
+            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion, forceRefresh: true).ConfigureAwait(false);
             var target = new { blockPath };
             var requestedInput = new { blockPath, action = "delete" };
 
@@ -59,7 +61,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion)).ConfigureAwait(false);
+                () => workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion, forceRefresh: true)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;

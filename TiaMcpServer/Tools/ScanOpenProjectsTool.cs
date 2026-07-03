@@ -8,6 +8,12 @@ namespace TiaMcpServer.Tools;
 [McpServerToolType]
 public static class ScanOpenProjectsTool
 {
+    // Per-version scan timeout. The worker's default timeout (5 min) is sized for
+    // heavy writes/compiles, but a browse should finish in 2-5s; if one version's
+    // enumeration stalls (e.g. TIA Portal has a modal open), fail it fast so the
+    // other versions' results still show instead of freezing the whole scan.
+    private static readonly TimeSpan ScanTimeout = TimeSpan.FromSeconds(60);
+
     [McpServerTool(Name = "scan_open_projects")]
     [Description("Scan all installed TIA Portal versions for open projects. Returns a combined list of projects from every running TIA Portal instance across all versions (V16, V18, V21, etc.).")]
     public static async Task<string> ScanOpenProjects(
@@ -63,7 +69,7 @@ public static class ScanOpenProjectsTool
             {
                 Console.Error.WriteLine($"[SCAN] Scanning {v.DisplayName}...");
                 var treeResult = await workerClient.BrowseProjectTreeAsync(
-                    projectPath: null, tiaVersion: v.MajorVersion);
+                    projectPath: null, tiaVersion: v.MajorVersion, timeout: ScanTimeout);
 
                 if (treeResult.StartsWith("Error:", StringComparison.OrdinalIgnoreCase))
                 {

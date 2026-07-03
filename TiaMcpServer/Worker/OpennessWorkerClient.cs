@@ -274,7 +274,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null, int? maxNodes = null, int? skip = null)
+    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null, int? maxNodes = null, int? skip = null, TimeSpan? timeout = null)
     {
         try
         {
@@ -292,7 +292,7 @@ public class OpennessWorkerClient
                     TiaVersion = tiaVersion,
                     MaxNodes = maxNodes,
                     Skip = skip
-                }).ConfigureAwait(false);
+                }, timeout).ConfigureAwait(false);
 
             return response.Success
                 ? response.Payload ?? "[]"
@@ -782,7 +782,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath, int? tiaVersion = null)
+    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath, int? tiaVersion = null, bool forceRefresh = false)
     {
         try
         {
@@ -797,7 +797,8 @@ public class OpennessWorkerClient
                     Method = "get_block_content",
                     BlockPath = blockPath,
                     ProjectPath = effectiveProjectPath,
-                    TiaVersion = tiaVersion
+                    TiaVersion = tiaVersion,
+                    ForceRefresh = forceRefresh
                 }).ConfigureAwait(false);
 
             return response.Success
@@ -1554,10 +1555,13 @@ public class OpennessWorkerClient
         return await readTask.ConfigureAwait(false);
     }
 
-    private async Task<WorkerResponse> SendAsync(WorkerRequest request)
+    private async Task<WorkerResponse> SendAsync(WorkerRequest request, TimeSpan? timeout = null)
     {
         var tiaVersion = ResolveTiaVersion(request.TiaVersion);
         request.TiaVersion = tiaVersion == 0 ? null : tiaVersion;
+        // Per-call timeout override (e.g. the fast scan timeout). Defaults to the
+        // long worker timeout sized for heavy writes/compiles.
+        var effectiveTimeout = timeout ?? WorkerTimeout;
 
         await _workerLock.WaitAsync().ConfigureAwait(false);
         try
@@ -1571,7 +1575,7 @@ public class OpennessWorkerClient
                     JsonSerializer.Serialize(request, JsonOptions)).ConfigureAwait(false);
                 await worker.Process.StandardInput.FlushAsync().ConfigureAwait(false);
                 responseLine = await ReadLineWithTimeoutAsync(
-                    worker.Process.StandardOutput, WorkerTimeout).ConfigureAwait(false);
+                    worker.Process.StandardOutput, effectiveTimeout).ConfigureAwait(false);
             }
             catch (IOException)
             {
@@ -1590,7 +1594,7 @@ public class OpennessWorkerClient
 
                 throw exited
                     ? new InvalidOperationException("The TIA Openness worker exited unexpectedly (TIA Portal may have been closed). Please retry.")
-                    : new InvalidOperationException($"The TIA Openness worker did not respond within {WorkerTimeout.TotalMinutes:N0} minutes.");
+                    : new InvalidOperationException($"The TIA Openness worker did not respond within {(int)effectiveTimeout.TotalSeconds} s.");
             }
 
             var response = JsonSerializer.Deserialize<WorkerResponse>(responseLine, JsonOptions);

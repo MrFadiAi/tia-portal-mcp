@@ -25,9 +25,14 @@ public class ProjectTreeWalker
         // hosts PLC software "PLF_03A_PLC_CARROUSEL"), so we must accept both.
         string? filter = string.IsNullOrWhiteSpace(plcNameFilter) ? null : plcNameFilter!.Trim();
 
+        Console.Error.WriteLine("[BROWSE] Enumerating project.Devices...");
+        var deviceIndex = 0;
         foreach (Device device in project.Devices)
         {
+            deviceIndex++;
+            Console.Error.WriteLine($"[BROWSE] Device {deviceIndex}: '{device.Name}' — locating PLC software...");
             var plcSoftwares = FindPlcSoftwareInDevice(device).ToList();
+            Console.Error.WriteLine($"[BROWSE] Device {deviceIndex}: '{device.Name}' — {plcSoftwares.Count} PLC software container(s).");
 
             if (filter is not null)
             {
@@ -110,11 +115,18 @@ public class ProjectTreeWalker
 
     private static ProjectTreeNode WalkPlcSoftware(string deviceName, PlcSoftware plcSoftware)
     {
+        Console.Error.WriteLine($"[BROWSE]   PLC '{plcSoftware.Name}': walking blocks...");
+        var blockNode = WalkBlockGroup(plcSoftware.BlockGroup, CombinePath(deviceName, "Blocks"), softwareUnitName: null);
+        Console.Error.WriteLine($"[BROWSE]   PLC '{plcSoftware.Name}': walking tag tables...");
+        var tagNode = WalkTagTableGroup(plcSoftware.TagTableGroup, CombinePath(deviceName, "TagTables"));
+        Console.Error.WriteLine($"[BROWSE]   PLC '{plcSoftware.Name}': walking types...");
+        var typeNode = WalkTypeGroup(plcSoftware.TypeGroup, CombinePath(deviceName, "Types"));
+
         var children = new List<ProjectTreeNode>
         {
-            WalkBlockGroup(plcSoftware.BlockGroup, CombinePath(deviceName, "Blocks"), softwareUnitName: null),
-            WalkTagTableGroup(plcSoftware.TagTableGroup, CombinePath(deviceName, "TagTables")),
-            WalkTypeGroup(plcSoftware.TypeGroup, CombinePath(deviceName, "Types"))
+            blockNode,
+            tagNode,
+            typeNode
         };
 
         // Walk system block groups (SFBs, SFCs, etc.) if available

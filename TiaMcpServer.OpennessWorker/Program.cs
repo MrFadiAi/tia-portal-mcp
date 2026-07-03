@@ -158,7 +158,9 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
+            Console.Error.WriteLine($"[BROWSE] Project='{session.Project.Name}' — walking tree (plcName='{request.PlcName}')...");
             var tree = walker.Walk(session.Project, request.PlcName);
+            Console.Error.WriteLine($"[BROWSE] Walk complete: {tree.Count} root device node(s).");
 
             // Paginate only when the caller opts in (maxNodes/skip). Default = whole tree, byte-identical
             // to the legacy response, so existing consumers are unaffected.
@@ -973,8 +975,13 @@ internal static class Program
                 // needed). The worker is a singleton, so the cache persists across calls.
                 var hash = ShownBlocksCache.ContentHash(yaml);
                 bool alreadyShown = ShownBlocksCache.WasAlreadyShown(request.BlockPath!, hash);
-                string payload = BlockRereadResponse.Respond(request.BlockPath!, yaml, alreadyShown);
-                if (!alreadyShown)
+                // forceRefresh (write-tool previews/validations) bypasses the note: those
+                // callers need the REAL current content for an accurate diff + safety hash.
+                string payload = BlockRereadResponse.Respond(request.BlockPath!, yaml, alreadyShown, request.ForceRefresh);
+                // Only record a chat read when we actually returned the full source. A
+                // forceRefresh read must not flip the cache, or it would suppress the next
+                // real get_block_content chat read.
+                if (!alreadyShown && !request.ForceRefresh)
                 {
                     ShownBlocksCache.Remember(request.BlockPath!, hash);
                 }

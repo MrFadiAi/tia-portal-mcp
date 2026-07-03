@@ -39,6 +39,12 @@ public class WorkerRequest
 
     public bool Confirm { get; set; }
 
+    /// <summary>get_block_content: bypass the "already shown" re-read optimization and return the FULL source.
+    /// Used by write-tool previews (update/delete block), which need the real current content to compute an
+    /// accurate diff and a stable safety hash — the skip-note would make every requested line show as an
+    /// addition and hash the note instead of the block.</summary>
+    public bool ForceRefresh { get; set; }
+
     public string? TableName { get; set; }
 
     public string? FolderPath { get; set; }

@@ -17,7 +17,10 @@ namespace TiaMcpServer.Tools
             [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion).ConfigureAwait(false);
+            // forceRefresh: the preview must diff against the REAL current content. Without
+            // it, a re-read of an unchanged block returns the skip-note, so every requested
+            // line shows as an addition and the currentStateHash hashes the note, not the block.
+            var currentState = await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion, forceRefresh: true).ConfigureAwait(false);
             var target = new { blockPath };
             var requestedInput = new { blockPath, yamlContent };
 
@@ -54,7 +57,7 @@ namespace TiaMcpServer.Tools
                 projectPath,
                 target,
                 requestedInput,
-                () => workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion)).ConfigureAwait(false);
+                () => workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion, forceRefresh: true)).ConfigureAwait(false);
             if (!safety.IsValid)
             {
                 return safety.Error!;

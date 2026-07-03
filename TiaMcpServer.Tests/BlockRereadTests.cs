@@ -33,6 +33,33 @@ public class BlockRereadResponseTests
         Assert.Contains("PLC1/FB5", note);
         Assert.Contains("conversation", note, StringComparison.OrdinalIgnoreCase);
     }
+
+    [Fact]
+    public void ForceRefreshReturnsFullContentEvenWhenAlreadyShown()
+    {
+        // Regression: preview_update_block_logic diffed the REAL content against the
+        // requested yaml, but on a re-read get_block_content returned this skip-note —
+        // so the diff became note-vs-full-yaml and every requested line showed as an
+        // addition. forceRefresh (write-tool previews) must always return full content.
+        var result = BlockRereadResponse.Respond("PLC1/FC1", "// the code", alreadyShown: true, forceRefresh: true);
+        Assert.Equal("// the code", result);
+    }
+
+    [Fact]
+    public void ForceRefreshOnFirstReadStillReturnsFullContent()
+    {
+        var result = BlockRereadResponse.Respond("PLC1/FC1", "// the code", alreadyShown: false, forceRefresh: true);
+        Assert.Equal("// the code", result);
+    }
+
+    [Fact]
+    public void DefaultKeepsSkipNoteSoChatGetBlockContentStillConservesContext()
+    {
+        // Backward compat: chat get_block_content (no forceRefresh) still gets the note
+        // on a repeat unchanged read — the context-conservation feature is preserved.
+        var result = BlockRereadResponse.Respond("PLC1/FC1", "// the code", alreadyShown: true);
+        Assert.NotEqual("// the code", result);
+    }
 }
 
 public class ShownBlocksCacheTests

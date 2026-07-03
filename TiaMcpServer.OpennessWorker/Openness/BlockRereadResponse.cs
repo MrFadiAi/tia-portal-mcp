@@ -12,9 +12,16 @@ public static class BlockRereadResponse
     /// <summary>
     /// Return the full content on a first read (or after the block changed), or a
     /// compact note when the same content was already returned this session.
+    /// <para>
+    /// <paramref name="forceRefresh"/> bypasses the note and always returns the
+    /// full content. Write-tool previews/validations (update/delete block) need the
+    /// REAL current content to compute an accurate diff and a stable safety hash;
+    /// feeding the skip-note to the diff made every requested line appear as an
+    /// addition and hashed the note instead of the block.
+    /// </para>
     /// </summary>
-    public static string Respond(string blockPath, string fullContent, bool alreadyShown)
-        => alreadyShown ? NoteFor(blockPath) : fullContent;
+    public static string Respond(string blockPath, string fullContent, bool alreadyShown, bool forceRefresh = false)
+        => (alreadyShown && !forceRefresh) ? NoteFor(blockPath) : fullContent;
 
     /// <summary>The compact note returned instead of re-injecting the full source.</summary>
     public static string NoteFor(string blockPath) =>
