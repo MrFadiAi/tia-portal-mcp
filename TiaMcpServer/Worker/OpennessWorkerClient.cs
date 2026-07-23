@@ -359,6 +359,73 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> ExtractPlcBlocksAsync(string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "extract_plc_blocks",
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "Failed to extract PLC blocks."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
+    public async Task<string> ComparePlcBlocksAsync(
+        string plcNameA, string? projectPathA, int? tiaVersionA,
+        string plcNameB, string? projectPathB, int? tiaVersionB)
+    {
+        var jsonA = await ExtractPlcBlocksAsync(plcNameA, projectPathA, tiaVersionA).ConfigureAwait(false);
+        if (jsonA.StartsWith("Error:", StringComparison.Ordinal))
+        {
+            return JsonSerializer.Serialize(new { error = jsonA["Error: ".Length..], side = "A" }, JsonOptions);
+        }
+
+        var jsonB = await ExtractPlcBlocksAsync(plcNameB, projectPathB, tiaVersionB).ConfigureAwait(false);
+        if (jsonB.StartsWith("Error:", StringComparison.Ordinal))
+        {
+            return JsonSerializer.Serialize(new { error = jsonB["Error: ".Length..], side = "B" }, JsonOptions);
+        }
+
+        var sideA = JsonSerializer.Deserialize<List<BlockInfo>>(jsonA, JsonOptions) ?? new List<BlockInfo>();
+        var sideB = JsonSerializer.Deserialize<List<BlockInfo>>(jsonB, JsonOptions) ?? new List<BlockInfo>();
+        var diff = PlcBlockCompare.Compare(sideA, sideB);
+
+        var result = new
+        {
+            summary = new
+            {
+                added = diff.Added.Count,
+                removed = diff.Removed.Count,
+                changed = diff.Changed.Count,
+                unchanged = diff.Unchanged.Count,
+                sideA = new { version = tiaVersionA, project = projectPathA, plc = plcNameA, total = sideA.Count },
+                sideB = new { version = tiaVersionB, project = projectPathB, plc = plcNameB, total = sideB.Count },
+            },
+            added = diff.Added.Select(b => new { name = b.Name, type = b.Type }),
+            removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type }),
+            changed = diff.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
+            unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type }),
+        };
+        return JsonSerializer.Serialize(result, JsonOptions);
+    }
+
     public async Task<string> ListPlcTypesAsync(string? plcName, string? projectPath, int? tiaVersion = null)
     {
         try
@@ -782,7 +849,7 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath, int? tiaVersion = null, bool forceRefresh = false)
+    public async Task<string> GetBlockContentAsync(string blockPath, string? projectPath, int? tiaVersion = null, bool forceRefresh = false, bool raw = false)
     {
         try
         {
@@ -798,7 +865,8 @@ public class OpennessWorkerClient
                     BlockPath = blockPath,
                     ProjectPath = effectiveProjectPath,
                     TiaVersion = tiaVersion,
-                    ForceRefresh = forceRefresh
+                    ForceRefresh = forceRefresh,
+                    Raw = raw
                 }).ConfigureAwait(false);
 
             return response.Success
