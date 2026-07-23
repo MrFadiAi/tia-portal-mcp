@@ -88,6 +88,7 @@ internal static class Program
                 "tag_xref" => TagXref(request),
                 "call_graph" => CallGraph(request),
 #endif
+                "extract_plc_blocks"  => ExtractPlcBlocks(request),
                 "get_block_content"   => GetBlockContent(request),
                 "update_block_logic"  => UpdateBlockLogic(request),
                 "delete_block"        => DeleteBlock(request),
@@ -965,6 +966,16 @@ internal static class Program
 
             try
             {
+                // DIAGNOSTIC raw mode: return the un-reconstructed tokenized export XML so we can
+                // see exactly why BlockSourceReconstructor drops content (e.g. a parameterized STL
+                // CALL losing its parameter pins). Bypasses the re-read cache entirely — no skip-note,
+                // no cache write — so it's a pure, side-effect-free diagnostic path.
+                if (request.Raw)
+                {
+                    string rawXml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath, raw: true);
+                    return new WorkerResponse { Success = true, Payload = rawXml };
+                }
+
                 string yaml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath);
 
                 // Avoid re-injecting a block's full source when the same (unchanged)
@@ -1054,6 +1065,93 @@ internal static class Program
 
         var parts = blockPath.Split('/');
         return parts[parts.Length - 1];
+    }
+
+    // Bulk companion to list_blocks + get_block_content: returns roster AND reconstructed
+    // source for EVERY block of one PLC in a single round-trip (host-side compare uses this
+    // to fetch a whole PLC's source without N per-block calls). Resolution + enumeration
+    // mirror ListBlocks (BlockListReader.Read); reconstruction mirrors GetBlockContent
+    // (BlockExporter.Export). A single unreadable block (know-how protected, missing,
+    // export error) degrades to source="" and the call continues — same philosophy as
+    // GetBlockContent's protected-block fallback. Intentionally bypasses ShownBlocksCache
+    // (the re-read skip-note cache): callers need the FULL current source for comparison.
+    // Not registered as cacheable (heavy, source-bound payload) or mutating (pure read).
+    private static WorkerResponse ExtractPlcBlocks(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath!);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var roster = BlockListReader.Read(session.Project, request.PlcName);
+            var blocks = new List<ExtractedBlockInfo>(roster.Count);
+            foreach (var entry in roster)
+            {
+                string source = string.Empty;
+                try
+                {
+                    source = BlockExporter.Export(session.Project, entry.Path, request.ProjectPath);
+                }
+                catch (Exception ex)
+                {
+                    // Per-block degradation: keep the roster entry with empty source so the
+                    // caller still sees the block exists. Continues to the next block.
+                    Console.Error.WriteLine($"[EXTRACT_PLC_BLOCKS] Failed to reconstruct '{entry.Path}': {ex.Message}");
+                }
+
+                blocks.Add(new ExtractedBlockInfo
+                {
+                    Name = entry.Name,
+                    Type = entry.BlockType,
+                    Language = entry.ProgrammingLanguage,
+                    Source = source,
+                });
+            }
+
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(blocks, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // Serialization DTO matching TiaMcpServer.Worker.BlockInfo (name/type/source) plus the
+    // language the roster already yields for free. Worker doesn't reference PlcBlockCompare,
+    // so we emit matching JSON from a local type.
+    private sealed class ExtractedBlockInfo
+    {
+        public string Name { get; set; } = "";
+        public string Type { get; set; } = "";
+        public string Language { get; set; } = "";
+        public string Source { get; set; } = "";
     }
 
     private static WorkerResponse UpdateBlockLogic(WorkerRequest request)
