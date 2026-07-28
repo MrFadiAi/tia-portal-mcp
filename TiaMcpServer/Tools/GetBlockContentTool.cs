@@ -13,9 +13,10 @@ namespace TiaMcpServer.Tools
             OpennessWorkerClient workerClient,
             [Description("Block path: 'BlockName' for first PLC, or 'PLC_1/BlockName' to target a specific PLC. Optional suffix like ' [OB1]' is stripped automatically.")] string blockPath,
             [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
-            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
+            [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null,
+            [Description("DIAGNOSTIC ONLY: return the raw tokenized Openness export XML BEFORE source reconstruction, to inspect why reconstruction drops content (e.g. a CALL losing its parameter pins). Output is large and unreadable — do NOT use for normal reads.")] bool raw = false)
         {
-            return await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion).ConfigureAwait(false);
+            return await workerClient.GetBlockContentAsync(blockPath, projectPath, tiaVersion, raw: raw).ConfigureAwait(false);
         }
     }
 }

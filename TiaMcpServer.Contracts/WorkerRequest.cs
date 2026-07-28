@@ -45,6 +45,13 @@ public class WorkerRequest
     /// addition and hash the note instead of the block.</summary>
     public bool ForceRefresh { get; set; }
 
+    /// <summary>get_block_content: DIAGNOSTIC — return the raw tokenized Openness export XML
+    /// BEFORE source reconstruction (BlockSourceReconstructor). Used to inspect WHY reconstruction
+    /// drops content (e.g. a parameterized STL CALL exporting its parameter pins). Bypasses the
+    /// re-read cache and the skip-note so the full raw export is always returned. Not for normal
+    /// chat reads — the output is large and unreadable.</summary>
+    public bool Raw { get; set; }
+
     public string? TableName { get; set; }
 
     public string? FolderPath { get; set; }

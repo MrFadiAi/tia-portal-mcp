@@ -8,7 +8,7 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 public static class BlockExporter
 {
-    public static string Export(Project project, string blockPath, string? projectPath = null)
+    public static string Export(Project project, string blockPath, string? projectPath = null, bool raw = false)
     {
         var address = BlockAddress.Parse(blockPath);
         var target = BlockTargetResolver.ResolveForExport(project, address);
@@ -32,7 +32,9 @@ public static class BlockExporter
             // V16-V18: Use legacy Export API (XML export)
             var exportPath = Path.Combine(tempDir, target.DocumentName);
             target.Block!.Export(new FileInfo(exportPath), ExportOptions.WithDefaults);
-            return BlockSourceReconstructor.Reconstruct(File.ReadAllText(exportPath), target.Block!.ProgrammingLanguage.ToString());
+            var exportedLegacy = File.ReadAllText(exportPath);
+            // raw = diagnostic bypass: return the tokenized XML unchanged (see WorkerRequest.Raw).
+            return raw ? exportedLegacy : BlockSourceReconstructor.Reconstruct(exportedLegacy, target.Block!.ProgrammingLanguage.ToString());
 #else
             var combined = TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
                 ?? TryExportToFile(target.Block!, tempDir, target.DocumentName);
@@ -50,8 +52,9 @@ public static class BlockExporter
 
             // Reconstruct readable STL from the tokenized XML so get_block_content returns code
             // (e.g. '      T     "PLUKSCHIJF"') instead of raw <StlToken>/<Component> XML. STL
-            // only; other languages pass through unchanged.
-            return BlockSourceReconstructor.Reconstruct(combined, target.Block!.ProgrammingLanguage.ToString());
+            // only; other languages pass through unchanged. raw = diagnostic bypass: return the
+            // tokenized XML unchanged so we can see why reconstruction drops content.
+            return raw ? combined : BlockSourceReconstructor.Reconstruct(combined, target.Block!.ProgrammingLanguage.ToString());
 #endif
         }
         finally
