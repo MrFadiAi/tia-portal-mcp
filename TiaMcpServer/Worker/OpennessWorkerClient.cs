@@ -418,10 +418,10 @@ public class OpennessWorkerClient
                 sideA = new { version = tiaVersionA, project = projectPathA, plc = plcNameA, total = sideA.Count },
                 sideB = new { version = tiaVersionB, project = projectPathB, plc = plcNameB, total = sideB.Count },
             },
-            added = diff.Added.Select(b => new { name = b.Name, type = b.Type }),
-            removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type }),
+            added = diff.Added.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+            removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type, sourceB = b.Source }),
             changed = diff.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
-            unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type }),
+            unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
         };
         return JsonSerializer.Serialize(result, JsonOptions);
     }
