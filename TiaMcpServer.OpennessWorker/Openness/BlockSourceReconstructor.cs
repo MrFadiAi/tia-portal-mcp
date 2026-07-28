@@ -51,10 +51,18 @@ internal static class BlockSourceReconstructor
         new(@"<\?xml[^>]*\?>", RegexOptions.Compiled | RegexOptions.Singleline);
 
     /// <summary>
-    /// Reconstruct readable source for a block export. STL and SCL are reconstructed; any other
-    /// programming language (or an unrecoverable parse failure) returns <paramref name="xml"/>
-    /// unchanged so callers never lose data.
+    /// Reconstruct readable source for a block export. STL and SCL networks are reconstructed
+    /// from their tokenized XML; DBs (any block whose <c>&lt;Interface&gt;</c> is the only
+    /// meaningful content) render as a deterministic struct listing; any other programming
+    /// language (or an unrecoverable parse failure) returns <paramref name="xml"/> unchanged so
+    /// callers never lose data.
     /// </summary>
+    /// <remarks>
+    /// DB reconstruction MUST come before the STL/SCL fall-through. Without it, a DB returns the
+    /// raw Openness XML, which (a) is unreadable in the PLC Compare drill-in diff and (b) leaks
+    /// <c>&lt;DocumentInfo&gt;&lt;Created&gt;</c> timestamps that differ on every export, so two
+    /// exports of an identical DB diff and every DB is falsely classified as "Changed".
+    /// </remarks>
     public static string Reconstruct(string? xml, string? programmingLanguage)
     {
         if (string.IsNullOrEmpty(xml))
@@ -64,6 +72,35 @@ internal static class BlockSourceReconstructor
 
         var isStl = IsStl(programmingLanguage);
         var isScl = IsScl(programmingLanguage);
+        var isDbLanguage = IsDb(programmingLanguage);
+
+        // DB interface rendering — handles DBs (language="DB" or GlobalDB/InstanceDB root) and
+        // any other non-STL/SCL block that exposes an <Interface> (FBD/GRAPH blocks with
+        // instance params). Rendered output derives ONLY from <AttributeList>(Name/Number) +
+        // <Interface>, so it is timestamp-free and stable across exports.
+        if (isDbLanguage || (!isStl && !isScl))
+        {
+            try
+            {
+                var cleaned = FileSeparator.Replace(xml, string.Empty);
+                var doc = XDocument.Parse(cleaned);
+                if (isDbLanguage || IsGlobalDbRoot(doc) || HasInterface(doc))
+                {
+                    return ReconstructDb(doc);
+                }
+            }
+            catch
+            {
+                if (isDbLanguage)
+                {
+                    // A DB we can't parse: emit a minimal stub rather than the raw XML, so a
+                    // parse hiccup never reintroduces the timestamp-leak / false-"Changed" bug.
+                    return "DATA_BLOCK\nSTRUCT\nEND_STRUCT\n";
+                }
+                // Non-DB without a parseable interface: fall through to the raw-XML return.
+            }
+        }
+
         if (!isStl && !isScl)
         {
             return xml;
@@ -103,6 +140,148 @@ internal static class BlockSourceReconstructor
         {
             return xml;
         }
+    }
+
+    // ---------------------------------------------------------------- DB reconstruction
+    // Real TIA Openness DB exports carry <SW.Blocks.GlobalDB> + <AttributeList>(Name/Number/
+    // ProgrammingLanguage=DB) + <Interface><Sections xmlns="...Interface/v5"><Section Name="Static">
+    // with nested <Member>s. Members can themselves be Structs containing further Members
+    // (recursion required). The renderer matches by LocalName so the interface namespace does
+    // not matter. Everything is derived from <AttributeList> + <Interface>; never from
+    // <DocumentInfo>/<Created>/<InstalledProducts> (those carry export timestamps that would
+    // make identical DBs falsely "Changed" in PLC Compare).
+
+    private static bool IsDb(string? programmingLanguage)
+        => !string.IsNullOrEmpty(programmingLanguage)
+           && programmingLanguage.Equals("DB", StringComparison.OrdinalIgnoreCase);
+
+    private static bool IsGlobalDbRoot(XDocument doc)
+        => doc.Root is XElement root
+           && (root.Name.LocalName == "SW.Blocks.GlobalDB"
+               || root.Name.LocalName == "SW.Blocks.InstanceDB");
+
+    private static bool HasInterface(XDocument doc)
+        => doc.Descendants().Any(e => e.Name.LocalName == "Interface");
+
+    /// <summary>Render a DB (or any block with an <Interface>) as a readable STRUCT listing.
+    /// Never throws — on a parse hiccup, emits whatever was parsed, NOT the raw XML.</summary>
+    private static string ReconstructDb(XDocument doc)
+    {
+        var root = doc.Root;
+        var sb = new StringBuilder();
+
+        // Header: DATA_BLOCK "Name" / DB Number — derives from <AttributeList> only.
+        var attributeList = root?.Descendants().FirstOrDefault(e => e.Name.LocalName == "AttributeList");
+        var name = attributeList?.Elements().FirstOrDefault(e => e.Name.LocalName == "Name")?.Value;
+        var number = attributeList?.Elements().FirstOrDefault(e => e.Name.LocalName == "Number")?.Value;
+
+        if (!string.IsNullOrEmpty(name))
+        {
+            sb.Append("DATA_BLOCK \"").Append(name).Append("\"");
+            if (!string.IsNullOrEmpty(number))
+            {
+                sb.Append(" / DB ").Append(number);
+            }
+            sb.Append('\n');
+        }
+
+        sb.Append("STRUCT\n");
+
+        var interfaceElement = doc.Descendants().FirstOrDefault(e => e.Name.LocalName == "Interface");
+        var sectionsElement = interfaceElement?.Elements().FirstOrDefault(e => e.Name.LocalName == "Sections");
+
+        if (sectionsElement != null)
+        {
+            foreach (var section in sectionsElement.Elements().Where(e => e.Name.LocalName == "Section"))
+            {
+                var sectionName = section.Attribute("Name")?.Value ?? "Static";
+                sb.Append("  // ").Append(sectionName).Append('\n');
+                foreach (var member in section.Elements().Where(e => e.Name.LocalName == "Member"))
+                {
+                    AppendDbMember(sb, member, indent: 1);
+                }
+            }
+        }
+
+        sb.Append("END_STRUCT\n");
+        return sb.ToString();
+    }
+
+    /// <summary>Append one Member line and, if it has child Members (a Struct), recurse with
+    /// one more indent level followed by an <c>END_STRUCT</c> at the opener's indent. Leaf
+    /// members render <c>Name : Type := StartValue;</c> plus a <c>(* Accessibility, Remanence *)</c>
+    /// annotation when those attributes are present and non-default.</summary>
+    private static void AppendDbMember(StringBuilder sb, XElement member, int indent)
+    {
+        var name = member.Attribute("Name")?.Value ?? "";
+        var datatype = member.Attribute("Datatype")?.Value
+                       ?? member.Attribute("DataType")?.Value
+                       ?? "";
+
+        var indentStr = new string(' ', indent * 2);
+        var childMembers = member.Elements().Where(e => e.Name.LocalName == "Member").ToList();
+        // Treat as a struct when it has child Members OR declares Datatype="Struct" (an empty
+        // struct has no children but should still open/close with END_STRUCT, not emit a ';').
+        var isStruct = childMembers.Count > 0
+                       || datatype.Equals("Struct", StringComparison.OrdinalIgnoreCase);
+
+        sb.Append(indentStr).Append(name).Append(" : ").Append(datatype);
+
+        if (isStruct)
+        {
+            var annotations = CollectDbAnnotations(member);
+            if (annotations.Count > 0)
+            {
+                sb.Append(" (* ").Append(string.Join(", ", annotations)).Append(" *)");
+            }
+            sb.Append('\n');
+
+            foreach (var child in childMembers)
+            {
+                AppendDbMember(sb, child, indent + 1);
+            }
+
+            sb.Append(indentStr).Append("END_STRUCT\n");
+        }
+        else
+        {
+            // Leaf: start value + semicolon + optional annotations.
+            var startValue = member.Elements().FirstOrDefault(e => e.Name.LocalName == "StartValue")?.Value;
+            if (!string.IsNullOrEmpty(startValue))
+            {
+                sb.Append(" := ").Append(startValue);
+            }
+            sb.Append(';');
+
+            var annotations = CollectDbAnnotations(member);
+            if (annotations.Count > 0)
+            {
+                sb.Append(" (* ").Append(string.Join(", ", annotations)).Append(" *)");
+            }
+            sb.Append('\n');
+        }
+    }
+
+    /// <summary>Non-default Accessibility / Remanence values, used for the trailing
+    /// <c>(* ... *)</c> annotation. Default/empty values are omitted to keep output minimal.</summary>
+    private static List<string> CollectDbAnnotations(XElement member)
+    {
+        var annotations = new List<string>();
+        var accessibility = member.Attribute("Accessibility")?.Value;
+        if (!string.IsNullOrEmpty(accessibility)
+            && !accessibility.Equals("Default", StringComparison.OrdinalIgnoreCase))
+        {
+            annotations.Add(accessibility);
+        }
+
+        var remanence = member.Attribute("Remanence")?.Value;
+        if (!string.IsNullOrEmpty(remanence)
+            && !remanence.Equals("Default", StringComparison.OrdinalIgnoreCase))
+        {
+            annotations.Add(remanence);
+        }
+
+        return annotations;
     }
 
     /// <summary>Every <c>&lt;CompileUnit&gt;</c> / <c>&lt;SW.Blocks.CompileUnit&gt;</c> across the

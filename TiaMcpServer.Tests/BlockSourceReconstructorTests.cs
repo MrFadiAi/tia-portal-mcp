@@ -451,4 +451,158 @@ public class BlockSourceReconstructorTests
         Assert.Contains("ANALOGE_METING_DATA := ", src);
         Assert.Contains("\"DATA ANALOOG\".CHAMPIGNON", src);
     }
+
+    // --------------------------------------------------------------- DB reconstruction
+    // Real TIA Openness DB exports carry <SW.Blocks.GlobalDB> + <AttributeList>(Name/Number/
+    // ProgrammingLanguage=DB) + <Interface><Sections xmlns="...Interface/v5"><Section Name="Static">
+    // with nested <Member>s. Without DB reconstruction, Reconstruct returns the raw XML, which
+    // (a) is unreadable in the Compare drill-in diff and (b) leaks <DocumentInfo><Created>
+    // timestamps that differ on every export, falsely marking identical DBs as "Changed".
+
+    private const string InterfaceNs = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
+
+    /// <summary>Build a GlobalDB export. <paramref name="sectionsInner"/> goes inside
+    /// <c>&lt;Sections xmlns="...Interface/v5"&gt;</c>. <paramref name="extraHeaderChildren"/>
+    /// is appended after AttributeList (used to inject a &lt;DocumentInfo&gt; timestamp).</summary>
+    private static string DbBlock(string name, string number, string sectionsInner,
+        string? extraHeaderChildren = null, string programmingLanguage = "DB")
+        => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Document>"
+           + "<SW.Blocks.GlobalDB ID=\"0\"><AttributeList>"
+           + "<Name>" + name + "</Name>"
+           + "<Number>" + number + "</Number>"
+           + "<ProgrammingLanguage>" + programmingLanguage + "</ProgrammingLanguage>"
+           + "</AttributeList>"
+           + "<Interface><Sections xmlns=\"" + InterfaceNs + "\">"
+           + sectionsInner
+           + "</Sections></Interface>"
+           + "</SW.Blocks.GlobalDB>"
+           + (extraHeaderChildren ?? "")
+           + "</Document>";
+
+    /// <summary>A single Static-section &lt;Member&gt; tree.</summary>
+    private static string Section(string name, params string[] members)
+        => "<Section Name=\"" + name + "\">" + string.Join("", members) + "</Section>";
+
+    private static string LeafMember(string name, string datatype, string? startValue = null,
+        string? extraAttrs = null)
+    {
+        var sv = startValue is null ? "" : "<StartValue>" + startValue + "</StartValue>";
+        var attrs = extraAttrs is null ? "" : " " + extraAttrs;
+        return "<Member Name=\"" + name + "\" Datatype=\"" + datatype + "\"" + attrs + ">"
+               + "<AttributeList/>" + sv + "</Member>";
+    }
+
+    private static string StructMember(string name, string extraAttrs, params string[] children)
+    {
+        var attrs = string.IsNullOrEmpty(extraAttrs) ? "" : " " + extraAttrs;
+        return "<Member Name=\"" + name + "\" Datatype=\"Struct\"" + attrs + ">"
+               + "<AttributeList/>"
+               + string.Join("", children)
+               + "</Member>";
+    }
+
+    [Fact]
+    public void Db_Reconstructs_As_Readable_Struct_No_Raw_Xml_Leak()
+    {
+        // Mirrors the user's DATA_HYDRAULIEK block ( ProgrammingLanguage=DB, GlobalDB root ).
+        var xml = DbBlock("DATA_HYDRAULIEK", "13",
+            Section("Static",
+                StructMember("BITS", "Remanence=\"NonRetain\" Accessibility=\"Public\"",
+                    LeafMember("POMP_LOOPT_TE_LANG", "Bool", "FALSE"))));
+
+        var src = Reconstruct(xml, "DB");
+
+        // Header identifies the block.
+        Assert.Contains("DATA_BLOCK \"DATA_HYDRAULIEK\"", src);
+        Assert.Contains("DB 13", src);
+        // Struct parent + nested leaf with start value.
+        Assert.Contains("BITS : Struct", src);
+        Assert.Contains("(* Public, NonRetain *)", src);
+        Assert.Contains("POMP_LOOPT_TE_LANG : Bool := FALSE;", src);
+        // The two-struct delimiters.
+        Assert.Contains("STRUCT", src);
+        Assert.Contains("END_STRUCT", src);
+        // NO raw XML leak — this is what made the Compare drill-in unreadable.
+        Assert.DoesNotContain("<", src);
+        Assert.DoesNotContain("</Member>", src);
+        Assert.DoesNotContain("<Created>", src);
+        Assert.DoesNotContain("<DocumentInfo>", src);
+        Assert.DoesNotContain("<AttributeList", src);
+    }
+
+    [Fact]
+    public void Db_Two_Exports_With_Different_Timestamps_Produce_Identical_Output()
+    {
+        // The false-"Changed" guard: same Name+Number+Interface, but different <Created>
+        // timestamps inside <DocumentInfo>. Raw XML would differ; the reconstructed struct
+        // text MUST be byte-identical so the compare classifier sees them as equal.
+        var sectionsA = Section("Static", LeafMember("X", "Int", "5"));
+        var sectionsB = Section("Static", LeafMember("X", "Int", "5"));
+
+        var xmlA = DbBlock("DB1", "1", sectionsA,
+            extraHeaderChildren: "<DocumentInfo><Created>2026-07-28T10:00:00</Created>"
+                                 + "<InstalledProducts><Product Name=\"TIA Portal\"/></InstalledProducts>"
+                                 + "</DocumentInfo>");
+        var xmlB = DbBlock("DB1", "1", sectionsB,
+            extraHeaderChildren: "<DocumentInfo><Created>2026-07-28T11:30:45</Created>"
+                                 + "<InstalledProducts><Product Name=\"TIA Portal\"/></InstalledProducts>"
+                                 + "</DocumentInfo>");
+
+        var a = Reconstruct(xmlA, "DB");
+        var b = Reconstruct(xmlB, "DB");
+        Assert.Equal(a, b);
+        // Sanity: the output really did drop the timestamps (else the assert above is vacuous).
+        Assert.DoesNotContain("2026-07-28", a);
+    }
+
+    [Fact]
+    public void Db_Nested_Struct_Recurses_With_Indentation()
+    {
+        var xml = DbBlock("NESTED", "42",
+            Section("Static",
+                StructMember("OUTER", "",
+                    StructMember("INNER", "",
+                        LeafMember("DEEP", "Int", "0")))));
+
+        var src = Reconstruct(xml, "DB");
+
+        // Top-level member at 2 spaces; its child at 4; the leaf at 6.
+        var lines = src.Split('\n');
+        Assert.Contains("  OUTER : Struct", lines);
+        Assert.Contains("    INNER : Struct", lines);
+        Assert.Contains("      DEEP : Int := 0;", lines);
+        // END_STRUCT closes each level at the OPENER's indent.
+        Assert.Contains("    END_STRUCT", lines);
+        Assert.Contains("  END_STRUCT", lines);
+        Assert.Contains("END_STRUCT", src); // top-level
+        Assert.DoesNotContain("<", src);
+    }
+
+    [Fact]
+    public void Db_Empty_Interface_Produces_Empty_Struct_No_Crash()
+    {
+        // No <Section>, no <Member>. Must not crash and must not leak raw XML.
+        var xml = DbBlock("EMPTY", "99", "");
+        var src = Reconstruct(xml, "DB");
+
+        Assert.Contains("DATA_BLOCK \"EMPTY\"", src);
+        Assert.Contains("STRUCT", src);
+        Assert.Contains("END_STRUCT", src);
+        Assert.DoesNotContain("<", src);
+    }
+
+    [Fact]
+    public void Db_Root_GlobalDB_With_Non_Db_Language_Still_Renders_Interface()
+    {
+        // The DB-branch also fires when the root is <SW.Blocks.GlobalDB> even if the
+        // programming-language field is missing/odd (TIA sometimes exports without it).
+        var xml = DbBlock("LANGLESS", "7",
+            Section("Static", LeafMember("Y", "Real", "1.5")),
+            programmingLanguage: "");
+        var src = Reconstruct(xml, "");
+
+        Assert.Contains("DATA_BLOCK \"LANGLESS\"", src);
+        Assert.Contains("Y : Real := 1.5;", src);
+        Assert.DoesNotContain("<", src);
+    }
 }
