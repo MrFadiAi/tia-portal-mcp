@@ -453,18 +453,23 @@ public class BlockSourceReconstructorTests
     }
 
     // ---- jump labels ------------------------------------------------------------
-    // Real TIA Openness shape (confirmed against the Python reference parser,
-    // Extract_PLC_Data_GUI/src/extract_plc_full.py lines 449-453):
-    // <Access Scope="Label"><Label Name="KLAAR"/></Access> appears in TWO roles,
-    // distinguished by the statement's token:
-    //   jump statement (JU/JC/JCN/...) -> the jump TARGET: "JCN     KLAAR" (operand column)
-    //   any other statement            -> the DEFINITION: "KLAAR: NOP 0" (column 0, same line)
-    // Without a Label case AppendOperand silently dropped both, leaving holes in the
-    // reconstructed STL ("JCN" with an empty operand column, "NOP 0" with nothing before
-    // it) — production chat 2026-09-07.
+    // Real TIA Openness encodings (verified against a live V18 export of
+    // PLF-01A-PLC_9/PUTBAND, 2026-09-07):
+    //   jump TARGET      -> <Access Scope="Label"><Label Name="KLAAR"/></Access> inside the
+    //                        jump StlStatement (JU/JC/JCN/...) -> "JCN     KLAAR" (operand column)
+    //   label DEFINITION -> a <LabelDeclaration><Label Name="KLAAR"/></LabelDeclaration> child
+    //                        of the StlStatement, BEFORE the StlToken -> "KLAAR: NOP 0"
+    //                        (column 0, same line, no instruction indent)
+    // Without both, the reconstructor dropped jump targets ("JCN" + an empty operand column)
+    // and label definitions (bare "NOP 0" lines), so the AI could not follow STL control flow.
 
     private static string Label(string name)
         => "<Access Scope=\"Label\"><Label Name=\"" + name + "\"/></Access>";
+
+    /// <summary>A statement carrying a label DEFINITION (LabelDeclaration precedes the token).</summary>
+    private static string LabeledStmt(string label, string token, params string[] operands)
+        => "<StlStatement><LabelDeclaration><Label Name=\"" + label + "\"/></LabelDeclaration>"
+           + "<StlToken Text=\"" + token + "\"/>" + string.Join("", operands) + "</StlStatement>";
 
     [Fact]
     public void Stl_Jump_Target_Renders_After_Mnemonic_Without_Colon()
@@ -477,7 +482,7 @@ public class BlockSourceReconstructorTests
     [Fact]
     public void Stl_Label_Definition_Renders_At_Column_Zero_On_Same_Line()
     {
-        var src = Reconstruct(Block(Stmt("NOP_0", Label("KLAAR"))));
+        var src = Reconstruct(Block(LabeledStmt("KLAAR", "NOP_0")));
         var line = src.Split('\n').FirstOrDefault(l => l.StartsWith("KLAAR:", StringComparison.Ordinal));
         Assert.NotNull(line);
         Assert.StartsWith("KLAAR: NOP 0", line); // label + statement on the SAME line
@@ -491,7 +496,7 @@ public class BlockSourceReconstructorTests
         var src = Reconstruct(Block(
             Stmt("A", Global("VOETJESAFVOER RUNNING")),
             Stmt("JCN", Label("KLAAR")),
-            Stmt("NOP_0", Label("KLAAR"))));
+            LabeledStmt("KLAAR", "NOP_0")));
         Assert.Contains("A     \"VOETJESAFVOER RUNNING\"", src);
         Assert.Contains("JCN     KLAAR", src);
         Assert.Contains("KLAAR: NOP 0", src);
@@ -500,7 +505,7 @@ public class BlockSourceReconstructorTests
     [Fact]
     public void Stl_Label_Is_Not_Rendered_Twice_On_A_Labeled_Statement()
     {
-        var src = Reconstruct(Block(Stmt("NOP_0", Label("KLAAR"))));
+        var src = Reconstruct(Block(LabeledStmt("KLAAR", "NOP_0")));
         var count = 0;
         var idx = src.IndexOf("KLAAR", StringComparison.Ordinal);
         while (idx >= 0)
@@ -509,6 +514,51 @@ public class BlockSourceReconstructorTests
             idx = src.IndexOf("KLAAR", idx + 1, StringComparison.Ordinal);
         }
         Assert.Equal(1, count); // once as the definition prefix, never again in the operand column
+    }
+
+    [Fact]
+    public void Stl_Putband_Raw_Export_Fixture_Reconstructs_Jumps_And_Labels()
+    {
+        // Statements lifted from the live V18 PUTBAND export (StatementList v4): condition ->
+        // conditional jump -> load/transfer -> unconditional jump -> both label definitions.
+        // Every line the control flow depends on must survive reconstruction.
+        var raw = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Document>"
+                  + "<SW.Blocks.FC ID=\"0\"><AttributeList><Name>PUTBAND</Name>"
+                  + "<ProgrammingLanguage>STL</ProgrammingLanguage></AttributeList><ObjectList>"
+                  + "<SW.Blocks.CompileUnit ID=\"5\" CompositionName=\"CompileUnits\">"
+                  + "<AttributeList><NetworkSource>"
+                  + "<StatementList xmlns=\"http://www.siemens.com/automation/Openness/SW/NetworkSource/StatementList/v4\">"
+                  + "<StlStatement UId=\"23\"><StlToken Text=\"A\" />"
+                  + "<Access Scope=\"GlobalVariable\"><Symbol><Component Name=\"VOETJESAFVOER RUNNING\" /></Symbol></Access>"
+                  + "</StlStatement>"
+                  + "<StlStatement UId=\"21\"><StlToken Text=\"JCN\" />"
+                  + "<Access Scope=\"Label\"><Label Name=\"NIET_READY\" /></Access></StlStatement>"
+                  + "<StlStatement UId=\"61\"><StlToken Text=\"L\" />"
+                  + "<Access Scope=\"LiteralConstant\"><Constant><ConstantType>Int</ConstantType>"
+                  + "<ConstantValue>1</ConstantValue></Constant></Access></StlStatement>"
+                  + "<StlStatement UId=\"66\"><StlToken Text=\"T\" />"
+                  + "<Access Scope=\"GlobalVariable\"><Symbol><Component Name=\"DB_HMI\" />"
+                  + "<Component Name=\"INDICATIES\" /><Component Name=\"PUTBAND_STATUS\" /></Symbol></Access>"
+                  + "</StlStatement>"
+                  + "<StlStatement UId=\"70\"><StlToken Text=\"JU\" />"
+                  + "<Access Scope=\"Label\"><Label Name=\"KLAAR\" /></Access></StlStatement>"
+                  + "<StlStatement UId=\"22\"><LabelDeclaration><Label Name=\"NIET_READY\" /></LabelDeclaration>"
+                  + "<StlToken Text=\"NOP_0\" /></StlStatement>"
+                  + "<StlStatement UId=\"59\"><LabelDeclaration><Label Name=\"KLAAR\" /></LabelDeclaration>"
+                  + "<StlToken Text=\"NOP_0\" /></StlStatement>"
+                  + "</StatementList></NetworkSource></AttributeList>"
+                  + "</SW.Blocks.CompileUnit></ObjectList></SW.Blocks.FC></Document>";
+
+        var src = Reconstruct(raw);
+
+        Assert.Contains("A     \"VOETJESAFVOER RUNNING\"", src);
+        Assert.Contains("JCN     NIET_READY", src);
+        Assert.Contains("L     1", src);
+        Assert.Contains("T     \"DB_HMI\".INDICATIES.PUTBAND_STATUS", src);
+        Assert.Contains("JU     KLAAR", src);
+        Assert.Contains("NIET_READY: NOP 0", src);
+        Assert.Contains("KLAAR: NOP 0", src);
+        Assert.DoesNotContain("<", src); // fully reconstructed — no raw XML leak
     }
 
     // --------------------------------------------------------------- DB reconstruction

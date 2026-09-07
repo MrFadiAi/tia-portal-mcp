@@ -40,14 +40,6 @@ internal static class BlockSourceReconstructor
         ["OffDelay"] = "SF",
     };
 
-    /// <summary>Jump mnemonics. A label <c>&lt;Access&gt;</c> on one of these statements is the
-    /// jump TARGET (rendered in the operand column, no colon); on any other statement it is a
-    /// label DEFINITION (rendered at column 0 as <c>KLAAR: NOP 0</c>).</summary>
-    private static readonly HashSet<string> JumpTokens = new(StringComparer.OrdinalIgnoreCase)
-    {
-        "JU", "JC", "JCN", "JCB", "JNB", "JNBI", "JBI", "JL",
-    };
-
     /// <summary>"--- FILE: name ---" separator lines <see cref="BlockExporter"/> prepends to a
     /// multi-file <c>ExportAsDocuments</c> result — strip them before parsing.</summary>
     private static readonly Regex FileSeparator =
@@ -483,20 +475,18 @@ internal static class BlockSourceReconstructor
                 continue;
             }
 
-            // A label Access serves two roles (distinguished by the token): on a JUMP it is
-            // the target (rendered below in the operand column); otherwise it is a label
-            // DEFINITION — rendered at column 0 ("KLAAR: NOP 0") instead of the usual indent,
-            // and skipped in the operand loop so the name cannot appear twice.
-            var labelAccess = stmt.Elements().FirstOrDefault(e =>
-                e.Name.LocalName == "Access" && e.Attribute("Scope")?.Value == "Label");
-            var renderedLabelPrefix = false;
-            if (labelAccess != null && !JumpTokens.Contains(tokenText))
+            // Label DEFINITION: a <LabelDeclaration><Label Name="KLAAR"/></LabelDeclaration>
+            // child (before the token). Real TIA renders the label at column 0 with the
+            // statement on the SAME line and no instruction indent ("KLAAR: NOP 0"). Jump
+            // TARGETS are the other role — <Access Scope="Label"> handled by AppendOperand.
+            var labelDeclaration = stmt.Elements()
+                .FirstOrDefault(e => e.Name.LocalName == "LabelDeclaration");
+            if (labelDeclaration != null)
             {
-                var labelName = labelAccess.Elements()
+                var labelName = labelDeclaration.Elements()
                     .FirstOrDefault(e => e.Name.LocalName == "Label")?
                     .Attribute("Name")?.Value ?? string.Empty;
                 sb.Append(labelName).Append(": ");
-                renderedLabelPrefix = true;
             }
             else
             {
@@ -507,12 +497,12 @@ internal static class BlockSourceReconstructor
             foreach (var child in stmt.Elements())
             {
                 var localName = child.Name.LocalName;
-                if (localName == "StlToken" || localName == "LineComment")
+                if (localName == "StlToken" || localName == "LineComment" || localName == "LabelDeclaration")
                 {
                     continue;
                 }
 
-                if (localName == "Access" && !(renderedLabelPrefix && child == labelAccess))
+                if (localName == "Access")
                 {
                     AppendOperand(sb, child);
                 }
