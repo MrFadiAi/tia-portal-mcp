@@ -24,14 +24,20 @@ internal static class BlockCodeIndexer
         var skipped = 0;
         var total = 0;
 
-        foreach (var (_, plc) in PlcSoftwareFinder.Filter(project, plcNameFilter))
+        foreach (var (device, plc) in PlcSoftwareFinder.Filter(project, plcNameFilter))
         {
             if (blocks.Count >= MaxBlocks)
             {
                 break;
             }
 
-            WalkBlockGroup(plc.BlockGroup, plc.Name, projectPath, blocks, ref skipped, ref total);
+            // Stamp blocks with the DEVICE name — the identity list_plcs returns as deviceName
+            // and the one callers scope by. The PlcSoftware's own Name can go stale: a device
+            // copied from another station keeps the original software name, which made every
+            // search_code match report the WRONG PLC (scoped "PLF-01A-PLC_9", matches said
+            // "PLF-00A-PLC_MASTER") and sent the agent to read the wrong PLC first.
+            var plcIdentity = string.IsNullOrEmpty(device.Name) ? plc.Name : device.Name;
+            WalkBlockGroup(plc.BlockGroup, plcIdentity, projectPath, blocks, ref skipped, ref total);
         }
 
         return new IndexBuildResult(blocks, skipped, total);
