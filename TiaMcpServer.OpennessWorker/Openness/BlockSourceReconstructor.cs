@@ -40,6 +40,14 @@ internal static class BlockSourceReconstructor
         ["OffDelay"] = "SF",
     };
 
+    /// <summary>Jump mnemonics. A label <c>&lt;Access&gt;</c> on one of these statements is the
+    /// jump TARGET (rendered in the operand column, no colon); on any other statement it is a
+    /// label DEFINITION (rendered at column 0 as <c>KLAAR: NOP 0</c>).</summary>
+    private static readonly HashSet<string> JumpTokens = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "JU", "JC", "JCN", "JCB", "JNB", "JNBI", "JBI", "JL",
+    };
+
     /// <summary>"--- FILE: name ---" separator lines <see cref="BlockExporter"/> prepends to a
     /// multi-file <c>ExportAsDocuments</c> result — strip them before parsing.</summary>
     private static readonly Regex FileSeparator =
@@ -400,8 +408,8 @@ internal static class BlockSourceReconstructor
 
             case "Access":
                 // Reuses the STL operand handler: GlobalVariable -> "Tag", LocalVariable -> #name,
-                // Literal/TypedConstant -> value, Call -> "Block". SCL-only scopes
-                // (Address/Label/LocalConstant/Input/...) are not handled here and are skipped.
+                // Literal/TypedConstant -> value, Call -> "Block", Label -> bare name. SCL-only
+                // scopes (Address/LocalConstant/Input/...) are not handled here and are skipped.
                 AppendOperand(sb, element);
                 break;
         }
@@ -475,7 +483,27 @@ internal static class BlockSourceReconstructor
                 continue;
             }
 
-            sb.Append("      ").Append(mnemonic).Append("     ");
+            // A label Access serves two roles (distinguished by the token): on a JUMP it is
+            // the target (rendered below in the operand column); otherwise it is a label
+            // DEFINITION — rendered at column 0 ("KLAAR: NOP 0") instead of the usual indent,
+            // and skipped in the operand loop so the name cannot appear twice.
+            var labelAccess = stmt.Elements().FirstOrDefault(e =>
+                e.Name.LocalName == "Access" && e.Attribute("Scope")?.Value == "Label");
+            var renderedLabelPrefix = false;
+            if (labelAccess != null && !JumpTokens.Contains(tokenText))
+            {
+                var labelName = labelAccess.Elements()
+                    .FirstOrDefault(e => e.Name.LocalName == "Label")?
+                    .Attribute("Name")?.Value ?? string.Empty;
+                sb.Append(labelName).Append(": ");
+                renderedLabelPrefix = true;
+            }
+            else
+            {
+                sb.Append("      ");
+            }
+
+            sb.Append(mnemonic).Append("     ");
             foreach (var child in stmt.Elements())
             {
                 var localName = child.Name.LocalName;
@@ -484,7 +512,7 @@ internal static class BlockSourceReconstructor
                     continue;
                 }
 
-                if (localName == "Access")
+                if (localName == "Access" && !(renderedLabelPrefix && child == labelAccess))
                 {
                     AppendOperand(sb, child);
                 }
@@ -532,6 +560,15 @@ internal static class BlockSourceReconstructor
 
             case "Call":
                 AppendCall(sb, access);
+                break;
+
+            case "Label":
+                // Jump target ("JCN     KLAAR"). No colon here — the definition site
+                // (ReconstructStl) writes its own "KLAAR: " prefix.
+                foreach (var label in access.Elements().Where(e => e.Name.LocalName == "Label"))
+                {
+                    sb.Append(label.Attribute("Name")?.Value ?? string.Empty);
+                }
                 break;
         }
     }

@@ -452,6 +452,65 @@ public class BlockSourceReconstructorTests
         Assert.Contains("\"DATA ANALOOG\".CHAMPIGNON", src);
     }
 
+    // ---- jump labels ------------------------------------------------------------
+    // Real TIA Openness shape (confirmed against the Python reference parser,
+    // Extract_PLC_Data_GUI/src/extract_plc_full.py lines 449-453):
+    // <Access Scope="Label"><Label Name="KLAAR"/></Access> appears in TWO roles,
+    // distinguished by the statement's token:
+    //   jump statement (JU/JC/JCN/...) -> the jump TARGET: "JCN     KLAAR" (operand column)
+    //   any other statement            -> the DEFINITION: "KLAAR: NOP 0" (column 0, same line)
+    // Without a Label case AppendOperand silently dropped both, leaving holes in the
+    // reconstructed STL ("JCN" with an empty operand column, "NOP 0" with nothing before
+    // it) — production chat 2026-09-07.
+
+    private static string Label(string name)
+        => "<Access Scope=\"Label\"><Label Name=\"" + name + "\"/></Access>";
+
+    [Fact]
+    public void Stl_Jump_Target_Renders_After_Mnemonic_Without_Colon()
+    {
+        var src = Reconstruct(Block(Stmt("JCN", Label("KLAAR"))));
+        Assert.Contains("JCN     KLAAR", src);
+        Assert.DoesNotContain("KLAAR:", src); // a jump target is an operand, not a definition
+    }
+
+    [Fact]
+    public void Stl_Label_Definition_Renders_At_Column_Zero_On_Same_Line()
+    {
+        var src = Reconstruct(Block(Stmt("NOP_0", Label("KLAAR"))));
+        var line = src.Split('\n').FirstOrDefault(l => l.StartsWith("KLAAR:", StringComparison.Ordinal));
+        Assert.NotNull(line);
+        Assert.StartsWith("KLAAR: NOP 0", line); // label + statement on the SAME line
+        Assert.DoesNotContain("      KLAAR", src); // the labeled line carries no 6-space indent
+    }
+
+    [Fact]
+    public void Stl_Jump_And_Label_Definition_Together_Putband_Shape()
+    {
+        // Mirrors the production PUTBAND network: condition, conditional jump, target label.
+        var src = Reconstruct(Block(
+            Stmt("A", Global("VOETJESAFVOER RUNNING")),
+            Stmt("JCN", Label("KLAAR")),
+            Stmt("NOP_0", Label("KLAAR"))));
+        Assert.Contains("A     \"VOETJESAFVOER RUNNING\"", src);
+        Assert.Contains("JCN     KLAAR", src);
+        Assert.Contains("KLAAR: NOP 0", src);
+    }
+
+    [Fact]
+    public void Stl_Label_Is_Not_Rendered_Twice_On_A_Labeled_Statement()
+    {
+        var src = Reconstruct(Block(Stmt("NOP_0", Label("KLAAR"))));
+        var count = 0;
+        var idx = src.IndexOf("KLAAR", StringComparison.Ordinal);
+        while (idx >= 0)
+        {
+            count++;
+            idx = src.IndexOf("KLAAR", idx + 1, StringComparison.Ordinal);
+        }
+        Assert.Equal(1, count); // once as the definition prefix, never again in the operand column
+    }
+
     // --------------------------------------------------------------- DB reconstruction
     // Real TIA Openness DB exports carry <SW.Blocks.GlobalDB> + <AttributeList>(Name/Number/
     // ProgrammingLanguage=DB) + <Interface><Sections xmlns="...Interface/v5"><Section Name="Static">
