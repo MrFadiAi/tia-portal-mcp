@@ -798,6 +798,37 @@ public class OpennessWorkerClient
         }
     }
 
+    /// <summary>
+    /// Control the PLC run state (start_plc / stop_plc). <paramref name="confirm"/> false =
+    /// dry run: the worker reads the current operating state and reports what would happen;
+    /// true = the transition is executed. The confirm flag is forwarded (unlike the tag
+    /// mutations, which are always confirmed by the time they reach the worker).
+    /// </summary>
+    public Task<string> StartPlcAsync(string? plcName, bool confirm, string? projectPath, int? tiaVersion = null)
+        => PlcRunStateRequestAsync("start_plc", plcName, confirm, projectPath, tiaVersion);
+
+    public Task<string> StopPlcAsync(string? plcName, bool confirm, string? projectPath, int? tiaVersion = null)
+        => PlcRunStateRequestAsync("stop_plc", plcName, confirm, projectPath, tiaVersion);
+
+    private Task<string> PlcRunStateRequestAsync(
+        string method, string? plcName, bool confirm, string? projectPath, int? tiaVersion)
+    {
+        return SendBoundProjectRequestAsync(
+            method,
+            projectPath,
+            request =>
+            {
+                request.PlcName = plcName;
+                request.Confirm = confirm;
+                if (confirm)
+                {
+                    request.AllowTiaConfirmations = true;
+                }
+            },
+            "{}",
+            tiaVersion);
+    }
+
     public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath, int? tiaVersion = null)
     {
         try

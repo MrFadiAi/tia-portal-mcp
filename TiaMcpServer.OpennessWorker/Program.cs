@@ -122,6 +122,8 @@ internal static class Program
                 "hmi_tag_trace"       => HmiTagTrace(request),
                 "export_hmi_screen"   => ExportHmiScreen(request),
                 "import_hmi_screen"   => ImportHmiScreen(request),
+                "start_plc"           => StartPlc(request),
+                "stop_plc"            => StopPlc(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
@@ -2027,6 +2029,57 @@ internal static class Program
             {
                 Success = true,
                 Payload = result
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // PLC run-state control (runtime-mutating, NOT a project-structure change — no cache
+    // invalidation needed). Without request.Confirm the handler is a dry run that reads the
+    // current operating state and reports what WOULD happen; with Confirm the transition runs.
+    private static WorkerResponse StartPlc(WorkerRequest request)
+        => PlcRunState(request, (project, confirm) => PlcOnlineService.Start(project, request.PlcName, confirm));
+
+    private static WorkerResponse StopPlc(WorkerRequest request)
+        => PlcRunState(request, (project, confirm) => PlcOnlineService.Stop(project, request.PlcName, confirm));
+
+    private static WorkerResponse PlcRunState(WorkerRequest request, Func<Project, bool, PlcOnlineResultInfo> control)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = control(session.Project, request.Confirm);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
             };
         }
         catch (EngineeringException ex)
