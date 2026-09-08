@@ -124,6 +124,8 @@ internal static class Program
                 "import_hmi_screen"   => ImportHmiScreen(request),
                 "start_plc"           => StartPlc(request),
                 "stop_plc"            => StopPlc(request),
+                "create_block_group"  => CreateBlockGroup(request),
+                "delete_block_group"  => DeleteBlockGroup(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
@@ -2076,6 +2078,64 @@ internal static class Program
             }
 
             var result = control(session.Project, request.Confirm);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // Block-folder lifecycle. Mutating (project structure): registered in WorkerCache.
+    // MutatingMethods so structural reads invalidate. Without request.Confirm the handler is a
+    // preview (existence check / blast-radius counts); with Confirm it executes.
+    private static WorkerResponse CreateBlockGroup(WorkerRequest request)
+        => BlockGroupLifecycle(request, (project, confirm) =>
+            BlockGroupService.Create(project, request.BlockPath!, confirm));
+
+    private static WorkerResponse DeleteBlockGroup(WorkerRequest request)
+        => BlockGroupLifecycle(request, (project, confirm) =>
+            BlockGroupService.Delete(project, request.BlockPath!, confirm));
+
+    private static WorkerResponse BlockGroupLifecycle(WorkerRequest request, Func<Project, bool, BlockGroupResultInfo> operation)
+    {
+        if (string.IsNullOrEmpty(request.BlockPath))
+        {
+            return Failure("BlockPath (the group path, e.g. 'PLC_1/Blocks/MyGroup') is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = operation(session.Project, request.Confirm);
             return new WorkerResponse
             {
                 Success = true,

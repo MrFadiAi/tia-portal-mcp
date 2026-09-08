@@ -829,6 +829,36 @@ public class OpennessWorkerClient
             tiaVersion);
     }
 
+    /// <summary>
+    /// Block-folder lifecycle. <paramref name="confirm"/> false = preview (existence check /
+    /// delete blast-radius counts); true = execute. Confirm is forwarded to the worker.
+    /// </summary>
+    public Task<string> CreateBlockGroupAsync(string groupPath, bool confirm, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "create_block_group",
+            projectPath,
+            request =>
+            {
+                request.BlockPath = groupPath;
+                request.Confirm = confirm;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}",
+            tiaVersion);
+
+    public Task<string> DeleteBlockGroupAsync(string groupPath, bool confirm, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "delete_block_group",
+            projectPath,
+            request =>
+            {
+                request.BlockPath = groupPath;
+                request.Confirm = confirm;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}",
+            tiaVersion);
+
     public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath, int? tiaVersion = null)
     {
         try

@@ -38,6 +38,7 @@ internal static class WorkerCache
         "add_network_device", "configure_network_device",
         "import_hmi_screen",
         "knowhow_unlock",
+        "create_block_group", "delete_block_group",
     };
 
     public static bool IsCacheable(string method) => CacheableMethods.Contains(method);

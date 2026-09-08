@@ -63,6 +63,21 @@ internal static class BlockTargetResolver
             : new ResolvedBlockTarget(plcSoftware.BlockGroup, block: null, address.BlockName);
     }
 
+    /// <summary>
+    /// Resolve the PARENT group of a deterministic block address (the group its last segment
+    /// lives in) for block-group management (create/delete_block_group). The target segment
+    /// itself does not need to exist.
+    /// </summary>
+    internal static PlcBlockGroup ResolveParentGroup(Project project, BlockAddress address)
+    {
+        PlcSoftware plcSoftware = FindPlcSoftware(project, address.PlcName);
+        PlcBlockGroup rootGroup = address.UsesSoftwareUnit
+            ? FindSoftwareUnit(plcSoftware, address.UnitName!).BlockGroup
+            : plcSoftware.BlockGroup;
+
+        return FindBlockGroup(rootGroup, address.FolderPath);
+    }
+
     private static PlcBlockGroup ResolveDeterministicBlockGroup(PlcSoftware plcSoftware, BlockAddress address)
     {
         PlcBlockGroup rootGroup = address.UsesSoftwareUnit
