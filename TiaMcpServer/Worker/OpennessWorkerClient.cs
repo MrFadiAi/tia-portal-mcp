@@ -274,7 +274,16 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> BrowseProjectTreeAsync(string? projectPath, string? plcName = null, int? tiaVersion = null, int? maxNodes = null, int? skip = null, TimeSpan? timeout = null)
+    public async Task<string> BrowseProjectTreeAsync(
+        string? projectPath,
+        string? plcName = null,
+        int? tiaVersion = null,
+        int? maxNodes = null,
+        int? skip = null,
+        int? depth = null,
+        string? startPath = null,
+        string? cursor = null,
+        TimeSpan? timeout = null)
     {
         try
         {
@@ -291,7 +300,10 @@ public class OpennessWorkerClient
                     PlcName = plcName,
                     TiaVersion = tiaVersion,
                     MaxNodes = maxNodes,
-                    Skip = skip
+                    Skip = skip,
+                    Depth = depth,
+                    StartPath = startPath,
+                    Cursor = cursor
                 }, timeout).ConfigureAwait(false);
 
             return response.Success

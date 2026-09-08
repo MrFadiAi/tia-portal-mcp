@@ -119,4 +119,13 @@ public class WorkerRequest
 
     /// <summary>browse_project_tree: nodes to skip (continuation offset from a previous page's nextSkip). null/0 = start.</summary>
     public int? Skip { get; set; }
+
+    /// <summary>browse_project_tree: max levels to descend (the start level counts as 1). null = unlimited (legacy behavior). Enables the bounded cursor-paged response.</summary>
+    public int? Depth { get; set; }
+
+    /// <summary>browse_project_tree: tree path of a node to start the traversal at (e.g. "MyPLC/Blocks"). null = whole tree. Enables the bounded cursor-paged response.</summary>
+    public string? StartPath { get; set; }
+
+    /// <summary>browse_project_tree: continuation cursor from a previous page's nextCursor. Enables the bounded cursor-paged response.</summary>
+    public string? Cursor { get; set; }
 }

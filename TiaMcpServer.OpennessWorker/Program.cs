@@ -53,11 +53,15 @@ internal static class Program
             }
 
             // Cacheable structural reads: serve from cache before opening a TIA session.
-            // Exception: a paginated browse_project_tree (maxNodes/skip) bypasses the cache — BuildKey
-            // does not include paging params, so a paged page would collide with the default whole-tree
-            // shape. Cache only the default (un-paged) browse.
+            // Exception: a paginated browse_project_tree (maxNodes/skip, or the bounded
+            // depth/startPath/cursor mode) bypasses the cache — BuildKey does not include paging
+            // params, so a paged page would collide with the default whole-tree shape. Cache only
+            // the default (un-paged) browse.
             bool pagedBrowse = request.Method == "browse_project_tree"
-                && (request.MaxNodes.HasValue || request.Skip.HasValue);
+                && (request.MaxNodes.HasValue || request.Skip.HasValue
+                    || request.Depth.HasValue
+                    || !string.IsNullOrEmpty(request.StartPath)
+                    || !string.IsNullOrEmpty(request.Cursor));
             string? cacheKey = null;
             if (WorkerCache.IsCacheable(request.Method) && !pagedBrowse)
             {
@@ -163,6 +167,14 @@ internal static class Program
             var tree = walker.Walk(session.Project, request.PlcName);
             Console.Error.WriteLine($"[BROWSE] Walk complete: {tree.Count} root device node(s).");
 
+            // Bounded traversal (depth/startPath/cursor): normalized order + depth/start pruning +
+            // cursor paging, capped at TreeCursorPaging.DefaultMaxNodes. Kept strictly separate
+            // from both legacy shapes below so they stay byte-identical for existing consumers.
+            if (request.Depth.HasValue || !string.IsNullOrEmpty(request.StartPath) || !string.IsNullOrEmpty(request.Cursor))
+            {
+                return BoundedBrowse(tree, request);
+            }
+
             // Paginate only when the caller opts in (maxNodes/skip). Default = whole tree, byte-identical
             // to the legacy response, so existing consumers are unaffected.
             if (request.MaxNodes.HasValue || request.Skip.HasValue)
@@ -198,6 +210,76 @@ internal static class Program
         {
             return Failure(ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Bounded browse_project_tree traversal (depth/startPath/cursor). The walk's raw composition
+    /// order is not guaranteed stable across calls, so the view is name-sorted FIRST — cursor
+    /// positions are only meaningful when every page sees the same order. The view is then pruned
+    /// to depth/startPath and paged (cap defaults to <see cref="TreeCursorPaging.DefaultMaxNodes"/>)
+    /// with an opaque continuation cursor. Response: { nodes, nodeCount, truncated, nextCursor }.
+    /// </summary>
+    private static WorkerResponse BoundedBrowse(List<ProjectTreeNode> tree, WorkerRequest request)
+    {
+        if (request.Depth is < 1)
+        {
+            return Failure("depth must be 1 or greater (the start level counts as 1).");
+        }
+
+        TreeCursorState? cursor = null;
+        if (!string.IsNullOrEmpty(request.Cursor))
+        {
+            try
+            {
+                cursor = TreeCursorPaging.DecodeCursor(request.Cursor!);
+            }
+            catch (TreeCursorException ex)
+            {
+                return Failure(ex.Message);
+            }
+
+            if (!TreeCursorPaging.CursorMatchesRequest(cursor, request.Depth, request.StartPath))
+            {
+                return Failure("The cursor was issued for a different browse query (depth/startPath changed). Restart paging from the first page (no cursor).");
+            }
+        }
+
+        var view = TreeCursorPaging.SortByName(tree);
+
+        if (request.Depth.HasValue)
+        {
+            view = TreeCursorPaging.PruneToDepth(view, request.Depth.Value);
+        }
+
+        if (!string.IsNullOrEmpty(request.StartPath))
+        {
+            if (!TreeCursorPaging.TryFindStartNode(view, request.StartPath!, out var startNode, out var rootNames))
+            {
+                return Failure(
+                    $"startPath '{request.StartPath}' was not found in the project tree. Valid top-level paths: {string.Join(", ", rootNames)}");
+            }
+
+            view = new List<ProjectTreeNode> { startNode! };
+        }
+
+        var flat = TreePagination.Flatten(view);
+        TreeCursorPage page;
+        try
+        {
+            page = TreeCursorPaging.TakePage(flat, request.MaxNodes, cursor, request.Depth, request.StartPath);
+        }
+        catch (TreeCursorException ex)
+        {
+            return Failure(ex.Message);
+        }
+
+        Console.Error.WriteLine(
+            $"[BROWSE] Bounded page: {page.Nodes.Count}/{page.NodeCount} node(s), truncated={page.Truncated}.");
+        return new WorkerResponse
+        {
+            Success = true,
+            Payload = JsonSerializer.Serialize(page, JsonOptions)
+        };
     }
 
     private static WorkerResponse ListPlcs(WorkerRequest request)
