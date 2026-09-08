@@ -426,6 +426,85 @@ public class OpennessWorkerClient
         return JsonSerializer.Serialize(result, JsonOptions);
     }
 
+    // ------------------------------------------------------------------ read_batch
+
+    /// <summary>
+    /// Run up to <see cref="ReadBatchCatalog.MaxBatchSize"/> whitelisted READ operations in one
+    /// call. Each item is routed through the EXISTING per-op client method, so version routing,
+    /// the persistent worker, the export fallback chain and source reconstruction all apply.
+    /// Validation runs first (an invalid batch makes no worker calls); operations run
+    /// sequentially with per-item isolation (one failure never aborts the rest); results are
+    /// capped by <see cref="ReadBatchBudget"/> (20k chars per item, 150k per batch — later items
+    /// are omitted, failures never are).
+    /// </summary>
+    public async Task<string> ReadBatchAsync(List<ReadBatchOperation> operations)
+    {
+        var validation = ReadBatchCatalog.Validate(operations);
+        if (!validation.IsValid)
+        {
+            return JsonSerializer.Serialize(new
+            {
+                tool = "read_batch",
+                error = "batch validation failed — no operations were executed",
+                errors = validation.Errors,
+            }, JsonOptions);
+        }
+
+        var results = new List<ReadBatchOperationResult>(operations.Count);
+        foreach (var op in operations)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            string raw;
+            try
+            {
+                raw = await RunReadOperation(op).ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                // Per-item isolation: any unexpected failure becomes that item's error text.
+                results.Add(new ReadBatchOperationResult
+                {
+                    OperationId = op.OperationId,
+                    Operation = op.Operation,
+                    Status = "failed",
+                    Result = ex.Message,
+                });
+                continue;
+            }
+
+            stopwatch.Stop();
+            var failed = raw.StartsWith("Error:", StringComparison.Ordinal);
+            results.Add(new ReadBatchOperationResult
+            {
+                OperationId = op.OperationId,
+                Operation = op.Operation,
+                Status = failed ? "failed" : "succeeded",
+                Ms = stopwatch.ElapsedMilliseconds,
+                Result = failed ? raw : ReadBatchBudget.ApplyItemCap(raw),
+            });
+        }
+
+        ReadBatchBudget.ApplyBatchCap(results);
+
+        return JsonSerializer.Serialize(ReadBatchResponse.For(results), JsonOptions);
+    }
+
+    /// <summary>Dispatch one whitelisted operation to its existing client method. The catalog
+    /// has already verified the required fields are present, so the null-forgiving args are
+    /// safe; the default arm is unreachable but keeps the method total.</summary>
+    private async Task<string> RunReadOperation(ReadBatchOperation op)
+        => (op.Operation ?? "").ToLowerInvariant() switch
+        {
+            "get_block_content" => await GetBlockContentAsync(op.BlockPath!, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "read_block_interface" => await ReadBlockInterfaceAsync(op.BlockPath!, op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "list_blocks" => await ListBlocksAsync(op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "list_tag_tables" => await ListTagTablesAsync(op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "find_tags" => await FindTagsAsync(op.Query!, op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "search_code" => await SearchCodeAsync(op.Query!, ignoreCase: true, op.ContextLines ?? 2, op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            "tag_usage" => await TagUsageAsync(op.Tag!, op.PlcName, op.ProjectPath, op.TiaVersion).ConfigureAwait(false),
+            _ => "Error: unknown operation '" + op.Operation + "'",
+        };
+
     public async Task<string> ListPlcTypesAsync(string? plcName, string? projectPath, int? tiaVersion = null)
     {
         try
