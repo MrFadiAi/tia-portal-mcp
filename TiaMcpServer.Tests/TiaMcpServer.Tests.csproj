@@ -43,5 +43,8 @@
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ProjectReopenPolicy.cs" Link="Worker\ProjectReopenPolicy.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\BlockRereadResponse.cs" Link="Worker\BlockRereadResponse.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ShownBlocksCache.cs" Link="Worker\ShownBlocksCache.cs" />
+    <!-- Doctor diagnostics (host-side, Siemens-free): link-compiled for pure-verdict testing. -->
+    <Compile Include="..\TiaMcpServer\Diagnostics\**\*.cs" LinkBase="Diagnostics" />
+    <Compile Include="..\TiaMcpServer\Tools\DoctorTool.cs" Link="Host\DoctorTool.cs" />
   </ItemGroup>
 </Project>

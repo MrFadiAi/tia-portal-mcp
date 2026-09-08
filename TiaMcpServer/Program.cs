@@ -90,6 +90,16 @@ namespace TiaMcpServer
 
         private static async Task Main(string[] args)
         {
+            // `doctor` / `--doctor`: self-diagnosis CLI (host-side only, no TIA interaction) —
+            // prints the report and exits 0, or 1 when any check failed.
+            if (args.Any(a => a is "doctor" or "--doctor"))
+            {
+                var report = TiaMcpServer.Diagnostics.DoctorFactory.CreateDefault().Run();
+                Console.Out.WriteLine(TiaMcpServer.Diagnostics.DoctorTextRenderer.Render(report));
+                Environment.ExitCode = report.Status == TiaMcpServer.Diagnostics.DiagnosticStatus.Fail ? 1 : 0;
+                return;
+            }
+
             var builder = Host.CreateApplicationBuilder(args);
             builder.Logging.AddConsole(opts => opts.LogToStandardErrorThreshold = LogLevel.Trace);
             builder.Services.AddSingleton(new ProjectSessionBinding(ResolveStartupProjectPath(args)));
