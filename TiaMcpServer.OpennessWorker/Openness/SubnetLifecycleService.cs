@@ -109,15 +109,22 @@ public static class SubnetLifecycleService
         var subnet = ResolveUnique(project, name, out var networkType);
         result.NetworkType = networkType;
         result.SubnetId = ReadSubnetId(subnet);
-        CollectConnectedNodes(subnet, result.ConnectedNodes);
 
-        if (result.ConnectedNodes.Count > 0 && !force)
+        var nodeRead = ReadConnectedNodes(subnet, name);
+        result.ConnectedNodes.AddRange(nodeRead.Nodes);
+        var verdict = ConnectedNodeGuard.Evaluate(nodeRead.Status, result.ConnectedNodes.Count);
+
+        if (verdict.GuardEngaged && !force)
         {
-            result.Message =
-                $"Refused: subnet '{name}' still has {result.ConnectedNodes.Count} connected node(s): " +
-                $"{string.Join(", ", result.ConnectedNodes)}. " +
-                "Disconnect them in TIA Portal first, or re-run with force=true to delete the subnet anyway " +
-                "(their network interfaces will become subnet-less).";
+            result.Message = verdict.RequiresManualVerification
+                ? $"Refused: {ConnectedNodeGuard.UnverifiableNote} for subnet '{name}' — " +
+                  "the node list could not be read, so the subnet may still have connected interfaces. " +
+                  "Verify manually in TIA Portal, or re-run with force=true to delete it anyway " +
+                  "(their network interfaces will become subnet-less)."
+                : $"Refused: subnet '{name}' still has {result.ConnectedNodes.Count} connected node(s): " +
+                  $"{string.Join(", ", result.ConnectedNodes)}. " +
+                  "Disconnect them in TIA Portal first, or re-run with force=true to delete the subnet anyway " +
+                  "(their network interfaces will become subnet-less).";
             return result;
         }
 
@@ -125,9 +132,11 @@ public static class SubnetLifecycleService
         {
             result.Message =
                 $"DRY RUN — would delete subnet '{name}'" +
-                (result.ConnectedNodes.Count > 0
-                    ? $" and detach {result.ConnectedNodes.Count} connected node(s) ({string.Join(", ", result.ConnectedNodes)})"
-                    : " (no connected nodes)") + ".";
+                (verdict.RequiresManualVerification
+                    ? $" (NOTE: {ConnectedNodeGuard.UnverifiableNote})"
+                    : result.ConnectedNodes.Count > 0
+                        ? $" and detach {result.ConnectedNodes.Count} connected node(s) ({string.Join(", ", result.ConnectedNodes)})"
+                        : " (no connected nodes)") + ".";
             return result;
         }
 
@@ -136,9 +145,11 @@ public static class SubnetLifecycleService
         result.Applied = true;
         result.Message =
             $"Deleted subnet '{name}'" +
-            (result.ConnectedNodes.Count > 0
-                ? $" ({result.ConnectedNodes.Count} connected node(s) were detached)"
-                : " (no connected nodes)") + ".";
+            (verdict.RequiresManualVerification
+                ? $" (NOTE: {ConnectedNodeGuard.UnverifiableNote})"
+                : result.ConnectedNodes.Count > 0
+                    ? $" ({result.ConnectedNodes.Count} connected node(s) were detached)"
+                    : " (no connected nodes)") + ".";
         return result;
     }
 
@@ -202,15 +213,45 @@ public static class SubnetLifecycleService
     private static string? ReadSubnetId(Subnet subnet)
         => HardwareConfigReader.ReadPropertyOrAttribute(subnet, "SubnetId", "subnet id");
 
-    private static void CollectConnectedNodes(Subnet subnet, List<string> target)
+    /// <summary>
+    /// Reads the subnet's connected nodes WITHOUT <see cref="HardwareConfigReader"/>'s
+    /// silent-degradation contract (ReadEnumerableProperty swallows every failure into an
+    /// empty sequence, which is right for reads but would silently weaken the delete guard):
+    /// any failure — missing/not-enumerable Nodes property, or a Siemens exception during
+    /// enumeration — is surfaced as <see cref="ConnectedNodeReadStatus.Unreadable"/> (keeping
+    /// any partially collected names) so the guard engages instead of reporting a fake "0 nodes".
+    /// </summary>
+    private static ConnectedNodeReadResult ReadConnectedNodes(Subnet subnet, string subnetName)
     {
-        foreach (var node in HardwareConfigReader.ReadEnumerableProperty(subnet, "Nodes", $"subnet '{subnet.Name}' nodes"))
+        var nodes = new List<string>();
+        try
         {
-            var nodeName = HardwareConfigReader.ReadPropertyOrAttribute(node, "Name", "connected node");
-            if (!string.IsNullOrWhiteSpace(nodeName))
+            var nodesValue = subnet.GetType().GetProperty("Nodes")?.GetValue(subnet);
+            if (nodesValue is not System.Collections.IEnumerable enumerable)
             {
-                target.Add(nodeName!);
+                Console.Error.WriteLine(
+                    $"[SUBNET] Nodes of subnet '{subnetName}' is missing or not enumerable on this TIA version — delete guard treated as engaged.");
+                return ConnectedNodeReadResult.Unreadable(nodes);
             }
+
+            foreach (var node in enumerable)
+            {
+                var nodeName = node.GetType().GetProperty("Name")?.GetValue(node) as string;
+                if (!string.IsNullOrWhiteSpace(nodeName))
+                {
+                    nodes.Add(nodeName);
+                }
+            }
+
+            return ConnectedNodeReadResult.Readable(nodes);
+        }
+        catch (Exception ex) when (ex is EngineeringException
+                                      or System.Reflection.TargetInvocationException
+                                      or InvalidOperationException)
+        {
+            Console.Error.WriteLine(
+                $"[SUBNET] Failed to enumerate connected nodes of subnet '{subnetName}': {ex.Message} — delete guard treated as engaged.");
+            return ConnectedNodeReadResult.Unreadable(nodes);
         }
     }
 
