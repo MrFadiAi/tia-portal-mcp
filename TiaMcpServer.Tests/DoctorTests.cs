@@ -283,9 +283,20 @@ public class DoctorTests
     private static readonly DateTimeOffset T0 = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public void WorkerStale_OlderThanHost_IsStale()
+    public void WorkerStale_MinutesOfSkew_IsFresh_NormalBuildOrdering()
     {
-        var (stale, reason) = WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(-5), T0);
+        // dotnet builds the workers first and the host last, so a worker a few minutes older
+        // than the host is a normal fresh launch (was a false-positive WARN before the threshold).
+        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(-3), T0).Stale);
+        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(-5), T0).Stale);
+        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0, T0).Stale);
+        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(5), T0).Stale);
+    }
+
+    [Fact]
+    public void WorkerStale_SkewBeyondThreshold_IsStale()
+    {
+        var (stale, reason) = WorkerBinariesCheck.EvaluateStaleness(T0.AddHours(-2), T0);
 
         Assert.True(stale);
         Assert.NotNull(reason);
@@ -293,10 +304,11 @@ public class DoctorTests
     }
 
     [Fact]
-    public void WorkerStale_EqualOrNewerThanHost_IsFresh()
+    public void WorkerStale_ThresholdBoundary_TenMinutesExactly_IsFresh()
     {
-        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0, T0).Stale);
-        Assert.False(WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(5), T0).Stale);
+        var (stale, _) = WorkerBinariesCheck.EvaluateStaleness(T0.AddMinutes(-10), T0);
+
+        Assert.False(stale);
     }
 
     [Fact]
