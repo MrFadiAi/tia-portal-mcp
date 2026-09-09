@@ -7,9 +7,12 @@ public sealed class ReadBatchOperationResult
 {
     public string OperationId { get; set; } = "";
     public string Operation { get; set; } = "";
-    public string Status { get; set; } = ""; // succeeded | failed | omitted
+    public string Status { get; set; } = ""; // succeeded | failed | omitted | skipped (write batch)
     public long Ms { get; set; }
     public string Result { get; set; } = "";
+    /// <summary>Optional structured warnings (write batch). Null for read_batch items; the
+    /// payload ladder truncates these BEFORE dropping any failure information.</summary>
+    public List<string>? Warnings { get; set; }
 }
 
 /// <summary>
