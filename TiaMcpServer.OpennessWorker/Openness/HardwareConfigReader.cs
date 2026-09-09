@@ -10,6 +10,14 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 public static class HardwareConfigReader
 {
     public static HardwareConfigInfo Read(Project project)
+        => Read(project, ioState: null);
+
+    /// <summary>
+    /// Extended read: with a non-null <paramref name="ioState"/> every device item additionally
+    /// reports ioDetails (addresses + channels, plus exact tag matches when a tag index was
+    /// resolved). With a null ioState the output is byte-identical to the legacy read.
+    /// </summary>
+    public static HardwareConfigInfo Read(Project project, IoReadState? ioState)
     {
         var result = new HardwareConfigInfo();
 
@@ -17,7 +25,7 @@ public static class HardwareConfigReader
         {
             try
             {
-                result.Devices.Add(ReadDevice(device));
+                result.Devices.Add(ReadDevice(device, ioState));
             }
             catch (EngineeringException ex)
             {
@@ -40,7 +48,7 @@ public static class HardwareConfigReader
         return result;
     }
 
-    private static DeviceInfo ReadDevice(Device device)
+    private static DeviceInfo ReadDevice(Device device, IoReadState? ioState)
     {
         var deviceInfo = new DeviceInfo
         {
@@ -48,12 +56,12 @@ public static class HardwareConfigReader
             TypeIdentifier = ReadString(() => device.TypeIdentifier, $"device '{device.Name}' type identifier")
         };
 
-        deviceInfo.Items = ReadDeviceItems(device.DeviceItems, $"device '{deviceInfo.Name}'");
+        deviceInfo.Items = ReadDeviceItems(device.DeviceItems, $"device '{deviceInfo.Name}'", ioState);
 
         return deviceInfo;
     }
 
-    private static List<DeviceItemInfo> ReadDeviceItems(DeviceItemComposition items, string ownerDescription)
+    private static List<DeviceItemInfo> ReadDeviceItems(DeviceItemComposition items, string ownerDescription, IoReadState? ioState)
     {
         var result = new List<DeviceItemInfo>();
 
@@ -61,7 +69,7 @@ public static class HardwareConfigReader
         {
             try
             {
-                result.Add(ReadDeviceItem(item));
+                result.Add(ReadDeviceItem(item, ioState));
             }
             catch (EngineeringException ex)
             {
@@ -72,7 +80,7 @@ public static class HardwareConfigReader
         return result;
     }
 
-    private static DeviceItemInfo ReadDeviceItem(DeviceItem item)
+    private static DeviceItemInfo ReadDeviceItem(DeviceItem item, IoReadState? ioState)
     {
         var itemName = ReadString(() => item.Name, "device item name");
         var itemInfo = new DeviceItemInfo
@@ -89,7 +97,15 @@ public static class HardwareConfigReader
             itemInfo.NetworkInterfaces = networkInterfaces;
         }
 
-        var children = ReadDeviceItems(item.DeviceItems, $"device item '{itemName}'");
+        if (ioState is not null && ioState.Budget.CanTake())
+        {
+            var ioDetails = HardwareIoMapReader.Read(item, itemName, ioState.Notes, ioState.TagIndex);
+            itemInfo.IoDetails = ioDetails;
+            ioState.Budget.Take(HardwareIoMapReader.EntryCount(ioDetails));
+            ioState.NoteTruncationOnce();
+        }
+
+        var children = ReadDeviceItems(item.DeviceItems, $"device item '{itemName}'", ioState);
         if (children.Count > 0)
         {
             itemInfo.Items = children;

@@ -141,4 +141,13 @@ public class WorkerRequest
     /// <summary>delete_subnet: delete even though devices are still connected to the subnet
     /// (their interfaces become subnet-less). Without force a non-empty subnet is refused.</summary>
     public bool Force { get; set; }
+
+    /// <summary>read_hardware_config: include per-device-item I/O details (addresses + channels).
+    /// Default false keeps the payload byte-identical to earlier versions.</summary>
+    public bool IncludeIoDetails { get; set; }
+
+    /// <summary>read_hardware_config: match each channel against the selected PLC's tag tables
+    /// (exact absolute-address match; requires the channel's controller association). Implies
+    /// IncludeIoDetails. PlcName selects the PLC (required when the project has more than one).</summary>
+    public bool IncludeTagMatches { get; set; }
 }

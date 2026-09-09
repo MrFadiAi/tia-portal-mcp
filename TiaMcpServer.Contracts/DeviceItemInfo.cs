@@ -15,4 +15,11 @@ public class DeviceItemInfo
     public List<NetworkInterfaceInfo>? NetworkInterfaces { get; set; }
 
     public List<DeviceItemInfo>? Items { get; set; }
+
+    /// <summary>
+    /// Structured I/O evidence (addresses + channels) for this device item, present ONLY when the
+    /// read_hardware_config request set includeIoDetails/includeTagMatches — a default read omits
+    /// it so its payload stays byte-identical to earlier versions.
+    /// </summary>
+    public DeviceItemIoDetailsInfo? IoDetails { get; set; }
 }

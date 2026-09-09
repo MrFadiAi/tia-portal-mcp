@@ -699,7 +699,36 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
-            var config = HardwareConfigReader.Read(session.Project);
+            // I/O-details extension (additive): without the flags the payload is byte-identical
+            // to the legacy read. includeTagMatches implies includeIoDetails and resolves the
+            // tag index up front (unique PLC selection; notes explain any skipped matching).
+            var notes = new List<string>();
+            IoTagIndex? tagIndex = null;
+            string? tagMatchSource = null;
+            if (request.IncludeTagMatches)
+            {
+                tagIndex = IoTagIndexResolver.Resolve(session.Project, request.PlcName, notes, out tagMatchSource);
+            }
+
+            var ioState = request.IncludeIoDetails || request.IncludeTagMatches
+                ? new IoReadState(tagIndex, notes, new IoDetailBudget())
+                : null;
+
+            var config = HardwareConfigReader.Read(session.Project, ioState);
+            if (ioState is not null)
+            {
+                config.IoTagMatchSource = tagMatchSource;
+                if (notes.Count > 0)
+                {
+                    config.IoNotes = notes;
+                }
+
+                if (ioState.Budget.Truncated)
+                {
+                    config.IoDetailsTruncated = true;
+                }
+            }
+
             return new WorkerResponse
             {
                 Success = true,

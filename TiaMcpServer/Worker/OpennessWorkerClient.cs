@@ -771,7 +771,12 @@ public class OpennessWorkerClient
         }
     }
 
-    public async Task<string> ReadHardwareConfigAsync(string? projectPath, int? tiaVersion = null)
+    public async Task<string> ReadHardwareConfigAsync(
+        string? projectPath,
+        int? tiaVersion = null,
+        bool includeIoDetails = false,
+        bool includeTagMatches = false,
+        string? plcName = null)
     {
         try
         {
@@ -785,7 +790,10 @@ public class OpennessWorkerClient
                 {
                     Method = "read_hardware_config",
                     ProjectPath = effectiveProjectPath,
-                    TiaVersion = tiaVersion
+                    TiaVersion = tiaVersion,
+                    IncludeIoDetails = includeIoDetails,
+                    IncludeTagMatches = includeTagMatches,
+                    PlcName = plcName
                 }).ConfigureAwait(false);
 
             return response.Success
