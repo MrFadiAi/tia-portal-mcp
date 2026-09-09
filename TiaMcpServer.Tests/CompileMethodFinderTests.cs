@@ -107,4 +107,82 @@ public class CompileMethodFinderTests
     {
         Assert.Null(CompileMethodFinder.Find(typeof(int)));
     }
+
+    // --- TryGetService: the V16/V18 compile route -------------------------------------------
+    // The real V18 PlcSoftware declares NO Compile method — the compiler is obtained as a
+    // service via the object's generic GetService<T>(). These pin the reflection helper
+    // compile_check relies on before it ever falls back to the Compile-method hunt.
+
+    private interface IPingService
+    {
+        string Ping();
+    }
+
+    private sealed class PingService : IPingService
+    {
+        public string Ping() => "pong";
+    }
+
+    private sealed class HasGenericGetService
+    {
+        public T? GetService<T>() where T : class
+            => typeof(T) == typeof(IPingService) ? (T)(object)new PingService() : null;
+    }
+
+    private sealed class GetServiceForAnything
+    {
+        public T GetService<T>() where T : class => (T)Activator.CreateInstance(typeof(T))!;
+    }
+
+    private sealed class NoGetServiceAtAll
+    {
+        public int Value => 1;
+    }
+
+    private sealed class GetServiceThrows
+    {
+        public T GetService<T>() where T : class => throw new InvalidOperationException("no service");
+    }
+
+    [Fact]
+    public void TryGetService_Resolves_The_Requested_Service()
+    {
+        var service = CompileMethodFinder.TryGetService(new HasGenericGetService(), typeof(IPingService));
+
+        var ping = Assert.IsAssignableFrom<IPingService>(service);
+        Assert.Equal("pong", ping.Ping());
+    }
+
+    [Fact]
+    public void TryGetService_Returns_Null_When_No_Generic_GetService_Exists()
+    {
+        Assert.Null(CompileMethodFinder.TryGetService(new NoGetServiceAtAll(), typeof(IPingService)));
+    }
+
+    [Fact]
+    public void TryGetService_Returns_Null_When_The_Service_Is_Unavailable()
+    {
+        // GetService<T> exists but returns null for the requested marker → caller must fall
+        // through to the Compile-method routes, not treat this as "compilable"
+        Assert.Null(CompileMethodFinder.TryGetService(new HasGenericGetService(), typeof(IDisposable)));
+    }
+
+    [Fact]
+    public void TryGetService_Unwraps_The_Inner_Exception_Thrown_By_GetService()
+    {
+        // an EngineeringException from Openness must surface as itself (so callers' catch
+        // filters match), never wrapped in TargetInvocationException
+        var ex = Assert.Throws<InvalidOperationException>(
+            () => CompileMethodFinder.TryGetService(new GetServiceThrows(), typeof(IPingService)));
+        Assert.Equal("no service", ex.Message);
+    }
+
+    [Fact]
+    public void TryGetService_Closes_Over_The_Requested_Marker_Type()
+    {
+        // the generic method must be closed with the SERVICE type, not the target's type —
+        // a wrong closure silently resolves the wrong service
+        var service = CompileMethodFinder.TryGetService(new GetServiceForAnything(), typeof(PingService));
+        Assert.IsType<PingService>(service);
+    }
 }

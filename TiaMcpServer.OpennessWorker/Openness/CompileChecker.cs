@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using Siemens.Engineering;
 using Siemens.Engineering.Compiler;
-using Siemens.Engineering.HW;
-using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using Siemens.Engineering.SW.Blocks;
 using TiaMcpServer.Contracts;
@@ -70,7 +68,7 @@ public static class CompileChecker
 
     private static string? FindFirstDeviceName(Project project)
     {
-        return FindAllPlcSoftware(project, null).FirstOrDefault()?.DeviceName;
+        return PlcSoftwareFinder.Enumerate(project).Select(pair => pair.Device.Name).FirstOrDefault();
     }
 
     private static CompileCheckReport CompilePlcSoftware(Project project, string? plcName)
@@ -102,8 +100,17 @@ public static class CompileChecker
 
         if (report.Plcs.Count == 0)
         {
-            var detail = plcName is null ? string.Empty : $" named '{plcName}'";
-            throw new InvalidOperationException($"No PLC software{detail} was found in the project.");
+            if (plcName is null)
+            {
+                throw new InvalidOperationException("No PLC software was found in the project.");
+            }
+
+            // Miss lists both name forms of the available PLCs (same message shape as the
+            // other PLC-targeting tools), so the retry uses an accepted name.
+            throw new InvalidOperationException(PlcNameMatcher.BuildNotFoundMessage(
+                plcName,
+                PlcSoftwareFinder.Enumerate(project)
+                    .Select(pair => (pair.Device.Name, pair.Plc.Name))));
         }
 
         foreach (var plc in report.Plcs)
@@ -116,48 +123,17 @@ public static class CompileChecker
         return report;
     }
 
+    /// <summary>
+    /// Tolerant PLC resolution (device name OR software name, via the shared
+    /// <see cref="PlcSoftwareFinder.Filter"/> rule) — compile_check must accept the same names
+    /// every other PLC-targeting tool accepts, including the plcName the UDT-inconsistency
+    /// recovery hint prints (which is often the software name, e.g. PLF-00A-PLC_MASTER).
+    /// </summary>
     private static IEnumerable<DiscoveredPlcSoftware> FindAllPlcSoftware(Project project, string? plcName)
     {
-        foreach (Device device in project.Devices)
+        foreach (var (device, software) in PlcSoftwareFinder.Filter(project, plcName))
         {
-            if (plcName is not null &&
-                !string.Equals(device.Name, plcName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            foreach (PlcSoftware plcSoftware in FindPlcSoftwareInDeviceItems(device.DeviceItems))
-            {
-                yield return new DiscoveredPlcSoftware(device.Name, plcSoftware);
-            }
-        }
-    }
-
-    private static IEnumerable<PlcSoftware> FindPlcSoftwareInDeviceItems(DeviceItemComposition items)
-    {
-        foreach (DeviceItem item in items)
-        {
-            PlcSoftware? plcSoftware = null;
-
-            try
-            {
-                var container = item.GetService<SoftwareContainer>();
-                plcSoftware = container?.Software as PlcSoftware;
-            }
-            catch (EngineeringException ex)
-            {
-                Console.Error.WriteLine($"Skipping a device item while locating PLC software: {ex.Message}");
-            }
-
-            if (plcSoftware is not null)
-            {
-                yield return plcSoftware;
-            }
-
-            foreach (var child in FindPlcSoftwareInDeviceItems(item.DeviceItems))
-            {
-                yield return child;
-            }
+            yield return new DiscoveredPlcSoftware(device.Name, software);
         }
     }
 
@@ -174,10 +150,24 @@ public static class CompileChecker
     }
 
     /// <summary>The ONE compile route (compile_check) — also used by the cross-reference
-    /// auto-compile so both paths find the same Compile method (see
-    /// <see cref="CompileMethodFinder"/>) and share the COM late-binding fallback.</summary>
+    /// auto-compile so both paths take the same route: FIRST the <see cref="ICompilable"/>
+    /// service (the real V16/V18 shape — PlcSoftware declares no Compile method at all),
+    /// then the <see cref="CompileMethodFinder"/> method hunt, then the COM late-binding
+    /// fallback.</summary>
     internal static CompilerResult CompileObject(object compilable)
     {
+        // Route 1 — the compiler as a SERVICE: GetService<ICompilable>() → Compile().
+        // Verified against the real V18 PublicAPI DLL: PlcSoftware's declared members are
+        // properties + UpdateProgram + GetService[T] only — no Compile method anywhere. The
+        // runtime interfaces dump (IEngineeringServiceProvider, ...) confirms the service
+        // route is the one Openness provides. V21 wrappers that declare Compile directly
+        // resolve the service too, so this route runs first for every version.
+        var service = TryResolveCompilableService(compilable);
+        if (service is not null)
+        {
+            return service.Compile();
+        }
+
         var compileMethod = CompileMethodFinder.Find(compilable.GetType());
         if (compileMethod == null)
         {
@@ -206,8 +196,8 @@ public static class CompileChecker
             var runtimeType = compilable.GetType().FullName ?? compilable.GetType().Name;
             var interfaces = string.Join(", ", compilable.GetType().GetInterfaces().Select(i => i.Name));
             throw new InvalidOperationException(
-                $"Object '{runtimeType}' does not expose a Compile method. " +
-                $"Implemented interfaces: [{interfaces}]. " +
+                $"Object '{runtimeType}' exposes neither a Compile method nor an ICompilable service " +
+                $"(GetService failed or returned null). Implemented interfaces: [{interfaces}]. " +
                 "The PLC software may not support compilation through the Openness API in this state.");
         }
 
@@ -219,6 +209,21 @@ public static class CompileChecker
         {
             ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             throw;
+        }
+    }
+
+    /// <summary>Resolve the object's compiler service, tolerating "no service for this
+    /// object" (Openness throws an EngineeringException) — null means fall through to the
+    /// Compile-method routes.</summary>
+    private static ICompilable? TryResolveCompilableService(object compilable)
+    {
+        try
+        {
+            return CompileMethodFinder.TryGetService(compilable, typeof(ICompilable)) as ICompilable;
+        }
+        catch (EngineeringException)
+        {
+            return null;
         }
     }
 
