@@ -41,32 +41,7 @@ public static class PlcTypeExporter
     }
 
     private static PlcSoftware FindPlcSoftware(Project project, string? plcName)
-    {
-        foreach (Device device in project.Devices)
-        {
-            if (plcName is not null && !string.Equals(device.Name, plcName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            foreach (DeviceItem item in device.DeviceItems)
-            {
-                try
-                {
-                    var container = item.GetService<SoftwareContainer>();
-                    if (container?.Software is PlcSoftware plcSoftware)
-                    {
-                        return plcSoftware;
-                    }
-                }
-                catch (EngineeringException) { }
-            }
-        }
-
-        throw plcName is null
-            ? new InvalidOperationException("No PLC software found in project.")
-            : new InvalidOperationException($"PLC '{plcName}' not found in project.");
-    }
+        => PlcSoftwareFinder.ResolveUnique(project, plcName).Plc;
 
     /// <summary>
     /// Locate a PLC type and the group that OWNS it (needed by update_type_content, which

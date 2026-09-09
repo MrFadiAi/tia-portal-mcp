@@ -45,6 +45,7 @@
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\PlcTypeNamePreflight.cs" Link="Worker\PlcTypeNamePreflight.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\SubnetLifecycleValidator.cs" Link="Worker\SubnetLifecycleValidator.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ConnectedNodeGuard.cs" Link="Worker\ConnectedNodeGuard.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\PlcNameMatcher.cs" Link="Worker\PlcNameMatcher.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\IoDetailBudget.cs" Link="Worker\IoDetailBudget.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ProjectReopenPolicy.cs" Link="Worker\ProjectReopenPolicy.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\BlockRereadResponse.cs" Link="Worker\BlockRereadResponse.cs" />

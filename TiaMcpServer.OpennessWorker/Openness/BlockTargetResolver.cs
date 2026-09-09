@@ -88,52 +88,7 @@ internal static class BlockTargetResolver
     }
 
     private static PlcSoftware FindPlcSoftware(Project project, string? plcName)
-    {
-        foreach (Device device in project.Devices)
-        {
-            if (plcName is not null && !string.Equals(device.Name, plcName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            foreach (PlcSoftware plcSoftware in FindPlcSoftwareInDeviceItems(device.DeviceItems))
-            {
-                return plcSoftware;
-            }
-        }
-
-        return plcName is null
-            ? throw new InvalidOperationException("No PLC software found in project.")
-            : throw new InvalidOperationException($"PLC '{plcName}' not found in project.");
-    }
-
-    private static IEnumerable<PlcSoftware> FindPlcSoftwareInDeviceItems(DeviceItemComposition items)
-    {
-        foreach (DeviceItem item in items)
-        {
-            PlcSoftware? plcSoftware = null;
-
-            try
-            {
-                var container = item.GetService<SoftwareContainer>();
-                plcSoftware = container?.Software as PlcSoftware;
-            }
-            catch (EngineeringException ex)
-            {
-                Console.Error.WriteLine($"Skipping a device item while locating PLC software: {ex.Message}");
-            }
-
-            if (plcSoftware is not null)
-            {
-                yield return plcSoftware;
-            }
-
-            foreach (var child in FindPlcSoftwareInDeviceItems(item.DeviceItems))
-            {
-                yield return child;
-            }
-        }
-    }
+        => PlcSoftwareFinder.ResolveUnique(project, plcName).Plc;
 
     private static PlcUnit FindSoftwareUnit(PlcSoftware plcSoftware, string unitName)
     {
