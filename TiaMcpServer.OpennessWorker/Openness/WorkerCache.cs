@@ -40,6 +40,7 @@ internal static class WorkerCache
         "knowhow_unlock",
         "create_block_group", "delete_block_group",
         "update_type_content",
+        "create_subnet", "update_subnet", "delete_subnet",
     };
 
     public static bool IsCacheable(string method) => CacheableMethods.Contains(method);

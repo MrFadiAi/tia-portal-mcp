@@ -128,6 +128,9 @@ internal static class Program
                 "delete_block_group"  => DeleteBlockGroup(request),
                 "get_type_content"    => GetTypeContent(request),
                 "update_type_content" => UpdateTypeContent(request),
+                "create_subnet"       => CreateSubnet(request),
+                "update_subnet"       => UpdateSubnet(request),
+                "delete_subnet"       => DeleteSubnet(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
@@ -2122,6 +2125,92 @@ internal static class Program
             return Failure("BlockPath (the group path, e.g. 'PLC_1/Blocks/MyGroup') is required.");
         }
 
+        try
+        {
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = operation(session.Project, request.Confirm);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // Subnet lifecycle. Mutating (project structure/network): registered in WorkerCache
+    // MutatingMethods so structural reads invalidate. Pure validation runs BEFORE a session is
+    // opened (invalid requests never touch TIA Portal); without request.Confirm the service is a
+    // read-only preview. delete_subnet additionally refuses a non-empty subnet without Force.
+    private static WorkerResponse CreateSubnet(WorkerRequest request)
+    {
+        var errors = SubnetLifecycleValidator.ValidateCreate(
+            request.SubnetName, request.SubnetNetworkType, request.SubnetHighestAddress, request.SubnetTransmissionSpeed);
+        if (errors.Count > 0)
+        {
+            return Failure(string.Join(" ", errors));
+        }
+
+        return SubnetLifecycle(request, (project, confirm) => SubnetLifecycleService.Create(
+            project, request.SubnetName!, request.SubnetNetworkType!,
+            request.SubnetHighestAddress, request.SubnetTransmissionSpeed, confirm));
+    }
+
+    private static WorkerResponse UpdateSubnet(WorkerRequest request)
+    {
+        var errors = SubnetLifecycleValidator.ValidateUpdate(
+            request.SubnetName, request.NewName, request.SubnetHighestAddress, request.SubnetTransmissionSpeed);
+        if (errors.Count > 0)
+        {
+            return Failure(string.Join(" ", errors));
+        }
+
+        return SubnetLifecycle(request, (project, confirm) => SubnetLifecycleService.Update(
+            project, request.SubnetName!, request.NewName,
+            request.SubnetHighestAddress, request.SubnetTransmissionSpeed, confirm));
+    }
+
+    private static WorkerResponse DeleteSubnet(WorkerRequest request)
+    {
+        var errors = SubnetLifecycleValidator.ValidateDelete(request.SubnetName);
+        if (errors.Count > 0)
+        {
+            return Failure(string.Join(" ", errors));
+        }
+
+        return SubnetLifecycle(request, (project, confirm) => SubnetLifecycleService.Delete(
+            project, request.SubnetName!, confirm, request.Force));
+    }
+
+    private static WorkerResponse SubnetLifecycle(WorkerRequest request, Func<Project, bool, SubnetLifecycleResultInfo> operation)
+    {
         try
         {
             using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);

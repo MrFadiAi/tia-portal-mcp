@@ -128,4 +128,17 @@ public class WorkerRequest
 
     /// <summary>browse_project_tree: continuation cursor from a previous page's nextCursor. Enables the bounded cursor-paged response.</summary>
     public string? Cursor { get; set; }
+
+    /// <summary>create_subnet: network type of the subnet to create — "Ethernet" or "Profibus".</summary>
+    public string? SubnetNetworkType { get; set; }
+
+    /// <summary>create_subnet/update_subnet: PROFIBUS highest station address (0-126). PROFIBUS-only.</summary>
+    public int? SubnetHighestAddress { get; set; }
+
+    /// <summary>create_subnet/update_subnet: PROFIBUS transmission speed (e.g. "Baud187500"). PROFIBUS-only.</summary>
+    public string? SubnetTransmissionSpeed { get; set; }
+
+    /// <summary>delete_subnet: delete even though devices are still connected to the subnet
+    /// (their interfaces become subnet-less). Without force a non-empty subnet is refused.</summary>
+    public bool Force { get; set; }
 }

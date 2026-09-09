@@ -298,7 +298,7 @@ public static class HardwareConfigReader
         }
     }
 
-    private static string? ReadPropertyOrAttribute(object instance, string name, string description)
+    internal static string? ReadPropertyOrAttribute(object instance, string name, string description)
     {
         var value = ReadProperty(instance, name);
         if (value is not null)
@@ -331,7 +331,7 @@ public static class HardwareConfigReader
         }
     }
 
-    private static IEnumerable<object> ReadEnumerableProperty(object instance, string propertyName, string description)
+    internal static IEnumerable<object> ReadEnumerableProperty(object instance, string propertyName, string description)
     {
         var value = ReadProperty(instance, propertyName);
         if (value is null)

@@ -894,6 +894,72 @@ public class OpennessWorkerClient
             "{}",
             tiaVersion);
 
+    /// <summary>
+    /// Subnet lifecycle. <paramref name="confirm"/> false = read-only preview (create: duplicate
+    /// check; update: located subnet + pending changes; delete: connected nodes). Confirm is
+    /// forwarded to the worker. <paramref name="force"/> (delete only) allows deleting a subnet
+    /// that still has connected nodes.
+    /// </summary>
+    public Task<string> CreateSubnetAsync(
+        string name, string networkType, int? highestAddress, string? transmissionSpeed,
+        bool confirm, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "create_subnet",
+            projectPath,
+            request =>
+            {
+                request.SubnetName = name;
+                request.SubnetNetworkType = networkType;
+                request.SubnetHighestAddress = highestAddress;
+                request.SubnetTransmissionSpeed = transmissionSpeed;
+                request.Confirm = confirm;
+                if (confirm)
+                {
+                    request.AllowTiaConfirmations = true;
+                }
+            },
+            "{}",
+            tiaVersion);
+
+    public Task<string> UpdateSubnetAsync(
+        string name, string? newName, int? highestAddress, string? transmissionSpeed,
+        bool confirm, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "update_subnet",
+            projectPath,
+            request =>
+            {
+                request.SubnetName = name;
+                request.NewName = newName;
+                request.SubnetHighestAddress = highestAddress;
+                request.SubnetTransmissionSpeed = transmissionSpeed;
+                request.Confirm = confirm;
+                if (confirm)
+                {
+                    request.AllowTiaConfirmations = true;
+                }
+            },
+            "{}",
+            tiaVersion);
+
+    public Task<string> DeleteSubnetAsync(
+        string name, bool confirm, bool force, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "delete_subnet",
+            projectPath,
+            request =>
+            {
+                request.SubnetName = name;
+                request.Confirm = confirm;
+                request.Force = force;
+                if (confirm)
+                {
+                    request.AllowTiaConfirmations = true;
+                }
+            },
+            "{}",
+            tiaVersion);
+
     public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath, int? tiaVersion = null)
     {
         try
