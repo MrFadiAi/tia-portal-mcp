@@ -1150,6 +1150,15 @@ internal static class Program
                 }
             }
         }
+        catch (EngineeringException ex) when (UdtInconsistencyHint.IsUdtInconsistency(ex.Message))
+        {
+            // UDT-inconsistent blocks cannot be exported until the PLC is compiled again —
+            // point the agent at compile_check (read paths never auto-compile: compile mutates).
+            return Failure(UdtInconsistencyHint.Append(
+                $"TIA Portal operation failed: {ex.Message}",
+                ResolveBlockPlcHint(request),
+                AssemblyResolver.DetectedVersion?.MajorVersion));
+        }
         catch (EngineeringException ex)
         {
             return Failure($"TIA Portal operation failed: {ex.Message}");
@@ -1185,6 +1194,20 @@ internal static class Program
 
         var parts = blockPath.Split('/');
         return parts[parts.Length - 1];
+    }
+
+    /// <summary>Best-known PLC qualifier for block-read recovery hints: the PLC prefix of the
+    /// block path, else the request's plcName. Parse failures degrade to the request value.</summary>
+    private static string? ResolveBlockPlcHint(WorkerRequest request)
+    {
+        try
+        {
+            return BlockAddress.Parse(request.BlockPath!).PlcName ?? request.PlcName;
+        }
+        catch
+        {
+            return request.PlcName;
+        }
     }
 
     // Bulk companion to list_blocks + get_block_content: returns roster AND reconstructed
@@ -1696,6 +1719,15 @@ internal static class Program
                 Success = true,
                 Payload = JsonSerializer.Serialize(info, JsonOptions)
             };
+        }
+        catch (EngineeringException ex) when (UdtInconsistencyHint.IsUdtInconsistency(ex.Message))
+        {
+            // UDT-inconsistent blocks cannot be exported until the PLC is compiled again —
+            // point the agent at compile_check (read paths never auto-compile: compile mutates).
+            return Failure(UdtInconsistencyHint.Append(
+                $"TIA Portal operation failed: {ex.Message}",
+                ResolveBlockPlcHint(request),
+                AssemblyResolver.DetectedVersion?.MajorVersion));
         }
         catch (EngineeringException ex)
         {

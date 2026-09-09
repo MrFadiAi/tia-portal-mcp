@@ -173,9 +173,12 @@ public static class CompileChecker
         };
     }
 
-    private static CompilerResult CompileObject(object compilable)
+    /// <summary>The ONE compile route (compile_check) — also used by the cross-reference
+    /// auto-compile so both paths find the same Compile method (see
+    /// <see cref="CompileMethodFinder"/>) and share the COM late-binding fallback.</summary>
+    internal static CompilerResult CompileObject(object compilable)
     {
-        var compileMethod = FindCompileMethod(compilable.GetType());
+        var compileMethod = CompileMethodFinder.Find(compilable.GetType());
         if (compileMethod == null)
         {
             // Fallback: try COM late-binding via Type.InvokeMember (V21 COM interop wrappers)
@@ -217,42 +220,6 @@ public static class CompileChecker
             ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
             throw;
         }
-    }
-
-    private static MethodInfo? FindCompileMethod(Type type)
-    {
-        const BindingFlags allFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-
-        // 1. Search the type itself (public and non-public — explicit interface implementations are private)
-        var compileMethod = type.GetMethod("Compile", allFlags);
-        if (compileMethod != null)
-        {
-            return compileMethod;
-        }
-
-        // 2. Search all implemented interfaces
-        foreach (var interfaceType in type.GetInterfaces())
-        {
-            compileMethod = interfaceType.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public);
-            if (compileMethod != null)
-            {
-                return compileMethod;
-            }
-        }
-
-        // 3. Walk base types (COM wrappers may hide Compile in a base class)
-        var baseType = type.BaseType;
-        while (baseType is not null)
-        {
-            compileMethod = baseType.GetMethod("Compile", allFlags);
-            if (compileMethod != null)
-            {
-                return compileMethod;
-            }
-            baseType = baseType.BaseType;
-        }
-
-        return null;
     }
 
     private static string MapState(CompilerResultState state)

@@ -1,10 +1,7 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using Siemens.Engineering;
 using Siemens.Engineering.CrossReference;
-using Siemens.Engineering.HW;
-using Siemens.Engineering.HW.Features;
 using Siemens.Engineering.SW;
 using TiaMcpServer.Contracts;
 
@@ -20,15 +17,22 @@ public static class CrossReferenceReader
             Filter = filterName
         };
 
-        foreach (var plc in FindPlcSoftware(project, plcName))
+        // Same tolerant resolution as every other PLC-targeting tool (PlcSoftwareFinder):
+        // device name OR PLC-software name, case-insensitive.
+        foreach (var (device, software) in PlcSoftwareFinder.Filter(project, plcName))
         {
-            report.Plcs.Add(ReadPlc(plc.DeviceName, plc.Software, filter));
+            report.Plcs.Add(ReadPlc(device.Name, software, filter));
         }
 
         if (report.Plcs.Count == 0)
         {
-            var detail = plcName is null ? string.Empty : $" named '{plcName}'";
-            throw new InvalidOperationException($"No PLC software{detail} was found in the project.");
+            throw new InvalidOperationException(
+                plcName is null
+                    ? "No PLC software was found in the project."
+                    : PlcNameMatcher.BuildNotFoundMessage(
+                        plcName,
+                        PlcSoftwareFinder.Enumerate(project)
+                            .Select(p => (DeviceName: p.Device.Name, SoftwareName: p.Plc.Name))));
         }
 
         report.TotalSourceCount = report.Plcs.Sum(plc => plc.SourceCount);
@@ -70,7 +74,9 @@ public static class CrossReferenceReader
 
             try
             {
-                CompilePlcSoftware(plcSoftware);
+                // The SAME compile route compile_check uses (base-type + COM discovery) — the
+                // old local reflection here missed Compile methods hidden in base classes.
+                CompileChecker.CompileObject(plcSoftware);
                 result.Messages.Add("Compilation completed. Retrying cross-reference retrieval...");
 
                 service = plcSoftware.GetService<CrossReferenceService>();
@@ -197,51 +203,6 @@ public static class CrossReferenceReader
         };
     }
 
-    private static IEnumerable<DiscoveredPlcSoftware> FindPlcSoftware(Project project, string? plcName)
-    {
-        foreach (Device device in project.Devices)
-        {
-            if (plcName is not null &&
-                !string.Equals(device.Name, plcName, StringComparison.OrdinalIgnoreCase))
-            {
-                continue;
-            }
-
-            foreach (PlcSoftware plcSoftware in FindPlcSoftwareInDeviceItems(device.DeviceItems))
-            {
-                yield return new DiscoveredPlcSoftware(device.Name, plcSoftware);
-            }
-        }
-    }
-
-    private static IEnumerable<PlcSoftware> FindPlcSoftwareInDeviceItems(DeviceItemComposition items)
-    {
-        foreach (DeviceItem item in items)
-        {
-            PlcSoftware? plcSoftware = null;
-
-            try
-            {
-                var container = item.GetService<SoftwareContainer>();
-                plcSoftware = container?.Software as PlcSoftware;
-            }
-            catch (EngineeringException ex)
-            {
-                Console.Error.WriteLine($"Skipping a device item while locating PLC software: {ex.Message}");
-            }
-
-            if (plcSoftware is not null)
-            {
-                yield return plcSoftware;
-            }
-
-            foreach (var child in FindPlcSoftwareInDeviceItems(item.DeviceItems))
-            {
-                yield return child;
-            }
-        }
-    }
-
     private static CrossReferenceFilter ToOpennessFilter(string filterName)
     {
         return filterName switch
@@ -273,46 +234,5 @@ public static class CrossReferenceReader
     private static string SafeString(object? value)
     {
         return value?.ToString() ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Compile PLC software via reflection (same approach as CompileChecker).
-    /// Cross-reference service requires compiled data to be available.
-    /// </summary>
-    private static void CompilePlcSoftware(PlcSoftware plcSoftware)
-    {
-        var type = plcSoftware.GetType();
-        var compileMethod = type.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public)
-            ?? type.GetMethod("Compile", BindingFlags.Instance | BindingFlags.NonPublic);
-
-        if (compileMethod is null)
-        {
-            // Search interfaces (explicit implementations are private)
-            foreach (var iface in type.GetInterfaces())
-            {
-                compileMethod = iface.GetMethod("Compile", BindingFlags.Instance | BindingFlags.Public);
-                if (compileMethod is not null) break;
-            }
-        }
-
-        if (compileMethod is null)
-        {
-            throw new InvalidOperationException("PlcSoftware does not expose a Compile method.");
-        }
-
-        compileMethod.Invoke(plcSoftware, null);
-    }
-
-    private sealed class DiscoveredPlcSoftware
-    {
-        public DiscoveredPlcSoftware(string deviceName, PlcSoftware software)
-        {
-            DeviceName = deviceName;
-            Software = software;
-        }
-
-        public string DeviceName { get; }
-
-        public PlcSoftware Software { get; }
     }
 }

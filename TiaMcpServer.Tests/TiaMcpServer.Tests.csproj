@@ -23,11 +23,14 @@
   <ItemGroup>
     <ProjectReference Include="..\TiaMcpServer.Contracts\TiaMcpServer.Contracts.csproj" />
     <Compile Include="..\TiaMcpServer\Worker\OpennessWorkerClient.cs" Link="Host\OpennessWorkerClient.cs" />
+    <Compile Include="..\TiaMcpServer\Worker\ScanProjectTreeParser.cs" Link="Host\ScanProjectTreeParser.cs" />
     <Compile Include="..\TiaMcpServer\Worker\PlcBlockCompare.cs" Link="Worker\PlcBlockCompare.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchCatalog.cs" Link="Worker\ReadBatchCatalog.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchBudget.cs" Link="Worker\ReadBatchBudget.cs" />
     <Compile Include="..\TiaMcpServer\Worker\WriteBatchCatalog.cs" Link="Worker\WriteBatchCatalog.cs" />
     <Compile Include="..\TiaMcpServer\Audit\AuditLogger.cs" Link="Audit\AuditLogger.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\UdtInconsistencyHint.cs" Link="Worker\UdtInconsistencyHint.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\CompileMethodFinder.cs" Link="Worker\CompileMethodFinder.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyService.cs" Link="Host\WriteSafetyService.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyTooling.cs" Link="Host\WriteSafetyTooling.cs" />
     <Compile Include="..\TiaMcpServer\Tools\SearchEquipmentCatalogTool.cs" Link="Host\SearchEquipmentCatalogTool.cs" />
