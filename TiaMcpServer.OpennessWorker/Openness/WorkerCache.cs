@@ -39,6 +39,7 @@ internal static class WorkerCache
         "import_hmi_screen",
         "knowhow_unlock",
         "create_block_group", "delete_block_group",
+        "update_type_content",
     };
 
     public static bool IsCacheable(string method) => CacheableMethods.Contains(method);

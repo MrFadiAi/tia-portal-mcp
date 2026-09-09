@@ -859,6 +859,41 @@ public class OpennessWorkerClient
             "{}",
             tiaVersion);
 
+    /// <summary>Read a PLC type (UDT) rendered as a readable interface listing (reconstructed
+    /// from the export XML; falls back to the raw XML with a note).</summary>
+    public Task<string> GetTypeContentAsync(
+        string typeName, string? plcName, string? folderPath, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "get_type_content",
+            projectPath,
+            request =>
+            {
+                request.TypeName = typeName;
+                request.PlcName = plcName;
+                request.FolderPath = folderPath;
+            },
+            "",
+            tiaVersion);
+
+    /// <summary>Update an existing PLC type from TIA export XML (update-only: the declared
+    /// &lt;Name&gt; must match and the type must exist — the worker refuses otherwise).</summary>
+    public Task<string> UpdateTypeContentAsync(
+        string typeName, string? plcName, string? folderPath, string xmlContent, string? projectPath, int? tiaVersion = null)
+        => SendBoundProjectRequestAsync(
+            "update_type_content",
+            projectPath,
+            request =>
+            {
+                request.TypeName = typeName;
+                request.PlcName = plcName;
+                request.FolderPath = folderPath;
+                request.YamlContent = xmlContent;
+                request.Confirm = true;
+                request.AllowTiaConfirmations = true;
+            },
+            "{}",
+            tiaVersion);
+
     public async Task<string> SearchEquipmentCatalogAsync(string query, string? projectPath, int? tiaVersion = null)
     {
         try

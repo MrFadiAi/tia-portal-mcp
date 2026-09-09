@@ -13,8 +13,7 @@ public static class PlcTypeExporter
 {
     public static string Export(Project project, string typeName, string? plcName, string? folderPath)
     {
-        var plcSoftware = FindPlcSoftware(project, plcName);
-        var plcType = FindType(plcSoftware.TypeGroup, typeName, folderPath)
+        var plcType = Locate(project, typeName, plcName, folderPath).Type
             ?? throw new InvalidOperationException($"PLC type '{typeName}' not found.");
 
         string tempFile = Path.Combine(Path.GetTempPath(), "tia-mcp-type-" + Guid.NewGuid().ToString("N") + ".xml");
@@ -69,7 +68,20 @@ public static class PlcTypeExporter
             : new InvalidOperationException($"PLC '{plcName}' not found in project.");
     }
 
-    private static PlcType? FindType(PlcTypeGroup group, string typeName, string? folderPath)
+    /// <summary>
+    /// Locate a PLC type and the group that OWNS it (needed by update_type_content, which
+    /// imports into the owning group's Types composition). Returns a null Type (with the
+    /// best-effort owning group) when the type does not exist — callers decide whether that
+    /// is an error. A bad folderPath still throws (the folder itself must exist).
+    /// </summary>
+    internal static (PlcType? Type, PlcTypeGroup Group) Locate(
+        Project project, string typeName, string? plcName, string? folderPath)
+    {
+        var plcSoftware = FindPlcSoftware(project, plcName);
+        return FindType(plcSoftware.TypeGroup, typeName, folderPath);
+    }
+
+    private static (PlcType? Type, PlcTypeGroup Group) FindType(PlcTypeGroup group, string typeName, string? folderPath)
     {
         if (!string.IsNullOrWhiteSpace(folderPath))
         {
@@ -95,28 +107,28 @@ public static class PlcTypeExporter
                 current = next;
             }
 
-            return current.Types.Find(typeName);
+            return (current.Types.Find(typeName), current);
         }
 
         return FindTypeRecursive(group, typeName);
     }
 
-    private static PlcType? FindTypeRecursive(PlcTypeGroup group, string typeName)
+    private static (PlcType? Type, PlcTypeGroup Group) FindTypeRecursive(PlcTypeGroup group, string typeName)
     {
         var found = group.Types.Find(typeName);
         if (found is not null)
         {
-            return found;
+            return (found, group);
         }
 
         foreach (PlcTypeGroup childGroup in group.Groups)
         {
             try
             {
-                found = FindTypeRecursive(childGroup, typeName);
+                (found, var owner) = FindTypeRecursive(childGroup, typeName);
                 if (found is not null)
                 {
-                    return found;
+                    return (found, owner);
                 }
             }
             catch (EngineeringException ex)
@@ -125,6 +137,6 @@ public static class PlcTypeExporter
             }
         }
 
-        return null;
+        return (null, group);
     }
 }

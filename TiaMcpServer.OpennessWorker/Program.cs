@@ -126,6 +126,8 @@ internal static class Program
                 "stop_plc"            => StopPlc(request),
                 "create_block_group"  => CreateBlockGroup(request),
                 "delete_block_group"  => DeleteBlockGroup(request),
+                "get_type_content"    => GetTypeContent(request),
+                "update_type_content" => UpdateTypeContent(request),
                 "get_tia_version"     => GetTiaVersion(),
                 _                     => Failure($"Unsupported worker method '{request.Method}'.")
             };
@@ -2136,6 +2138,130 @@ internal static class Program
             }
 
             var result = operation(session.Project, request.Confirm);
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(result, JsonOptions)
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // PLC type (UDT) read: export XML (existing route) then render it READABLE through the same
+    // reconstructor the block reads use — a type's <Interface> matches the DB branch, so users
+    // see a STRUCT listing instead of raw tokenized XML. Falls back to the raw XML (with a note)
+    // when reconstruction cannot handle the shape.
+    private static WorkerResponse GetTypeContent(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.TypeName))
+        {
+            return Failure("TypeName is required.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            string xml = PlcTypeExporter.Export(session.Project, request.TypeName!, request.PlcName, request.FolderPath);
+            string readable = BlockSourceReconstructor.Reconstruct(xml, programmingLanguage: null);
+            if (string.Equals(readable, xml, StringComparison.Ordinal))
+            {
+                return new WorkerResponse
+                {
+                    Success = true,
+                    Payload =
+                        $"--- PLC type '{request.TypeName}': no readable reconstruction available for this " +
+                        $"export shape; raw XML below (use export_plc_type for the canonical XML). ---\n{xml}"
+                };
+            }
+
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = $"--- PLC type '{request.TypeName}' (reconstructed interface listing) ---\n{readable}"
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    // PLC type (UDT) update — XML-only, UPDATE-ONLY (both guards refuse before any write), via
+    // Types.Import(FileInfo, ImportOptions.Override) into the owning group. Mutating: registered
+    // in WorkerCache.MutatingMethods.
+    private static WorkerResponse UpdateTypeContent(WorkerRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.TypeName))
+        {
+            return Failure("TypeName is required.");
+        }
+
+        if (string.IsNullOrEmpty(request.YamlContent))
+        {
+            return Failure("XmlContent is required (a TIA type export XML whose declared <Name> matches TypeName).");
+        }
+
+        if (!request.Confirm)
+        {
+            return Failure("Operation not confirmed. Set confirm=true to proceed with the type update.");
+        }
+
+        try
+        {
+            using var session = new WorkerTiaPortalSession(allowTiaConfirmations: true, tiaVersion: request.TiaVersion);
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var result = PlcTypeUpdater.Update(
+                session.Project, request.TypeName!, request.PlcName, request.FolderPath, request.YamlContent!);
             return new WorkerResponse
             {
                 Success = true,
