@@ -27,6 +27,7 @@
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchCatalog.cs" Link="Worker\ReadBatchCatalog.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchBudget.cs" Link="Worker\ReadBatchBudget.cs" />
     <Compile Include="..\TiaMcpServer\Worker\WriteBatchCatalog.cs" Link="Worker\WriteBatchCatalog.cs" />
+    <Compile Include="..\TiaMcpServer\Audit\AuditLogger.cs" Link="Audit\AuditLogger.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyService.cs" Link="Host\WriteSafetyService.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyTooling.cs" Link="Host\WriteSafetyTooling.cs" />
     <Compile Include="..\TiaMcpServer\Tools\SearchEquipmentCatalogTool.cs" Link="Host\SearchEquipmentCatalogTool.cs" />

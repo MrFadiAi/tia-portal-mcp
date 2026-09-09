@@ -1,5 +1,7 @@
+using System;
 using System.ComponentModel;
 using ModelContextProtocol.Server;
+using TiaMcpServer.Audit;
 using TiaMcpServer.Worker;
 
 namespace TiaMcpServer.Tools
@@ -26,7 +28,13 @@ namespace TiaMcpServer.Tools
             [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.CreateBlockGroupAsync(groupPath, confirm, projectPath, tiaVersion).ConfigureAwait(false);
+            var result = await workerClient.CreateBlockGroupAsync(groupPath, confirm, projectPath, tiaVersion).ConfigureAwait(false);
+            if (confirm)
+            {
+                Audit(result, "create_block_group", groupPath);
+            }
+
+            return result;
         }
 
         [McpServerTool(Name = "delete_block_group")]
@@ -43,7 +51,22 @@ namespace TiaMcpServer.Tools
             [Description("Optional path to a TIA Portal project file (.ap16, .ap18, .ap19, .ap21). If omitted, uses the project currently open in TIA Portal.")] string? projectPath = null,
             [Description("TIA Portal major version (16, 18, 21). Omit for auto-detect.")] int? tiaVersion = null)
         {
-            return await workerClient.DeleteBlockGroupAsync(groupPath, confirm, projectPath, tiaVersion).ConfigureAwait(false);
+            var result = await workerClient.DeleteBlockGroupAsync(groupPath, confirm, projectPath, tiaVersion).ConfigureAwait(false);
+            if (confirm)
+            {
+                Audit(result, "delete_block_group", groupPath);
+            }
+
+            return result;
         }
+
+        /// <summary>One audit line per EXECUTED group operation (dry runs change nothing and are
+        /// not audited). Best-effort — never affects the returned result.</summary>
+        private static void Audit(string result, string operation, string target)
+            => AuditLogger.Append(
+                operation,
+                operation,
+                target,
+                result.StartsWith("Error:", StringComparison.OrdinalIgnoreCase) ? "failed" : "applied");
     }
 }

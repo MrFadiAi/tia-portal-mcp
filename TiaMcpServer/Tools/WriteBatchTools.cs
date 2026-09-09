@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Text.Json;
 using ModelContextProtocol.Server;
+using TiaMcpServer.Audit;
 using TiaMcpServer.Safety;
 using TiaMcpServer.Worker;
 
@@ -176,6 +177,7 @@ public static class WriteBatchTools
             {
                 results.Add(Item(op, "skipped",
                     $"skipped — operation '{stoppedOn}' failed earlier in this batch and the run stopped there"));
+                Audit(op, "skipped", batchId);
                 continue;
             }
 
@@ -197,10 +199,12 @@ public static class WriteBatchTools
                 stoppedOn = op.OperationId;
                 // The warning leads the result so payload caps can never cut it off.
                 results.Add(Item(op, "failed", StoppedOnFailureWarning + "\n" + raw, stopwatch.ElapsedMilliseconds));
+                Audit(op, "failed", batchId);
             }
             else
             {
                 results.Add(Item(op, "succeeded", raw, stopwatch.ElapsedMilliseconds));
+                Audit(op, "applied", batchId);
             }
         }
 
@@ -237,6 +241,12 @@ public static class WriteBatchTools
 
     private static bool IsFailure(string raw)
         => raw.StartsWith("Error:", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>One JSONL audit line per batch item (applied/failed/skipped), best-effort —
+    /// the batch's own audit trail complements the per-op hash audits the individual tag tools
+    /// already write via WriteSafetyService.AppendAudit.</summary>
+    private static void Audit(WriteBatchOperation op, string outcome, string batchId)
+        => AuditLogger.Append(ApplyToolName, op.Operation, WriteBatchSnapshot.DescribeOperation(op), outcome, batchId);
 
     private static ReadBatchOperationResult Item(
         WriteBatchOperation op, string status, string result, long ms = 0)
