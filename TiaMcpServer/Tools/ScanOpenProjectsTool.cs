@@ -83,7 +83,7 @@ public static class ScanOpenProjectsTool
                 }
                 else
                 {
-                    var project = ParseProjectFromTree(treeResult, v.MajorVersion, v.DisplayName);
+                    var project = ScanProjectTreeParser.Parse(treeResult, v.MajorVersion, v.DisplayName);
                     Console.Error.WriteLine($"[SCAN] {v.DisplayName}: found project with {project.DeviceCount} devices, {project.BlockCount} blocks");
                     results.Add(project);
                 }
@@ -106,105 +106,9 @@ public static class ScanOpenProjectsTool
         }, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
     }
 
-    private static ScannedProject ParseProjectFromTree(string treeJson, int version, string displayName)
-    {
-        try
-        {
-            using var doc = JsonDocument.Parse(treeJson);
-            var root = doc.RootElement;
-
-            var deviceNames = new List<string>();
-            var plcNames = new List<string>();
-            var blockCount = 0;
-            var tagTableCount = 0;
-
-            void WalkNode(JsonElement node)
-            {
-                var name = node.TryGetProperty("name", out var n) ? n.GetString() : "";
-                var nodeType = node.TryGetProperty("nodeType", out var nt) ? nt.GetString() : "";
-
-                switch (nodeType)
-                {
-                    case "Device":
-                        deviceNames.Add(name ?? "");
-                        break;
-                    case "PlcSoftware":
-                        plcNames.Add(name ?? "");
-                        break;
-                    case "OB": case "FB": case "FC":
-                    case "GlobalDB": case "InstanceDB": case "ArrayDB":
-                        blockCount++;
-                        break;
-                    case "TagTable":
-                        tagTableCount++;
-                        break;
-                }
-
-                if (node.TryGetProperty("children", out var children))
-                {
-                    foreach (var child in children.EnumerateArray())
-                    {
-                        WalkNode(child);
-                    }
-                }
-            }
-
-            // Handle both array and single object
-            if (root.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var item in root.EnumerateArray())
-                {
-                    WalkNode(item);
-                }
-            }
-            else
-            {
-                WalkNode(root);
-            }
-
-            var projectName = deviceNames.Count > 0
-                ? string.Join(", ", deviceNames)
-                : "TIA Portal Project";
-
-            return new ScannedProject
-            {
-                Name = projectName,
-                Version = version,
-                DisplayName = displayName,
-                PlcNames = plcNames,
-                DeviceNames = deviceNames,
-                DeviceCount = deviceNames.Count,
-                BlockCount = blockCount,
-                TagTableCount = tagTableCount
-            };
-        }
-        catch
-        {
-            return new ScannedProject
-            {
-                Name = "Unknown Project",
-                Version = version,
-                DisplayName = displayName
-            };
-        }
-    }
-
     private class VersionEntry
     {
         public int MajorVersion { get; set; }
         public string DisplayName { get; set; } = "";
-    }
-
-    private class ScannedProject
-    {
-        public string Name { get; set; } = "";
-        public int Version { get; set; }
-        public string DisplayName { get; set; } = "";
-        public List<string> PlcNames { get; set; } = new();
-        public List<string> DeviceNames { get; set; } = new();
-        public int DeviceCount { get; set; }
-        public int BlockCount { get; set; }
-        public int TagTableCount { get; set; }
-        public string? Error { get; set; }
     }
 }
