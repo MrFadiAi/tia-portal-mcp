@@ -446,8 +446,8 @@ public class OpennessWorkerClient
     /// the persistent worker, the export fallback chain and source reconstruction all apply.
     /// Validation runs first (an invalid batch makes no worker calls); operations run
     /// sequentially with per-item isolation (one failure never aborts the rest); results are
-    /// capped by <see cref="ReadBatchBudget"/> (20k chars per item, 150k per batch — later items
-    /// are omitted, failures never are).
+    /// capped by <see cref="ReadBatchBudget"/> (20k chars per item, then a 150k batch-level
+    /// failure-preserving ladder: success payloads are dropped before any failure detail).
     /// </summary>
     public async Task<string> ReadBatchAsync(List<ReadBatchOperation> operations)
     {
@@ -496,7 +496,7 @@ public class OpennessWorkerClient
             });
         }
 
-        ReadBatchBudget.ApplyBatchCap(results);
+        ReadBatchBudget.ApplyBatchLadder(results);
 
         return JsonSerializer.Serialize(ReadBatchResponse.For(results), JsonOptions);
     }

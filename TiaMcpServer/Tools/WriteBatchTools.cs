@@ -61,15 +61,19 @@ public static class WriteBatchTools
             return Error(PreviewToolName, stateResult.Error, null, stateResult.FailedOperationId);
         }
 
+        // The same failure-preserving ladder guards the preview response: success payloads are
+        // dropped before failure detail (a state read that failed aborts the preview entirely,
+        // but a huge tag-table listing must not crowd out later items' payloads).
         var previews = stateResult.States!
-            .Select(s => new
+            .Select(s => new ReadBatchOperationResult
             {
-                s.OperationId,
-                s.Operation,
-                status = "previewed",
-                result = ReadBatchBudget.ApplyItemCap(s.State),
+                OperationId = s.OperationId,
+                Operation = s.Operation,
+                Status = "previewed",
+                Result = ReadBatchBudget.ApplyItemCap(s.State),
             })
             .ToList();
+        ReadBatchBudget.ApplyBatchLadder(previews);
 
         var fingerprint = WriteBatchSnapshot.ComposeStateFingerprint(
             stateResult.States.Select(s => (s.OperationId, s.State)).ToList());
@@ -208,6 +212,10 @@ public static class WriteBatchTools
             var tiaVersion = operations.FirstOrDefault(o => o.TiaVersion.HasValue)?.TiaVersion;
             compileCheck = await workerClient.CompileCheckAsync(null, firstPlc, projectPath, tiaVersion).ConfigureAwait(false);
         }
+
+        // Batch-level payload ladder: succeeded payloads degrade to markers before the failed
+        // item's stop-warning + error detail (which the ladder truncates only from the tail).
+        ReadBatchBudget.ApplyBatchLadder(results);
 
         return JsonSerializer.Serialize(new
         {
