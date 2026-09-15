@@ -23,11 +23,12 @@ public static class BlockInterfaceReader
         var block = target.Block
             ?? throw new InvalidOperationException($"Block '{blockPath}' not found.");
 
-        // Consistency auto-heal (chat reads; see BlockExporter.Export): compile a
-        // UDT-inconsistent block first so its interface can be exported at all. The note
-        // rides in DiagnosticMessage (this tool returns JSON, not bare source text).
+        // Stale-read auto-heal (chat reads; see BlockExporter.Export): compile a block that
+        // was modified after its last compile (or UDT-inconsistent) first, so the interface
+        // reflects the current editor state. The note rides in DiagnosticMessage (this tool
+        // returns JSON, not bare source text).
         string? healNote = autoHeal
-            ? ConsistencyAutoHeal.EnsureConsistent(block)
+            ? ConsistencyAutoHeal.EnsureConsistent(block, blockPath)
             : null;
 
         var info = new BlockInterfaceInfo

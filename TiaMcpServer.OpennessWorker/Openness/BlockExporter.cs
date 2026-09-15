@@ -13,15 +13,17 @@ public static class BlockExporter
         var address = BlockAddress.Parse(blockPath);
         var target = BlockTargetResolver.ResolveForExport(project, address);
 
-        // Consistency auto-heal: a block edited in the TIA Portal GUI is UDT-inconsistent and
-        // refuses to export until compiled. With autoHeal (single-block chat reads — also the
-        // read_batch route), compile JUST this block first and disclose it in the source
-        // header; compile errors surface as a clear failure listing them. Bulk callers
-        // (extract_plc_blocks / compare) pass autoHeal:false — compiling a whole PLC from a
-        // bulk read would be a surprise; the roster's isConsistent flags disclose instead.
-        // raw (diagnostic) mode never heals: side-effect-free by contract.
+        // Stale-read auto-heal: a block edited in the TIA Portal GUI is either
+        // UDT-inconsistent (export refuses) or — for a plain code edit — silently exports
+        // the LAST COMPILED source. With autoHeal (single-block chat reads — also the
+        // read_batch route), compile JUST this block first when its timestamps say it was
+        // modified after its last compile, and disclose it in the source header; compile
+        // errors surface as a clear failure listing them. Bulk callers (extract_plc_blocks /
+        // compare) pass autoHeal:false — compiling a whole PLC from a bulk read would be a
+        // surprise; the roster's isConsistent flags disclose instead. raw (diagnostic) mode
+        // never heals: side-effect-free by contract.
         string? healNote = autoHeal && !raw
-            ? ConsistencyAutoHeal.EnsureConsistent(target.Block!)
+            ? ConsistencyAutoHeal.EnsureConsistent(target.Block!, blockPath)
             : null;
 
         string tempDir = Path.Combine(Path.GetTempPath(), "tia-mcp-export-" + Guid.NewGuid().ToString("N"));

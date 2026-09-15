@@ -20,9 +20,53 @@ public class ConsistencyTextTests
 
         Assert.StartsWith(ConsistencyText.AutoCompiledPrefix, note);
         Assert.Contains("'PUTBAND'", note);
-        Assert.Contains("UDT-inconsistent", note);
+        Assert.Contains("modified after its last compile", note);
         Assert.Contains("state: Success", note);
         Assert.Contains("warnings: 2", note);
+    }
+
+    // --- NeedsCompile: the stale-read gate ------------------------------------------------
+    // A plain CODE edit keeps IsConsistent true while Openness silently exports the LAST
+    // COMPILED source — the timestamps are the only authoritative dirtiness signal
+    // (observed live in production chat 0dac593c).
+
+    private static readonly DateTime Compiled = new(2026, 9, 15, 12, 0, 0);
+    private static readonly DateTime EditedAfter = new(2026, 9, 15, 13, 0, 0);
+
+    [Fact]
+    public void NeedsCompile_True_When_Code_Was_Edited_After_The_Last_Compile()
+    {
+        Assert.True(ConsistencyText.NeedsCompile(
+            isConsistent: true, codeModified: EditedAfter, interfaceModified: Compiled, compiled: Compiled));
+    }
+
+    [Fact]
+    public void NeedsCompile_True_When_Interface_Was_Edited_After_The_Last_Compile()
+    {
+        Assert.True(ConsistencyText.NeedsCompile(
+            isConsistent: true, codeModified: Compiled, interfaceModified: EditedAfter, compiled: Compiled));
+    }
+
+    [Fact]
+    public void NeedsCompile_True_When_Udt_Inconsistent_Even_With_Fresh_Timestamps()
+    {
+        Assert.True(ConsistencyText.NeedsCompile(
+            isConsistent: false, codeModified: Compiled, interfaceModified: Compiled, compiled: Compiled));
+    }
+
+    [Fact]
+    public void NeedsCompile_False_For_A_Freshly_Compiled_Block()
+    {
+        Assert.False(ConsistencyText.NeedsCompile(
+            isConsistent: true, codeModified: Compiled, interfaceModified: Compiled, compiled: Compiled));
+    }
+
+    [Fact]
+    public void NeedsCompile_True_For_A_Never_Compiled_Block()
+    {
+        // CompileDate stays default (year 1) while CodeModifiedDate is a real date
+        Assert.True(ConsistencyText.NeedsCompile(
+            isConsistent: true, codeModified: Compiled, interfaceModified: default, compiled: default));
     }
 
     [Fact]

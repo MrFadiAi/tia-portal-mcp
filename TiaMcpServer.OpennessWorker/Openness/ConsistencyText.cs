@@ -19,10 +19,22 @@ public static class ConsistencyText
     public const string PostconditionPrefix = "[postcondition]";
     private const int MaxErrorLines = 5;
 
+    /// <summary>
+    /// The stale-read gate, pure so it is unit-testable. A block edited in the TIA Portal GUI
+    /// is NOT necessarily UDT-inconsistent — a plain code edit keeps IsConsistent true, and
+    /// Openness then exports the LAST COMPILED source without any error, silently serving
+    /// stale code. The authoritative dirtiness signal is the block's own timestamps:
+    /// code/interface modified after the last compile. Verified present on the real V16/V18
+    /// PublicAPI DLLs and the V21 stubs (PlcBlock.CodeModifiedDate / InterfaceModifiedDate /
+    /// CompileDate).
+    /// </summary>
+    public static bool NeedsCompile(bool isConsistent, DateTime codeModified, DateTime interfaceModified, DateTime compiled)
+        => !isConsistent || codeModified > compiled || interfaceModified > compiled;
+
     /// <summary>Disclosure prepended to a read whose block had to be compiled first. Never silent.</summary>
     public static string AutoCompiledNote(string blockName, string state, int warningCount)
-        => $"{AutoCompiledPrefix} Block '{blockName}' was UDT-inconsistent; it was compiled before this read " +
-           $"(state: {state}, warnings: {warningCount}).";
+        => $"{AutoCompiledPrefix} Block '{blockName}' was modified after its last compile (or UDT-inconsistent); " +
+           $"it was compiled before this read (state: {state}, warnings: {warningCount}).";
 
     /// <summary>Failure shown when the auto-compile reveals errors — replaces the cryptic export refusal.</summary>
     public static string CompileFailureMessage(string blockName, int errorCount, int warningCount, IReadOnlyList<string> errors)

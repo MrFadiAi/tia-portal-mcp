@@ -7,43 +7,64 @@ using Siemens.Engineering.SW.Blocks;
 namespace TiaMcpServer.OpennessWorker.Openness;
 
 /// <summary>
-/// The read-path consistency auto-heal. A block edited in the TIA Portal GUI is left
-/// UDT-inconsistent and Openness refuses to export it until a compile — historically the
-/// user had to compile by hand so the agent could read the block back. This gate (used by
+/// The read-path consistency auto-heal. A block edited in the TIA Portal GUI exports
+/// either nothing (UDT-inconsistent) or — worse — the LAST COMPILED source without any
+/// error (a plain code edit keeps IsConsistent true; observed live in production chat
+/// 0dac593c: "my export read the last compiled version"). Either way the user historically
+/// had to compile by hand so the agent could see their edit. This gate (used by
 /// get_block_content / read_block_interface, and inherited by read_batch) compiles JUST the
 /// requested block first (block-scoped <see cref="CompileChecker.CompileObject"/>, seconds
-/// rather than a whole-PLC compile) and discloses it via <see cref="ConsistencyText"/>.
-/// If the compile reports errors, the failure CARRIES them — the user learns their edit is
-/// broken the moment they ask the agent to look, instead of Openness's cryptic
-/// "Inconsistent blocks and PLC data types (UDT) cannot be exported".
+/// rather than a whole-PLC compile) when its timestamps say it was modified after its last
+/// compile, and discloses it via <see cref="ConsistencyText"/>. If the compile reports
+/// errors, the failure CARRIES them — the user learns their edit is broken the moment they
+/// ask the agent to look.
 /// </summary>
 internal static class ConsistencyAutoHeal
 {
+    // One auto-compile per edited state: remembers (per block path) when we last compiled
+    // and what the block's CodeModifiedDate was then. If the code has not changed since OUR
+    // compile, skip recompiling — this stays correct even when Openness does not bump
+    // CompileDate for programmatic compiles (in which case the timestamp gate above would
+    // otherwise fire on every read). The worker is a persistent singleton, so the memo
+    // lives across calls.
+    private static readonly Dictionary<string, (DateTime CompiledAt, DateTime CodeModified)> LastAutoCompile = new();
+
     /// <summary>
-    /// Compile <paramref name="block"/> when it is UDT-inconsistent. Returns null when
-    /// nothing was needed (block already consistent, or its state could not be read — the
-    /// export attempt then still has the <see cref="UdtInconsistencyHint"/> fallback).
-    /// Throws <see cref="InvalidOperationException"/> carrying the compiler errors when the
-    /// block does not compile.
+    /// Compile <paramref name="block"/> when it is stale: UDT-inconsistent, or edited after
+    /// its last compile (a plain code edit keeps IsConsistent true, and Openness then exports
+    /// the LAST COMPILED source without an error — the silent stale read this gate exists to
+    /// prevent). Returns null when nothing was needed; throws carrying the compiler errors
+    /// when the block does not compile.
     /// </summary>
-    public static string? EnsureConsistent(PlcBlock block)
+    public static string? EnsureConsistent(PlcBlock block, string blockPath)
     {
-        bool inconsistent;
+        bool stale;
+        DateTime codeModified;
         try
         {
-            inconsistent = !block.IsConsistent;
+            codeModified = block.CodeModifiedDate;
+            stale = ConsistencyText.NeedsCompile(
+                block.IsConsistent, codeModified, block.InterfaceModifiedDate, block.CompileDate);
         }
         catch (EngineeringException)
         {
             return null; // cannot tell → let the export attempt; its failure path still hints
         }
 
-        if (!inconsistent)
+        if (!stale)
+        {
+            return null;
+        }
+
+        // Already auto-compiled for exactly this edit state → do not compile again (a second
+        // read of the same edited block should not pay the compile cost a second time).
+        if (LastAutoCompile.TryGetValue(blockPath, out var memo) && memo.CodeModified == codeModified)
         {
             return null;
         }
 
         var result = CompileChecker.CompileObject(block);
+        LastAutoCompile[blockPath] = (DateTime.Now, codeModified);
 
         if (result.ErrorCount > 0)
         {
