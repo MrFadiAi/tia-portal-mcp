@@ -35,6 +35,7 @@ public static class CodeSearcher
             PlcName = plcNameFilter,
             SearchedBlockCount = index.Blocks.Count,
             SkippedProtectedCount = index.SkippedProtected,
+            SkippedBlocks = index.SkippedBlocks,
         };
 
         foreach (var blk in index.Blocks)
@@ -116,6 +117,7 @@ public static class CodeSearcher
             AddressVariantsTried = variantsTried ?? new List<string>(),
             SearchedBlockCount = index.Blocks.Count,
             SkippedProtectedCount = index.SkippedProtected,
+            SkippedBlocks = index.SkippedBlocks,
         };
 
         foreach (var blk in index.Blocks)

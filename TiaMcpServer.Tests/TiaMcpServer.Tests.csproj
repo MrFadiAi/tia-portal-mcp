@@ -30,6 +30,7 @@
     <Compile Include="..\TiaMcpServer\Worker\WriteBatchCatalog.cs" Link="Worker\WriteBatchCatalog.cs" />
     <Compile Include="..\TiaMcpServer\Audit\AuditLogger.cs" Link="Audit\AuditLogger.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\UdtInconsistencyHint.cs" Link="Worker\UdtInconsistencyHint.cs" />
+    <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\ConsistencyText.cs" Link="Worker\ConsistencyText.cs" />
     <Compile Include="..\TiaMcpServer.OpennessWorker\Openness\CompileMethodFinder.cs" Link="Worker\CompileMethodFinder.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyService.cs" Link="Host\WriteSafetyService.cs" />
     <Compile Include="..\TiaMcpServer\Safety\WriteSafetyTooling.cs" Link="Host\WriteSafetyTooling.cs" />

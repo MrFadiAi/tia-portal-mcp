@@ -37,6 +37,10 @@ public static class BlockListReader
                     Number = block.Number,
                     ProgrammingLanguage = block.ProgrammingLanguage.ToString(),
                     Path = CombinePath(path, block.Name),
+                    // Blind-spot visibility: these two flags let the agent see WHICH blocks
+                    // it cannot read (and why) before any export attempt fails.
+                    IsConsistent = block.IsConsistent,
+                    IsKnowHowProtected = block.IsKnowHowProtected,
                 });
             }
             catch (EngineeringException ex)

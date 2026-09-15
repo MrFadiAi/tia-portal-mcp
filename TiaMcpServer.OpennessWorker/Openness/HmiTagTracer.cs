@@ -72,6 +72,7 @@ public static class HmiTagTracer
         var index = BlockCodeIndexer.GetOrBuild(project, projectPath, plcNameFilter);
         result.TracedBlockCount = index.Blocks.Count;
         result.SkippedProtectedCount = index.SkippedProtected;
+        result.SkippedBlocks = index.SkippedBlocks;
 
         var noRef = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var emitted = 0;

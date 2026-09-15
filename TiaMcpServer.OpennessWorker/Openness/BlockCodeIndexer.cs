@@ -23,6 +23,7 @@ internal static class BlockCodeIndexer
         var blocks = new List<IndexedBlock>();
         var skipped = 0;
         var total = 0;
+        var skippedBlocks = new List<string>();
 
         foreach (var (device, plc) in PlcSoftwareFinder.Filter(project, plcNameFilter))
         {
@@ -37,10 +38,10 @@ internal static class BlockCodeIndexer
             // search_code match report the WRONG PLC (scoped "PLF-01A-PLC_9", matches said
             // "PLF-00A-PLC_MASTER") and sent the agent to read the wrong PLC first.
             var plcIdentity = string.IsNullOrEmpty(device.Name) ? plc.Name : device.Name;
-            WalkBlockGroup(plc.BlockGroup, plcIdentity, projectPath, blocks, ref skipped, ref total);
+            WalkBlockGroup(plc.BlockGroup, plcIdentity, projectPath, blocks, ref skipped, ref total, skippedBlocks);
         }
 
-        return new IndexBuildResult(blocks, skipped, total);
+        return new IndexBuildResult(blocks, skipped, total, skippedBlocks);
     }
 
     /// <summary>
@@ -61,7 +62,8 @@ internal static class BlockCodeIndexer
         string? projectPath,
         List<IndexedBlock> blocks,
         ref int skipped,
-        ref int total)
+        ref int total,
+        List<string> skippedBlocks)
     {
         foreach (PlcBlock block in group.Blocks)
         {
@@ -78,11 +80,26 @@ internal static class BlockCodeIndexer
             }
 
             skipped++;
+            // Name the blind spot with a reason — a bare count left the agent (and user)
+            // unable to say which blocks a search silently did not cover.
+            skippedBlocks.Add(DescribeSkip(block));
         }
 
         foreach (PlcBlockGroup child in group.Groups)
         {
-            WalkBlockGroup(child, plcName, projectPath, blocks, ref skipped, ref total);
+            WalkBlockGroup(child, plcName, projectPath, blocks, ref skipped, ref total, skippedBlocks);
+        }
+    }
+
+    private static string DescribeSkip(PlcBlock block)
+    {
+        try
+        {
+            return ConsistencyText.SkippedBlockEntry(block.Name, block.IsKnowHowProtected, !block.IsConsistent);
+        }
+        catch (EngineeringException)
+        {
+            return ConsistencyText.SkippedBlockEntry(block.Name, knowHowProtected: false, inconsistent: false);
         }
     }
 
@@ -226,14 +243,19 @@ internal sealed class IndexedBlock
 
 internal sealed class IndexBuildResult
 {
-    public IndexBuildResult(List<IndexedBlock> blocks, int skippedProtected, int totalBlocks)
+    public IndexBuildResult(List<IndexedBlock> blocks, int skippedProtected, int totalBlocks, List<string>? skippedBlocks = null)
     {
         Blocks = blocks;
         SkippedProtected = skippedProtected;
         TotalBlocks = totalBlocks;
+        SkippedBlocks = skippedBlocks ?? new List<string>();
     }
 
     public List<IndexedBlock> Blocks { get; }
     public int SkippedProtected { get; }
     public int TotalBlocks { get; }
+
+    /// <summary>Named skip list ("NAME (reason)") — know-how-protected / UDT-inconsistent /
+    /// unreadable — so search results disclose exactly what they did NOT cover.</summary>
+    public List<string> SkippedBlocks { get; }
 }

@@ -1096,7 +1096,10 @@ internal static class Program
                     return new WorkerResponse { Success = true, Payload = rawXml };
                 }
 
-                string yaml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath);
+                // autoHeal: a GUI-edited block is UDT-inconsistent and refuses to export —
+                // compile JUST this block first (disclosed in-band) instead of bouncing the
+                // read back to the user for a manual compile. read_batch rides this same path.
+                string yaml = BlockExporter.Export(session.Project, request.BlockPath!, request.ProjectPath, autoHeal: true);
 
                 // Avoid re-injecting a block's full source when the same (unchanged)
                 // block was already read this session — repeat reads (8x for one block
@@ -1244,7 +1247,9 @@ internal static class Program
                 string source = string.Empty;
                 try
                 {
-                    source = BlockExporter.Export(session.Project, entry.Path, request.ProjectPath);
+                    // autoHeal:false — bulk extraction must not silently compile a whole PLC;
+                    // the roster flags below disclose inconsistency per block instead.
+                    source = BlockExporter.Export(session.Project, entry.Path, request.ProjectPath, autoHeal: false);
                 }
                 catch (Exception ex)
                 {
@@ -1259,6 +1264,8 @@ internal static class Program
                     Type = entry.BlockType,
                     Language = entry.ProgrammingLanguage,
                     Source = source,
+                    IsConsistent = entry.IsConsistent,
+                    IsKnowHowProtected = entry.IsKnowHowProtected,
                 });
             }
 
@@ -1295,6 +1302,12 @@ internal static class Program
         public string Type { get; set; } = "";
         public string Language { get; set; } = "";
         public string Source { get; set; } = "";
+
+        /// <summary>Blind-spot flags from the roster: an empty Source + IsConsistent=false
+        /// means "UDT-inconsistent (not compiled)", not "block vanished".</summary>
+        public bool IsConsistent { get; set; } = true;
+
+        public bool IsKnowHowProtected { get; set; }
     }
 
     private static WorkerResponse UpdateBlockLogic(WorkerRequest request)
@@ -1326,6 +1339,10 @@ internal static class Program
             }
 
             string result = BlockImporter.Import(session.Project, request.BlockPath!, request.YamlContent!);
+            // Compile-as-postcondition: never leave the written block in the UDT-inconsistent
+            // state that would block every subsequent read; report compile errors loudly
+            // (advisory — the import is not transactional and stands either way).
+            result += "\n\n" + CompilePostcondition.VerifyBlock(session.Project, request.BlockPath!);
             return new WorkerResponse { Success = true, Payload = result };
         }
         catch (EngineeringException ex)
@@ -1713,7 +1730,9 @@ internal static class Program
                 return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
             }
 
-            var info = BlockInterfaceReader.Read(session.Project, request.BlockPath!);
+            // autoHeal: compile a UDT-inconsistent block first so its interface can be
+            // exported at all (the note rides in DiagnosticMessage).
+            var info = BlockInterfaceReader.Read(session.Project, request.BlockPath!, autoHeal: true);
             return new WorkerResponse
             {
                 Success = true,
@@ -2412,6 +2431,10 @@ internal static class Program
 
             var result = PlcTypeUpdater.Update(
                 session.Project, request.TypeName!, request.PlcName, request.FolderPath, request.YamlContent!);
+            // Software-scope postcondition: a UDT change silently invalidates every block
+            // that reads its members — compile the PLC software so dependents regenerate and
+            // stay readable (and broken dependents are named, not discovered block-by-block).
+            result.Message += "\n\n" + CompilePostcondition.VerifySoftware(session.Project, request.PlcName);
             return new WorkerResponse
             {
                 Success = true,

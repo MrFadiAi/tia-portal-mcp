@@ -34,4 +34,9 @@ public class CodeSearchResultInfo
     public int MatchCount { get; set; }
 
     public List<CodeMatchInfo> Matches { get; set; } = new();
+
+    /// <summary>Named skip list ("NAME (reason)") for blocks the underlying code index
+    /// could not read (know-how protected / UDT-inconsistent / unreadable) — discloses
+    /// exactly what this result did NOT cover, instead of a bare count.</summary>
+    public List<string> SkippedBlocks { get; set; } = new();
 }

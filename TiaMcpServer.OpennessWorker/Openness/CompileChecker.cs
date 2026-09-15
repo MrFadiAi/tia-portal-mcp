@@ -227,6 +227,25 @@ public static class CompileChecker
         }
     }
 
+    /// <summary>Error-severity compiler messages as flat "path: description" texts (used by
+    /// the consistency auto-heal to put the actual errors in front of the user).</summary>
+    internal static List<string> ErrorTexts(CompilerResult result)
+    {
+        var texts = new List<string>();
+        foreach (CompilerResultMessage message in result.Messages)
+        {
+            if (message.ErrorCount <= 0 || string.IsNullOrWhiteSpace(message.Description))
+            {
+                continue;
+            }
+
+            var path = ReadMessagePath(message);
+            texts.Add(path.Length > 0 ? $"{path}: {message.Description}" : message.Description);
+        }
+
+        return texts;
+    }
+
     private static string MapState(CompilerResultState state)
     {
         switch (state)

@@ -14,4 +14,12 @@ public class BlockSummaryInfo
 
     /// <summary>Deterministic path, e.g. "PLC/Blocks/Folder/Block".</summary>
     public string Path { get; set; } = string.Empty;
+
+    /// <summary>False = UDT-inconsistent (a TIA Portal GUI edit leaves this state); the block
+    /// cannot be exported until it is compiled again. Read tools auto-compile single blocks;
+    /// this flag names the state up front so bulk listings disclose it.</summary>
+    public bool IsConsistent { get; set; } = true;
+
+    /// <summary>True = know-how protected; the code body is not readable without the password.</summary>
+    public bool IsKnowHowProtected { get; set; }
 }

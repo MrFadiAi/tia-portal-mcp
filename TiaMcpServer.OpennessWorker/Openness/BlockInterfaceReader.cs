@@ -16,12 +16,19 @@ public static class BlockInterfaceReader
 {
     private static readonly XNamespace InterfaceNs = "http://www.siemens.com/automation/Openness/SW/Interface/v5";
 
-    public static BlockInterfaceInfo Read(Project project, string blockPath)
+    public static BlockInterfaceInfo Read(Project project, string blockPath, bool autoHeal = false)
     {
         var address = BlockAddress.Parse(blockPath);
         var target = BlockTargetResolver.ResolveForExport(project, address);
         var block = target.Block
             ?? throw new InvalidOperationException($"Block '{blockPath}' not found.");
+
+        // Consistency auto-heal (chat reads; see BlockExporter.Export): compile a
+        // UDT-inconsistent block first so its interface can be exported at all. The note
+        // rides in DiagnosticMessage (this tool returns JSON, not bare source text).
+        string? healNote = autoHeal
+            ? ConsistencyAutoHeal.EnsureConsistent(block)
+            : null;
 
         var info = new BlockInterfaceInfo
         {
@@ -87,7 +94,7 @@ public static class BlockInterfaceReader
         {
             // XML parsing failed — return partial info with diagnostic instead of crashing
             info.Sections.Clear();
-            info.DiagnosticMessage = $"XML parsing error for block '{info.BlockName}': {ex.Message}. " +
+            info.DiagnosticMessage = $"{healNote}\nXML parsing error for block '{info.BlockName}': {ex.Message}. " +
                                      "The block may use an unsupported format or contain corrupted data.";
         }
         finally
@@ -96,6 +103,11 @@ public static class BlockInterfaceReader
             {
                 try { Directory.Delete(tempDir, true); } catch { }
             }
+        }
+
+        if (healNote is not null && string.IsNullOrEmpty(info.DiagnosticMessage))
+        {
+            info.DiagnosticMessage = healNote;
         }
 
         return info;

@@ -8,10 +8,21 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 public static class BlockExporter
 {
-    public static string Export(Project project, string blockPath, string? projectPath = null, bool raw = false)
+    public static string Export(Project project, string blockPath, string? projectPath = null, bool raw = false, bool autoHeal = false)
     {
         var address = BlockAddress.Parse(blockPath);
         var target = BlockTargetResolver.ResolveForExport(project, address);
+
+        // Consistency auto-heal: a block edited in the TIA Portal GUI is UDT-inconsistent and
+        // refuses to export until compiled. With autoHeal (single-block chat reads — also the
+        // read_batch route), compile JUST this block first and disclose it in the source
+        // header; compile errors surface as a clear failure listing them. Bulk callers
+        // (extract_plc_blocks / compare) pass autoHeal:false — compiling a whole PLC from a
+        // bulk read would be a surprise; the roster's isConsistent flags disclose instead.
+        // raw (diagnostic) mode never heals: side-effect-free by contract.
+        string? healNote = autoHeal && !raw
+            ? ConsistencyAutoHeal.EnsureConsistent(target.Block!)
+            : null;
 
         string tempDir = Path.Combine(Path.GetTempPath(), "tia-mcp-export-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempDir);
@@ -34,7 +45,8 @@ public static class BlockExporter
             target.Block!.Export(new FileInfo(exportPath), ExportOptions.WithDefaults);
             var exportedLegacy = File.ReadAllText(exportPath);
             // raw = diagnostic bypass: return the tokenized XML unchanged (see WorkerRequest.Raw).
-            return raw ? exportedLegacy : BlockSourceReconstructor.Reconstruct(exportedLegacy, target.Block!.ProgrammingLanguage.ToString());
+            var source = raw ? exportedLegacy : BlockSourceReconstructor.Reconstruct(exportedLegacy, target.Block!.ProgrammingLanguage.ToString());
+            return PrefixNote(source, healNote);
 #else
             var combined = TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
                 ?? TryExportToFile(target.Block!, tempDir, target.DocumentName);
@@ -54,7 +66,8 @@ public static class BlockExporter
             // (e.g. '      T     "PLUKSCHIJF"') instead of raw <StlToken>/<Component> XML. STL
             // only; other languages pass through unchanged. raw = diagnostic bypass: return the
             // tokenized XML unchanged so we can see why reconstruction drops content.
-            return raw ? combined : BlockSourceReconstructor.Reconstruct(combined, target.Block!.ProgrammingLanguage.ToString());
+            var source = raw ? combined : BlockSourceReconstructor.Reconstruct(combined, target.Block!.ProgrammingLanguage.ToString());
+            return PrefixNote(source, healNote);
 #endif
         }
         finally
@@ -63,6 +76,13 @@ public static class BlockExporter
                 Directory.Delete(tempDir, true);
         }
     }
+
+    /// <summary>The auto-compile disclosure rides as a leading comment line inside the
+    /// returned source (get_block_content returns plain code text, so the note must live
+    /// in-band — and it must survive into the content hash so the re-read cache treats a
+    /// healed read as different from a clean one).</summary>
+    private static string PrefixNote(string source, string? note)
+        => note is null ? source : "// " + note + "\n" + source;
 
 #if !LEGACY_TIA
     /// <summary>Try the preferred V21 ExportAsDocuments API. Returns the concatenated
