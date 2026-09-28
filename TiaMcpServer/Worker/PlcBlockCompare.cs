@@ -9,6 +9,10 @@ public sealed class BlockInfo
     public string Name { get; set; } = "";
     public string Type { get; set; } = "";
     public string Source { get; set; } = "";
+
+    /// <summary>Programming language (STL/SCL/DB/LAD/...) when known — lets the
+    /// frontend style the diff in the block's own language. Empty for tag tables.</summary>
+    public string Language { get; set; } = "";
 }
 
 /// <summary>Host-side mirror of the worker's extract_plc_types payload entry (name +
@@ -23,6 +27,7 @@ public sealed class ChangedBlock
 {
     public string Name { get; set; } = "";
     public string Type { get; set; } = "";
+    public string Language { get; set; } = "";
     public string SourceA { get; set; } = "";
     public string SourceB { get; set; } = "";
     public string? Note { get; set; }
@@ -77,6 +82,7 @@ public static class PlcBlockCompare
                 result.Changed.Add(new ChangedBlock
                 {
                     Name = a.Name,
+                    Language = a.Language,
                     Type = typeMismatch ? $"{a.Type}/{b.Type}" : a.Type,
                     SourceA = a.Source,
                     SourceB = b.Source,

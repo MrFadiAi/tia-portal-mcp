@@ -464,7 +464,7 @@ public class OpennessWorkerClient
         var typeSection = await CompareSectionAsync(
             () => ExtractPlcTypesAsync(plcNameA, projectPathA, tiaVersionA),
             () => ExtractPlcTypesAsync(plcNameB, projectPathB, tiaVersionB),
-            (System.Collections.Generic.List<ExtractedTypeInfo> types) => types.Select(t => new BlockInfo { Name = t.Name, Type = "UDT", Source = t.Source }).ToList()).ConfigureAwait(false);
+            (System.Collections.Generic.List<ExtractedTypeInfo> types) => types.Select(t => new BlockInfo { Name = t.Name, Type = "UDT", Language = "SCL", Source = t.Source }).ToList()).ConfigureAwait(false);
 
         var result = new
         {
@@ -491,10 +491,10 @@ public class OpennessWorkerClient
                     unchanged = typeSection.Result?.Unchanged.Count ?? 0,
                 },
             },
-            added = diff.Added.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
-            removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type, sourceB = b.Source }),
-            changed = diff.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
-            unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+            added = diff.Added.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceA = b.Source }),
+            removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceB = b.Source }),
+            changed = diff.Changed.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
+            unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceA = b.Source }),
             tagTables = RenderSection(tagSection),
             types = RenderSection(typeSection),
         };
@@ -535,10 +535,10 @@ public class OpennessWorkerClient
 
         return new
         {
-            added = result.Added.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
-            removed = result.Removed.Select(b => new { name = b.Name, type = b.Type, sourceB = b.Source }),
-            changed = result.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
-            unchanged = result.Unchanged.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+            added = result.Added.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceA = b.Source }),
+            removed = result.Removed.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceB = b.Source }),
+            changed = result.Changed.Select(b => new { name = b.Name, type = b.Type, language = b.Language, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
+            unchanged = result.Unchanged.Select(b => new { name = b.Name, type = b.Type, language = b.Source.Length > 0 ? b.Language : "", sourceA = b.Source }),
         };
     }
 
