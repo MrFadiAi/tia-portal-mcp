@@ -9,10 +9,12 @@ namespace TiaMcpServer.Tools
     {
         [McpServerTool(Name = "compare_plc_blocks")]
         [Description(
-            "Compare the PLC program blocks of two TIA Portal projects (any versions, " +
-            "e.g. V21 vs V18). Returns JSON: added (only in A), removed (only in B), " +
-            "changed (common, different reconstructed source — carries sourceA/sourceB), " +
-            "and unchanged. Matched by block name (case-insensitive).")]
+            "Compare TWO PLCs across TIA Portal projects (any versions, e.g. V21 vs V18) — " +
+            "program blocks AND tag tables AND PLC types (UDTs). Returns JSON: added (only in " +
+            "A), removed (only in B), changed (common, different content — carries " +
+            "sourceA/sourceB), unchanged, plus tagTables and types sections in the same " +
+            "shape (tag tables are rendered to canonical one-line-per-tag text; types to " +
+            "their reconstructed interface listing). Matched by name (case-insensitive).")]
         public static async Task<string> ComparePlcBlocks(
             OpennessWorkerClient workerClient,
             [Description("Side A PLC name (PLC-software name, as shown by scan_open_projects plcNames).")] string plcNameA,

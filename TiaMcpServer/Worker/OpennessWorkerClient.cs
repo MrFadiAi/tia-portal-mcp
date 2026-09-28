@@ -399,6 +399,34 @@ public class OpennessWorkerClient
         }
     }
 
+    public async Task<string> ExtractPlcTypesAsync(string? plcName, string? projectPath, int? tiaVersion = null)
+    {
+        try
+        {
+            if (!_projectSessionBinding.TryResolve(projectPath, out var effectiveProjectPath, out var bindingError))
+            {
+                return $"Error: {bindingError}";
+            }
+
+            var response = await SendAsync(
+                new WorkerRequest
+                {
+                    Method = "extract_plc_types",
+                    PlcName = plcName,
+                    ProjectPath = effectiveProjectPath,
+                    TiaVersion = tiaVersion
+                }).ConfigureAwait(false);
+
+            return response.Success
+                ? response.Payload ?? "[]"
+                : $"Error: {response.Error ?? "Failed to extract PLC types."}";
+        }
+        catch (Exception ex) when (ex is IOException or InvalidOperationException or TimeoutException or JsonException)
+        {
+            return $"Error: {ex.Message}";
+        }
+    }
+
     public async Task<string> ComparePlcBlocksAsync(
         string plcNameA, string? projectPathA, int? tiaVersionA,
         string plcNameB, string? projectPathB, int? tiaVersionB)
@@ -419,6 +447,25 @@ public class OpennessWorkerClient
         var sideB = JsonSerializer.Deserialize<List<BlockInfo>>(jsonB, JsonOptions) ?? new List<BlockInfo>();
         var diff = PlcBlockCompare.Compare(sideA, sideB);
 
+        // Tag tables + PLC types ride the SAME name-keyed pipeline: tag tables are rendered
+        // to canonical text (TagTableCanonicalText), types use their reconstructed listing.
+        // Each section degrades independently — a failed tags/types fetch never kills the
+        // block compare; the section carries the error instead.
+        var tagSection = await CompareSectionAsync(
+            () => ListTagTablesAsync(plcNameA, projectPathA, tiaVersionA),
+            () => ListTagTablesAsync(plcNameB, projectPathB, tiaVersionB),
+            (System.Collections.Generic.List<TagTableInfo> tables) => tables.Select(t => new BlockInfo
+            {
+                Name = $"{(t.FolderPath == "/" || t.FolderPath.Length == 0 ? "" : t.FolderPath.TrimEnd('/') + "/")}{t.Name}",
+                Type = "TagTable",
+                Source = TagTableCanonicalText.Render(t),
+            }).ToList()).ConfigureAwait(false);
+
+        var typeSection = await CompareSectionAsync(
+            () => ExtractPlcTypesAsync(plcNameA, projectPathA, tiaVersionA),
+            () => ExtractPlcTypesAsync(plcNameB, projectPathB, tiaVersionB),
+            (System.Collections.Generic.List<ExtractedTypeInfo> types) => types.Select(t => new BlockInfo { Name = t.Name, Type = "UDT", Source = t.Source }).ToList()).ConfigureAwait(false);
+
         var result = new
         {
             summary = new
@@ -429,13 +476,70 @@ public class OpennessWorkerClient
                 unchanged = diff.Unchanged.Count,
                 sideA = new { version = tiaVersionA, project = projectPathA, plc = plcNameA, total = sideA.Count },
                 sideB = new { version = tiaVersionB, project = projectPathB, plc = plcNameB, total = sideB.Count },
+                tagTables = new
+                {
+                    added = tagSection.Result?.Added.Count ?? 0,
+                    removed = tagSection.Result?.Removed.Count ?? 0,
+                    changed = tagSection.Result?.Changed.Count ?? 0,
+                    unchanged = tagSection.Result?.Unchanged.Count ?? 0,
+                },
+                types = new
+                {
+                    added = typeSection.Result?.Added.Count ?? 0,
+                    removed = typeSection.Result?.Removed.Count ?? 0,
+                    changed = typeSection.Result?.Changed.Count ?? 0,
+                    unchanged = typeSection.Result?.Unchanged.Count ?? 0,
+                },
             },
             added = diff.Added.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
             removed = diff.Removed.Select(b => new { name = b.Name, type = b.Type, sourceB = b.Source }),
             changed = diff.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
             unchanged = diff.Unchanged.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+            tagTables = RenderSection(tagSection),
+            types = RenderSection(typeSection),
         };
         return JsonSerializer.Serialize(result, JsonOptions);
+    }
+
+    /// <summary>Fetch both sides of one compare section (tags or types), map them to
+    /// BlockInfo-shaped items, and run the shared comparer. A failed fetch becomes the
+    /// section's error note with an empty result.</summary>
+    private async Task<(CompareResult? Result, string? Error)> CompareSectionAsync<T>(
+        Func<Task<string>> fetchA,
+        Func<Task<string>> fetchB,
+        Func<List<T>, List<BlockInfo>> map)
+    {
+        var jsonA = await fetchA().ConfigureAwait(false);
+        var jsonB = await fetchB().ConfigureAwait(false);
+        if (jsonA.StartsWith("Error:", StringComparison.Ordinal))
+        {
+            return (null, jsonA["Error: ".Length..]);
+        }
+        if (jsonB.StartsWith("Error:", StringComparison.Ordinal))
+        {
+            return (null, jsonB["Error: ".Length..]);
+        }
+
+        var sideA = map(JsonSerializer.Deserialize<List<T>>(jsonA, JsonOptions) ?? new List<T>());
+        var sideB = map(JsonSerializer.Deserialize<List<T>>(jsonB, JsonOptions) ?? new List<T>());
+        return (PlcBlockCompare.Compare(sideA, sideB), null);
+    }
+
+    private static object RenderSection((CompareResult? Result, string? Error) section)
+    {
+        var (result, error) = section;
+        if (result is null)
+        {
+            return new { error = error ?? "section unavailable" };
+        }
+
+        return new
+        {
+            added = result.Added.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+            removed = result.Removed.Select(b => new { name = b.Name, type = b.Type, sourceB = b.Source }),
+            changed = result.Changed.Select(b => new { name = b.Name, type = b.Type, sourceA = b.SourceA, sourceB = b.SourceB, note = b.Note }),
+            unchanged = result.Unchanged.Select(b => new { name = b.Name, type = b.Type, sourceA = b.Source }),
+        };
     }
 
     // ------------------------------------------------------------------ read_batch

@@ -25,6 +25,7 @@
     <Compile Include="..\TiaMcpServer\Worker\OpennessWorkerClient.cs" Link="Host\OpennessWorkerClient.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ScanProjectTreeParser.cs" Link="Host\ScanProjectTreeParser.cs" />
     <Compile Include="..\TiaMcpServer\Worker\PlcBlockCompare.cs" Link="Worker\PlcBlockCompare.cs" />
+    <Compile Include="..\TiaMcpServer\Worker\TagTableCanonicalText.cs" Link="Worker\TagTableCanonicalText.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchCatalog.cs" Link="Worker\ReadBatchCatalog.cs" />
     <Compile Include="..\TiaMcpServer\Worker\ReadBatchBudget.cs" Link="Worker\ReadBatchBudget.cs" />
     <Compile Include="..\TiaMcpServer\Worker\WriteBatchCatalog.cs" Link="Worker\WriteBatchCatalog.cs" />

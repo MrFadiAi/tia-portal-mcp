@@ -11,6 +11,14 @@ public sealed class BlockInfo
     public string Source { get; set; } = "";
 }
 
+/// <summary>Host-side mirror of the worker's extract_plc_types payload entry (name +
+/// reconstructed interface listing), deserialized for the compare types section.</summary>
+public sealed class ExtractedTypeInfo
+{
+    public string Name { get; set; } = "";
+    public string Source { get; set; } = "";
+}
+
 public sealed class ChangedBlock
 {
     public string Name { get; set; } = "";

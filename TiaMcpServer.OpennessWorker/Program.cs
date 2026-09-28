@@ -79,6 +79,7 @@ internal static class Program
                 "list_plcs" => ListPlcs(request),
                 "list_blocks" => ListBlocks(request),
                 "list_plc_types" => ListPlcTypes(request),
+                "extract_plc_types" => ExtractPlcTypes(request),
                 "find_tags" => FindTags(request),
                 "search_code" => SearchCode(request),
                 "tag_usage" => TagUsage(request),
@@ -403,6 +404,81 @@ internal static class Program
         {
             return Failure(ex.Message);
         }
+    }
+
+    // Bulk companion to list_plc_types: name + reconstructed source for EVERY user type
+    // (UDT) of the PLC — the input side of compare_plc_blocks' types section. Mirrors
+    // extract_plc_blocks' per-item degradation (unreadable type → empty source, roster row
+    // survives). Uses the same export+reconstruct route as get_type_content.
+    private static WorkerResponse ExtractPlcTypes(WorkerRequest request)
+    {
+        try
+        {
+            using var session = new WorkerTiaPortalSession(tiaVersion: request.TiaVersion);
+
+            session.EnsureConnected();
+
+            if (!string.IsNullOrEmpty(request.ProjectPath))
+            {
+                session.OpenProject(request.ProjectPath);
+            }
+
+            if (session.Project is null)
+            {
+                return Failure("No project is open. Provide a projectPath argument or open a project in TIA Portal.");
+            }
+
+            var roster = PlcTypeListReader.Read(session.Project, request.PlcName);
+            var types = new List<ExtractedTypeInfo>(roster.Count);
+            foreach (var entry in roster)
+            {
+                string source = string.Empty;
+                try
+                {
+                    string xml = PlcTypeExporter.Export(session.Project, entry.Name, request.PlcName, folderPath: null);
+                    string readable = BlockSourceReconstructor.Reconstruct(xml, programmingLanguage: null);
+                    source = string.Equals(readable, xml, StringComparison.Ordinal) ? xml : readable;
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"[EXTRACT_PLC_TYPES] Failed to reconstruct '{entry.Name}': {ex.Message}");
+                }
+
+                types.Add(new ExtractedTypeInfo
+                {
+                    Name = entry.Name,
+                    Source = source,
+                });
+            }
+
+            return new WorkerResponse
+            {
+                Success = true,
+                Payload = JsonSerializer.Serialize(types, JsonOptions),
+            };
+        }
+        catch (EngineeringException ex)
+        {
+            return Failure($"TIA Portal operation failed: {ex.Message}");
+        }
+        catch (NonRecoverableException ex)
+        {
+            return Failure($"TIA Portal was closed unexpectedly: {ex.Message}. Please restart TIA Portal and try again.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Failure(ex.Message);
+        }
+        catch (System.IO.IOException ex)
+        {
+            return Failure(ex.Message);
+        }
+    }
+
+    private sealed class ExtractedTypeInfo
+    {
+        public string Name { get; set; } = "";
+        public string Source { get; set; } = "";
     }
 
     private static WorkerResponse FindTags(WorkerRequest request)
