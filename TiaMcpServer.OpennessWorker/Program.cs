@@ -1317,14 +1317,29 @@ internal static class Program
             }
 
             var roster = BlockListReader.Read(session.Project, request.PlcName);
+
+            // NO auto-heal in bulk extraction — measured live on this project class:
+            // a whole-software compile exceeds 5 minutes, and a batch of block-scoped
+            // compiles blows every sane budget, so healing made compare time out instead
+            // of returning results. Compare stays fast; stale blocks export empty and the
+            // comparer names them ("not readable on side X (uncompiled…)"). Single-block
+            // reads (get_block_content / read_batch) keep their per-block auto-heal, which
+            // IS fast; compile via compile_check or in TIA, then re-compare.
+            var staleCount = roster.Count(r => r.IsStale);
+            if (staleCount > 0)
+            {
+                Console.Error.WriteLine($"[EXTRACT_PLC_BLOCKS] {staleCount}/{roster.Count} stale blocks (uncompiled edits) will compare as 'not readable'");
+            }
+
             var blocks = new List<ExtractedBlockInfo>(roster.Count);
             foreach (var entry in roster)
             {
                 string source = string.Empty;
                 try
                 {
-                    // autoHeal:false — bulk extraction must not silently compile a whole PLC;
-                    // the roster flags below disclose inconsistency per block instead.
+                    // autoHeal:false — see the stale-count note above: healing in bulk made
+                    // compare time out on real projects; stale blocks export empty and the
+                    // comparer names them. The roster flags disclose staleness per block.
                     source = BlockExporter.Export(session.Project, entry.Path, request.ProjectPath, autoHeal: false);
                 }
                 catch (Exception ex)

@@ -71,7 +71,9 @@ public static class PlcBlockCompare
             }
 
             bool typeMismatch = !string.Equals(a.Type, b.Type, System.StringComparison.OrdinalIgnoreCase);
-            bool sourceEqual = string.Equals(NormalizeSource(a.Source), NormalizeSource(b.Source), System.StringComparison.Ordinal);
+            var normA = NormalizeSource(a.Source);
+            var normB = NormalizeSource(b.Source);
+            bool sourceEqual = string.Equals(normA, normB, System.StringComparison.Ordinal);
 
             if (sourceEqual && !typeMismatch)
             {
@@ -79,6 +81,19 @@ public static class PlcBlockCompare
             }
             else
             {
+                // An empty source on one side is NOT a content difference — it means that
+                // side could not be extracted (uncompiled or know-how protected). Name it in
+                // the note so the UI shows why instead of a one-sided "diff".
+                string? note = typeMismatch ? $"type-mismatch: {a.Type}->{b.Type}" : null;
+                if (normA.Length == 0 && normB.Length > 0)
+                {
+                    note = "not readable on side A (uncompiled or know-how protected)";
+                }
+                else if (normB.Length == 0 && normA.Length > 0)
+                {
+                    note = "not readable on side B (uncompiled or know-how protected)";
+                }
+
                 result.Changed.Add(new ChangedBlock
                 {
                     Name = a.Name,
@@ -86,7 +101,7 @@ public static class PlcBlockCompare
                     Type = typeMismatch ? $"{a.Type}/{b.Type}" : a.Type,
                     SourceA = a.Source,
                     SourceB = b.Source,
-                    Note = typeMismatch ? $"type-mismatch: {a.Type}->{b.Type}" : null,
+                    Note = note,
                 });
             }
         }

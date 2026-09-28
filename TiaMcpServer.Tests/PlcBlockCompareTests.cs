@@ -61,4 +61,19 @@ public class PlcBlockCompareTests
         Assert.Single(r.Changed);
         Assert.Contains("type-mismatch", r.Changed[0].Note ?? "");
     }
+
+    [Fact]
+    public void Empty_Source_On_One_Side_Is_Named_In_The_Note_Not_A_Silent_Diff()
+    {
+        var a = new List<BlockInfo> { new() { Name = "DATA ANALOOG", Type = "GlobalDB", Source = "" } };
+        var b = new List<BlockInfo>
+        {
+            new() { Name = "DATA ANALOOG", Type = "GlobalDB", Source = "DATA_BLOCK \"DATA ANALOOG\" / DB 901 / STRUCT / END_STRUCT" },
+        };
+
+        var result = PlcBlockCompare.Compare(a, b);
+
+        var changed = Assert.Single(result.Changed);
+        Assert.Contains("not readable on side A", changed.Note);
+    }
 }

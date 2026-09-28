@@ -380,6 +380,8 @@ public class OpennessWorkerClient
                 return $"Error: {bindingError}";
             }
 
+            // Bulk extraction may pre-compile the PLC software when many blocks are stale
+            // (uncompiled GUI edits) — that single compile can outlast the default 5 min.
             var response = await SendAsync(
                 new WorkerRequest
                 {
@@ -387,7 +389,7 @@ public class OpennessWorkerClient
                     PlcName = plcName,
                     ProjectPath = effectiveProjectPath,
                     TiaVersion = tiaVersion
-                }).ConfigureAwait(false);
+                }, TimeSpan.FromMinutes(10)).ConfigureAwait(false);
 
             return response.Success
                 ? response.Payload ?? "[]"

@@ -22,4 +22,8 @@ public class BlockSummaryInfo
 
     /// <summary>True = know-how protected; the code body is not readable without the password.</summary>
     public bool IsKnowHowProtected { get; set; }
+
+    /// <summary>True = modified after its last compile (or UDT-inconsistent) — the export
+    /// would serve stale/empty content until the block is compiled.</summary>
+    public bool IsStale { get; set; }
 }

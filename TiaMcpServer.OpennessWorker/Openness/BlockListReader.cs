@@ -41,6 +41,8 @@ public static class BlockListReader
                     // it cannot read (and why) before any export attempt fails.
                     IsConsistent = block.IsConsistent,
                     IsKnowHowProtected = block.IsKnowHowProtected,
+                    IsStale = ConsistencyText.NeedsCompile(
+                        block.IsConsistent, block.CodeModifiedDate, block.InterfaceModifiedDate, block.CompileDate),
                 });
             }
             catch (EngineeringException ex)

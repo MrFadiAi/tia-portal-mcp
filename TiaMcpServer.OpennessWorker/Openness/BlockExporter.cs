@@ -8,7 +8,7 @@ namespace TiaMcpServer.OpennessWorker.Openness;
 
 public static class BlockExporter
 {
-    public static string Export(Project project, string blockPath, string? projectPath = null, bool raw = false, bool autoHeal = false)
+    public static string Export(Project project, string blockPath, string? projectPath = null, bool raw = false, bool autoHeal = false, bool quietHeal = false)
     {
         var address = BlockAddress.Parse(blockPath);
         var target = BlockTargetResolver.ResolveForExport(project, address);
@@ -22,9 +22,15 @@ public static class BlockExporter
         // compare) pass autoHeal:false — compiling a whole PLC from a bulk read would be a
         // surprise; the roster's isConsistent flags disclose instead. raw (diagnostic) mode
         // never heals: side-effect-free by contract.
+        // quietHeal: compile stale blocks WITHOUT the in-band [auto-compiled] note — used by
+        // bulk extraction (compare): the note line would itself show up as a diff.
         string? healNote = autoHeal && !raw
             ? ConsistencyAutoHeal.EnsureConsistent(target.Block!, blockPath)
             : null;
+        if (quietHeal)
+        {
+            healNote = null;
+        }
 
         string tempDir = Path.Combine(Path.GetTempPath(), "tia-mcp-export-" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(tempDir);
@@ -57,10 +63,16 @@ public static class BlockExporter
             // live: "DATA_BLOCK "DATA ANALOOG" / DB 901" vs a bare stub the user read as a
             // false difference). XML keeps both versions on the identical reconstruction path.
             var isDb = string.Equals(target.Block!.ProgrammingLanguage.ToString(), "DB", StringComparison.OrdinalIgnoreCase);
-            var combined = !raw && isDb
-                ? null
-                : TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
+            string? combined;
+            if (!raw && isDb)
+            {
+                combined = TryExportToFile(target.Block!, tempDir, target.DocumentName);
+            }
+            else
+            {
+                combined = TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
                     ?? TryExportToFile(target.Block!, tempDir, target.DocumentName);
+            }
 
             // Still nothing → likely know-how protected. Auto-unlock with a cached password and retry once.
             if (string.IsNullOrEmpty(combined) && KnowHowAutoUnlock.TryUnprotect(target.Block!, projectPath))
