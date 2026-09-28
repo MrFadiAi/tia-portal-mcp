@@ -50,8 +50,17 @@ public static class BlockExporter
             var source = raw ? exportedLegacy : BlockSourceReconstructor.Reconstruct(exportedLegacy, target.Block!.ProgrammingLanguage.ToString());
             return PrefixNote(source, healNote);
 #else
-            var combined = TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
-                ?? TryExportToFile(target.Block!, tempDir, target.DocumentName);
+            // DB blocks must take the XML route, NOT ExportAsDocuments: the documents API
+            // succeeds for DBs but emits SIMATIC-SD text the DB reconstructor cannot parse,
+            // silently degrading to the empty "DATA_BLOCK/STRUCT/END_STRUCT" stub — which made
+            // every V21 DB compare as changed-and-empty against V18's full listing (observed
+            // live: "DATA_BLOCK "DATA ANALOOG" / DB 901" vs a bare stub the user read as a
+            // false difference). XML keeps both versions on the identical reconstruction path.
+            var isDb = string.Equals(target.Block!.ProgrammingLanguage.ToString(), "DB", StringComparison.OrdinalIgnoreCase);
+            var combined = !raw && isDb
+                ? null
+                : TryExportAsDocuments(target.Block!, tempDir, target.DocumentName)
+                    ?? TryExportToFile(target.Block!, tempDir, target.DocumentName);
 
             // Still nothing → likely know-how protected. Auto-unlock with a cached password and retry once.
             if (string.IsNullOrEmpty(combined) && KnowHowAutoUnlock.TryUnprotect(target.Block!, projectPath))
